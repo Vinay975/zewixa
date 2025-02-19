@@ -1,12 +1,16 @@
 import { React } from "react";
-import { View,Text } from "react-native";
+import { View, Text } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+
 
 const Profile = () => {
-  return(
+
+  const navigation = useNavigation();
+  return (
     <>
-    <View>
-      <Text>home</Text>
-    </View>
+      <View>
+        <Text>home</Text>
+      </View>
     </>
   )
 }

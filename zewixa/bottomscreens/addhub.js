@@ -1,59 +1,58 @@
-// bottomscreens/addhub.js
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import HostelDataOne from "../stackscreen/hosteldata-one";
+import HostelDataTwo from "../stackscreen/hosteldata-two";
 
 const AddHub = ({ navigation }) => {
+  const [data, setData] = useState([
+    { id: '1', title: 'Hostels', screen: 'HostelDataOne' },
+    { id: '2', title: 'Apartments', screen: 'HostelDataTwo' },
+    { id: '3', title: 'To-lets', screen: 'HostelDataOne' },
+    { id: '4', title: 'Hotels', screen: 'HostelDataOne' },
+  ]);
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.box} 
+      onPress={() => navigation.navigate(item.screen)}
+    >
+      <Text style={styles.boxText}>{item.title}</Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.box} 
-        onPress={() => navigation.navigate("HostelDataOne")}
-      >
-        <Text style={styles.boxText}>Hostels</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.box} 
-        onPress={() => navigation.navigate("HostelDataOne")}
-      >
-        <Text style={styles.boxText}>Apartments</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.box} 
-        onPress={() => navigation.navigate("HostelDataOne")}
-      >
-        <Text style={styles.boxText}>To-lets</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.box} 
-        onPress={() => navigation.navigate("HostelDataOne")}
-      >
-        <Text style={styles.boxText}>Hotels</Text>
-      </TouchableOpacity>
-    </View>
+    <FlatList
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={item => item.id}
+      numColumns={1} 
+      contentContainerStyle={styles.container}
+      onEndReachedThreshold={0.5}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
   },
   box: {
-    width: "45%",
-    height: 200,
-    backgroundColor: "white",
+    width: 400,
+    height: 130,
     margin: 10,
+    marginTop: 15,
     justifyContent: "center",
     alignItems: "center",
-    borderColor: "black",
+    borderWidth: 1.4,
+    borderColor: "#6846bd",
+    borderBottomRightRadius: 20,
+    borderTopLeftRadius: 20,
   },
   boxText: {
     fontSize: 20,
     color: "black",
+    fontVariant: "medium",
   },
 });
 

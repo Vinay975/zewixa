@@ -1,11 +1,17 @@
-// HostelDataOne.js
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const HostelDataOne = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Hostel Data</Text>
+      <Button
+        title="Hostel Data Two"
+        onPress={() => navigation.navigate("HostelDataTwo")}
+      />
     </View>
   );
 };
