@@ -11,6 +11,7 @@ import WatchList from "./bottomscreens/watchlist";
 import Profile from "./bottomscreens/profile";
 import AddHub from "./bottomscreens/addhub";
 import AddHubStackScreen from "./nestednavigation/addhomeonestack";
+import MainProfileStack from "./customer/showProfile/profilestack";
 
 const Stack = createStackNavigator();
 const BottomTabTab = createBottomTabNavigator();
@@ -74,7 +75,7 @@ const BottomTab = () => {
         }
         }
       />
-      <BottomTabTab.Screen name="Profile" component={Profile} />
+      <BottomTabTab.Screen name="Profile" component={MainProfileStack} />
     </BottomTabTab.Navigator>
   );
 };
