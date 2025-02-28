@@ -20,14 +20,14 @@ const HostBottomBar = ({ setIsHost }) => {
         headerShown: false,
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
-          let IconComponent = Ionicons; // Default to Ionicons
+          let IconComponent = Ionicons; 
 
           if (route.name === "Host") {
-            iconName = focused ? "home" : "home-outline";
+            iconName = focused ? "add-circle" : "add-circle-outline";
           } else if (route.name === "Message") {
             iconName = focused ? "chatbubbles" : "chatbubbles-outline";
           } else if (route.name === "Payment") {
-            iconName = "credit-card"; // ✅ Corrected FontAwesome5 icon
+            iconName = "credit-card"; 
             IconComponent = FontAwesome5;
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
