@@ -33,7 +33,7 @@ const HostBottomBar = ({ setIsHost }) => {
             iconName = focused ? "person" : "person-outline";
           }
 
-          return <IconComponent name={iconName} size={size} color={color} />;
+          return <IconComponent name={iconName} size={26} color={color} />;
         },
       })}
     >
