@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from "react-na
 import { ScrollView } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const Profile = ({ navigation }) => {
+const Profile = ({ navigation, setIsHost }) => {
   const handleLogout = () => {
     Alert.alert("Logout", "You have been logged out.");
   };
@@ -36,7 +36,7 @@ const Profile = ({ navigation }) => {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.placecontainer} onPress={() => navigation.navigate("PlaceDetails")}>
+      <TouchableOpacity style={styles.placecontainer} onPress={() => setIsHost(false)}>
         <Text style={styles.sectionHeaderText}>Add Your Place</Text>
       </TouchableOpacity>
 

@@ -11,7 +11,7 @@ import Profile from "./bottomscreens/profile";
 
 const Tab = createBottomTabNavigator();
 
-const BottomTab = () => {
+const BottomTab = ({ setIsHost }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -60,7 +60,9 @@ const BottomTab = () => {
         name="Booking"
         component={AddHub}
       />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Profile">
+        {(props) => <Profile {...props} setIsHost={setIsHost} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 };
