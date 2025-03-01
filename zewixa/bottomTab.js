@@ -1,126 +1,70 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-const Host = () => {
-  const faqData = [
-    { question: "What is Zewixa?", answer: "Zewixa is a platform for video recommendations based on user preferences." },
-    { question: "How does it work?", answer: "Users input their preferences, and our system suggests relevant videos." },
-    { question: "Is Zewixa free to use?", answer: "Yes, Zewixa offers free recommendations with an option for premium features." },
-    { question: "Can I add my own videos?", answer: "Yes, users can upload and share their videos on the platform." }
-  ];
+import Home from "./bottomscreens/home";
+import Scanner from "./bottomscreens/scanner";
+import WatchList from "./bottomscreens/watchlist";
+import AddHub from "./bottomscreens/addhub";
+import Profile from "./bottomscreens/profile";
 
+const Tab = createBottomTabNavigator();
+
+const BottomTab = ({ setIsHost }) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.videoBox}>
-        <Text style={styles.title}>Video Recommendation</Text>
-      </View>
-
-      <TouchableOpacity style={styles.placeContainer}>
-        <Ionicons name="add-circle" size={40} color="#fff" />
-        <Text style={styles.sectionHeaderText}>Add Your Place</Text>
-      </TouchableOpacity>
-
-      <ScrollView style={styles.faqContainer}>
-        <Text style={styles.faqTitle}>FAQs</Text>
-        {faqData.map((item, index) => (
-          <View key={index} style={styles.faqItem}>
-            <Text style={styles.question}>{item.question}</Text>
-            <Text style={styles.answer}>{item.answer}</Text>
-          </View>
-        ))}
-      </ScrollView>
-
-      <View style={styles.askDoubtsBox}>
-        <Text style={styles.askDoubtsText}>Ask Your Doubts</Text>
-      </View>
-    </View>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          if (route.name === "Home") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "WatchList") {
+            iconName = focused ? "heart-circle" : "heart-circle-outline";
+          } else if (route.name === "Scanner") {
+            iconName = focused ? "qr-code" : "qr-code";
+          } else if (route.name === "Booking") {
+            iconName = focused ? "bookmarks" : "bookmarks-outline";
+          } else if (route.name === "Profile") {
+            iconName = focused ? "person-circle" : "person-circle-outline";
+          }
+          return <Ionicons name={iconName} size={30} color={color} />;
+        },
+        tabBarActiveTintColor: "#6846bd",
+        tabBarInactiveTintColor: "gray",
+        tabBarStyle: { height: 60 },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "bold",
+          marginTop: 5,
+        },
+      })}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          headerTitle: "Zewixa",
+          headerTitleStyle: {
+            fontSize: 25,
+            fontWeight: "bold",
+            color: "#6846bd",
+            marginLeft: 20,
+          },
+          headerStyle: { backgroundColor: "#f0f0f0", height: 80 },
+        }}
+      />
+      <Tab.Screen name="WatchList" component={WatchList} />
+      <Tab.Screen name="Scanner" component={Scanner} />
+      <Tab.Screen
+        name="Booking"
+        component={AddHub}
+      />
+      <Tab.Screen name="Profile">
+        {(props) => <Profile {...props} setIsHost={setIsHost} />}
+      </Tab.Screen>
+    </Tab.Navigator>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-  },
-  videoBox: {
-    width: "90%",
-    height: 100,
-    backgroundColor: "#6846bd",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  placeContainer: {
-    width: "90%",
-    height: 100,
-    backgroundColor: "#6846bd",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  sectionHeaderText: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#fff",
-    marginLeft: 10,
-  },
-  faqContainer: {
-    width: "90%",
-    paddingVertical: 20,
-  },
-  faqTitle: {
-    fontSize: 26,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-    color: "#333",
-  },
-  faqItem: {
-    marginBottom: 15,
-  },
-  question: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#222",
-  },
-  answer: {
-    fontSize: 18,
-    color: "#555",
-    marginTop: 5,
-  },
-  askDoubtsBox: {
-    width: "90%",
-    height: 80,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginTop: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  askDoubtsText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#6846bd",
-  },
-});
-
-export default Host;
+export default BottomTab;

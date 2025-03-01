@@ -7,7 +7,8 @@ const PlaceDetails = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.box} onPress={()=> navigation.navigate("HostelFirstData")}>
+        {/* onPress={()=> navigation.navigate("HostelFirstData")} */}
+      <TouchableOpacity style={styles.box}>
         <Text style={styles.boxText}>Box 1</Text>
       </TouchableOpacity>
       <View style={styles.box}>
