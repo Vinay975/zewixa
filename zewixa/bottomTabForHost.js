@@ -17,7 +17,12 @@ const HostBottomBar = ({ setIsHost }) => {
         tabBarStyle: { backgroundColor: "#fff", height: 60 },
         tabBarActiveTintColor: activeColor,
         tabBarInactiveTintColor: inactiveColor,
-        headerShown: false,
+        // headerShown: false,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "bold",
+          marginTop: 5,
+        },
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
           let IconComponent = Ionicons; 
@@ -33,7 +38,7 @@ const HostBottomBar = ({ setIsHost }) => {
             iconName = focused ? "person" : "person-outline";
           }
 
-          return <IconComponent name={iconName} size={26} color={color} />;
+          return <IconComponent name={iconName} size={30} color={color} />;
         },
       })}
     >
