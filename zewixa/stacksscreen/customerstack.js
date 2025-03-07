@@ -2,9 +2,7 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import BottomTab from "../bottomTab";
 import Settings from "../customerScreens/profileScreens/setting";
-import HostelFirstData from "../customerScreens/AddyourPlace/hostelfirstdata";
-import HostelSecondData from "../customerScreens/AddyourPlace/hostelseconddata";
-import FinalSubmit from "../customerScreens/AddyourPlace/finalsubmit";
+
 
 const CustomerBar = createStackNavigator();
 

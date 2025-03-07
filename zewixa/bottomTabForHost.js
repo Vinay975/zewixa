@@ -17,7 +17,7 @@ const HostBottomBar = ({ setIsHost }) => {
         tabBarStyle: { backgroundColor: "#fff", height: 60 },
         tabBarActiveTintColor: activeColor,
         tabBarInactiveTintColor: inactiveColor,
-        headerShown: false,
+        // headerShown: false,
         // screenOptions={{ headerShown: false }}
         tabBarLabelStyle: {
           fontSize: 12,

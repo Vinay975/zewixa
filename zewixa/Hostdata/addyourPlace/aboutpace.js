@@ -7,8 +7,7 @@ const AboutPlace = () => {
 
   return (
     <View style={styles.container}>
-        onPress={()=> navigation.navigate("AboutOwner")}
-      <TouchableOpacity style={styles.box}>
+      <TouchableOpacity style={styles.box} onPress={() => navigation.navigate("AboutOwner")}>
         <Text style={styles.boxText}>Box 1</Text>
       </TouchableOpacity>
       <View style={styles.box}>
@@ -23,8 +22,6 @@ const AboutPlace = () => {
     </View>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   container: {
