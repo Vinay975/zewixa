@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import PlaceDetails from "../../addyourplace/aboutplace";
+
 
 const Host = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -23,7 +23,7 @@ const Host = () => {
     <View style={styles.container}>
     
 
-      <TouchableOpacity style={styles.placeContainer} onPress={()=> Navigator.navigate("PlaceDetails")}>
+      <TouchableOpacity style={styles.placeContainer} onPress={()=> Navigator.navigate("AboutPlace")}>
         <Ionicons name="add-circle" size={40} color="#6846bd" />
         <Text style={styles.sectionHeaderText}>Add Your Place</Text>
       </TouchableOpacity>

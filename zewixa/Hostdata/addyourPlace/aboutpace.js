@@ -2,12 +2,12 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const PlaceDetails = () => {
+const AboutPlace = () => {
     const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-        {/* onPress={()=> navigation.navigate("HostelFirstData")} */}
+        onPress={()=> navigation.navigate("AboutOwner")}
       <TouchableOpacity style={styles.box}>
         <Text style={styles.boxText}>Box 1</Text>
       </TouchableOpacity>
@@ -24,7 +24,7 @@ const PlaceDetails = () => {
   );
 };
 
-export default PlaceDetails;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// export default PlaceDetails;
+export default AboutPlace;
