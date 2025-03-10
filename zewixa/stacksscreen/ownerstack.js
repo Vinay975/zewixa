@@ -1,4 +1,5 @@
 import React from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import HostBottomBar from "../bottomTabForHost";
@@ -15,7 +16,25 @@ const OwnerBar = createStackNavigator();
 
 const OwnerStack = ({ setIsHost }) => {
   return (
-    <OwnerBar.Navigator>
+    <OwnerBar.Navigator
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: "transparent", 
+      },
+      headerBackground: () => (
+        <LinearGradient
+          colors={["#6846bd", "#3a1c71"]} 
+          style={{ flex: 1 }}
+        />
+      ),
+      headerTintColor: "#fff", // Text color
+      headerTitleAlign: "center", // Center title
+      headerTitleStyle: {
+        fontWeight: "bold",
+        fontSize: 18,
+      },
+    }}
+    >
       <OwnerBar.Screen
         name="Host"
         options={{ headerShown: false }}

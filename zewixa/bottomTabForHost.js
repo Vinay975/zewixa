@@ -1,4 +1,5 @@
 import React from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import Host from "./Hostdata/bottomscreen/host";
@@ -24,7 +25,13 @@ const HostBottomBar = ({ setIsHost }) => {
           fontWeight: "bold",
           marginTop: 5,
         },
-
+        headerBackground: () => (
+          <LinearGradient
+            colors={["#6846bd", "#4b0082"]}
+            style={{ flex: 1 }}
+          />
+        ),
+        headerTintColor: "#fff",
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
           let IconComponent = Ionicons;

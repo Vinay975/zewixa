@@ -7,9 +7,15 @@ const FinalSubmit = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>This is Final Form</Text>
+      <Text style={styles.title}>Thank You for Registering!</Text>
+      <Text style={styles.message}>
+        Your details have been successfully submitted. You will receive a confirmation email soon.  
+        We will also keep you updated via WhatsApp.  
+      </Text>
+      <Text style={styles.appName}>- Team Zewixa</Text>
+
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Host")} >
-        <Text style={styles.buttonText}>Next</Text>
+        <Text style={styles.buttonText}>Go to Home</Text>
       </TouchableOpacity>
     </View>
   );
@@ -22,18 +28,33 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
     backgroundColor: "#f9f9f9",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
+    color: "#000",
+    textAlign: "center",
+  },
+  message: {
+    fontSize: 16,
     color: "#333",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  appName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#6846bd",
+    marginBottom: 30,
   },
   button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: "#007bff",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    backgroundColor: "#6846bd",
     borderRadius: 5,
   },
   buttonText: {
