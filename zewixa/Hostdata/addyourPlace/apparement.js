@@ -2,20 +2,20 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const HostelDataOne = () => {
+const Apparement = () => {
   const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>This is hostel data one Form</Text>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AboutHostelTwo")} >
+      <Text style={styles.title}>This is Apparement data Form</Text>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("FinalSubmit")} >
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-export default HostelDataOne;
+export default Apparement;
 
 const styles = StyleSheet.create({
   container: {

@@ -7,7 +7,7 @@ const FinalSubmit = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>This is Owner Form</Text>
+      <Text style={styles.title}>This is Final Form</Text>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Host")} >
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>

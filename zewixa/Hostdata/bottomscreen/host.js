@@ -5,46 +5,15 @@ import { useNavigation } from "@react-navigation/native";
 
 
 const Host = () => {
-  const [expandedIndex, setExpandedIndex] = useState(null);
-  const Navigator = useNavigation();
-  const faqData = [
-    { question: "What is Zewixa?", answer: "Zewixa is a platform for video recommendations based on user preferences." },
-    { question: "How does it work?", answer: "Users input their preferences, and our system suggests relevant videos." },
-    { question: "Is Zewixa free to use?", answer: "Yes, Zewixa offers free recommendations with an option for premium features." },
-    { question: "Can I add my own videos?", answer: "Yes, users can upload and share their videos on the platform." },
-    { question: "Is Zewixa free to use?", answer: "Yes, Zewixa offers free recommendations with an option for premium features." },
-  ];
 
-  const toggleExpand = (index) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
-  };
+  const Navigator = useNavigation();
 
   return (
     <View style={styles.container}>
-    
-
-      <TouchableOpacity style={styles.placeContainer} onPress={()=> Navigator.navigate("AboutPlace")}>
+      <TouchableOpacity style={styles.placeContainer} onPress={() => Navigator.navigate("AboutPlace")}>
         <Ionicons name="add-circle" size={40} color="#6846bd" />
         <Text style={styles.sectionHeaderText}>Add Your Place</Text>
       </TouchableOpacity>
-
-      <ScrollView style={styles.faqContainer}>
-        <Text style={styles.faqTitle}>FAQs</Text>
-        {faqData.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.faqItem} onPress={() => toggleExpand(index)}>
-            <View style={styles.questionContainer}>
-              <Text style={styles.question}>{item.question}</Text>
-              <Ionicons name={expandedIndex === index ? "chevron-up" : "chevron-down"} size={20} color="#6846bd" />
-            </View>
-            {expandedIndex === index && <Text style={styles.answer}>{item.answer}</Text>}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <View style={styles.askDoubtsBox}>
-        <Ionicons name="help-circle" size={30} color="#6846bd" style={styles.askDoubtsIcon} />
-        <Text style={styles.askDoubtsText}>Ask Your Doubts</Text>
-      </View>
     </View>
   );
 };
@@ -58,9 +27,9 @@ const styles = StyleSheet.create({
   },
   placeContainer: {
     width: 400,
-    height:130,
+    height: 130,
     backgroundColor: "#fff",
-    justifyContent:"center",
+    justifyContent: "center",
     alignItems: "center",
     margin: 10,
     borderRadius: 10,
@@ -76,7 +45,7 @@ const styles = StyleSheet.create({
   },
   faqContainer: {
     width: "96%",
-    height:300,
+    height: 300,
     paddingVertical: 20,
     // backgroundColor:"red"
   },
@@ -106,7 +75,7 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 20,
     // fontWeight: "bold",
-    color: "#222",  
+    color: "#222",
   },
   answer: {
     fontSize: 18,

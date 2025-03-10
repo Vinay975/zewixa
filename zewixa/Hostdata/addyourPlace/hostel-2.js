@@ -7,7 +7,7 @@ const HostelDataTwo = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>This is Owner Form</Text>
+      <Text style={styles.title}>This is hostel data two Form</Text>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("FinalSubmit")} >
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
