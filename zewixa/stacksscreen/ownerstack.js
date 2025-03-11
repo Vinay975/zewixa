@@ -7,7 +7,7 @@ import AboutPlace from "../Hostdata/addyourPlace/aboutpace";
 import AboutOwner from "../Hostdata/addyourPlace/ownerdetials";
 import HostelDataOne from "../Hostdata/addyourPlace/hostel-1";
 import HostelDataTwo from "../Hostdata/addyourPlace/hostel-2";
-import Apparement from "../Hostdata/addyourPlace/apparement";
+import Apartment from "../Hostdata/addyourPlace/apparement";
 import Tolet from "../Hostdata/addyourPlace/to-lets";
 import Hotel from "../Hostdata/addyourPlace/hotel";
 import FinalSubmit from "../Hostdata/addyourPlace/finalSubmit";
@@ -44,7 +44,7 @@ const OwnerStack = ({ setIsHost }) => {
       <OwnerBar.Screen name="AboutOwner" component={AboutOwner} />
       <OwnerBar.Screen name="AboutHostel" component={HostelDataOne} />
       <OwnerBar.Screen name="AboutHostelTwo" component={HostelDataTwo} />
-      <OwnerBar.Screen name="AboutApartment" component={Apparement} />
+      <OwnerBar.Screen name="AboutApartment" component={Apartment} />
       <OwnerBar.Screen name="AboutToLets" component={Tolet} />
       <OwnerBar.Screen name="AboutHotel" component={Hotel} />
       <OwnerBar.Screen name="FinalSubmit" component={FinalSubmit} />
