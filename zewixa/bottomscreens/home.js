@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import places from "../places";
 
 const Home = () => {
   return (
@@ -25,6 +26,20 @@ const Home = () => {
             </View>
           ))}
         </ScrollView>
+
+        {/* Vertical List of Places */}
+        <View style={styles.placesContainer}>
+          {places.map((place) => (
+            <View key={place.id} style={styles.placeBox}>
+              <Image source={place.image} style={styles.placeImage} />
+              <View style={styles.placeInfo}>
+                <Text style={styles.placeName}>{place.name}</Text>
+                <Text style={styles.placeLocation}>{place.location}</Text>
+                <Text style={styles.placeRating}>⭐ {place.rating}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
@@ -39,7 +54,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 70,
     marginTop: 20,
-    // backgroundColor: "black",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
@@ -51,7 +65,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 320,
     height: 50,
-    // backgroundColor: "gray",
     borderRadius: 25,
     paddingHorizontal: 15,
   },
@@ -59,16 +72,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   searchText: {
-    // color: "white",
     fontSize: 16,
   },
   location: {
     width: 50,
     height: 50,
-    backgroundColor: "white",
+    backgroundColor: "#6846bd",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#6846bd",
     borderRadius: 25,
     marginLeft: 10,
   },
@@ -83,17 +94,54 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
-    borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1, 
     shadowRadius: 5, 
     elevation: 3,
   },
-
   boxText: {
     fontSize: 16,
     color: "#6846bd",
+    fontWeight: "bold",
+  },
+  placesContainer: {
+    marginTop: 20,
+    width: "90%",
+  },
+  placeBox: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    marginBottom: 15,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  placeImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  placeInfo: {
+    marginLeft: 15,
+    justifyContent: "center",
+  },
+  placeName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  placeLocation: {
+    fontSize: 14,
+    color: "gray",
+  },
+  placeRating: {
+    fontSize: 14,
+    color: "#f5a623",
     fontWeight: "bold",
   },
 });
