@@ -17,12 +17,12 @@ const AboutPlace = () => {
             <TouchableOpacity style={styles.box} onPress={() => handleNavigation("Apartment")}>
                 <Text style={styles.boxText}>Apartment</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.box} onPress={() => handleNavigation("To-lets")}>
+            {/* <TouchableOpacity style={styles.box} onPress={() => handleNavigation("To-lets")}>
                 <Text style={styles.boxText}>To-lets</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.box} onPress={() => handleNavigation("Hotel")}>
                 <Text style={styles.boxText}>Hotel</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     );
 };

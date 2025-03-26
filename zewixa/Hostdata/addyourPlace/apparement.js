@@ -1,35 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image } from "react-native";
-import { launchImageLibrary } from 'react-native-image-picker';
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from "react-native";
+import { launchImageLibrary } from "react-native-image-picker";
+import Icon from "react-native-vector-icons/MaterialIcons"; // Import Icons
 
 const Apartment = () => {
-  const navigation = useNavigation();
   const [formData, setFormData] = useState({
-    photos: Array(7).fill(null),
-    furnishing: "",
-    policy: "",
-    security: "",
+    photos: Array(6).fill(null),
     rent: { "1BHK": "", "2BHK": "", "3BHK": "", "4BHK": "" },
-    rentToPay: "",
+    advancePayment: "",
+    wifiAvailable: "",
+    security: {
+      cctv: false,
+      securityGuards: false,
+      gatedCommunity: false,
+      fireSafety: false,
+    },
   });
 
-  const [isFormValid, setIsFormValid] = useState(false);
-
-  const handleChange = (name, value) => {
-    if (Object.keys(formData.rent).includes(name)) {
-      setFormData((prevData) => ({
-        ...prevData,
-        rent: { ...prevData.rent, [name]: value },
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-    }
-  };
-
+  // Handle Image Upload
   const handleFileChange = (index) => {
     launchImageLibrary({ mediaType: "photo" }, (response) => {
       if (!response.didCancel && response.assets) {
@@ -40,78 +28,178 @@ const Apartment = () => {
     });
   };
 
-  const handleSubmit = () => {
-    if (Object.values(formData).every((field) => field !== "" && field !== null)) {
-      setIsFormValid(true);
-      navigation.navigate("FinalSubmit");
-    } else {
-      Alert.alert("Error", "Please fill all fields");
-    }
+  // Handle Input Change
+  const handleChange = (field, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
   };
-
-  useEffect(() => {
-    const isValidRent = Object.values(formData.rent).every((value) => value !== "");
-    setIsFormValid(isValidRent && formData.rentToPay !== "");
-  }, [formData]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Apartment Details</Text>
+      {/* Upload Photos */}
       <Text style={styles.label}>Upload Photos</Text>
-      {['Building', 'Living Room', 'Kitchen', 'Bedroom', 'Bathroom', 'Balcony', 'Additional Space'].map((label, index) => (
-        <TouchableOpacity key={index} style={styles.photoUpload} onPress={() => handleFileChange(index)}>
-          <Text>{label}</Text>
-          {formData.photos[index] && <Image source={{ uri: formData.photos[index] }} style={styles.image} />}
-        </TouchableOpacity>
-      ))}
-
-      <Text style={styles.label}>Furnishing</Text>
-      <TextInput style={styles.input} placeholder="Enter Furnishing" value={formData.furnishing} onChangeText={(value) => handleChange("furnishing", value)} />
-
-      <Text style={styles.label}>Privacy Policy</Text>
-      <TextInput style={styles.input} placeholder="Enter Policy" value={formData.policy} onChangeText={(value) => handleChange("policy", value)} />
-
-      <Text style={styles.label}>Security Details</Text>
-      <TextInput style={styles.input} placeholder="Enter Security" value={formData.security} onChangeText={(value) => handleChange("security", value)} />
-
-      <Text style={styles.label}>Rent Details</Text>
-      {['1BHK', '2BHK', '3BHK', '4BHK'].map((bhk) => (
-        <TextInput
-          key={bhk}
-          style={styles.input}
-          placeholder={`Rent for ${bhk}`}
-          keyboardType="numeric"
-          value={formData.rent[bhk]}
-          onChangeText={(value) => handleChange(bhk, value)}
-        />
-      ))}
-
-      <Text style={styles.label}>Rent to Pay</Text>
-      <TextInput style={styles.input} placeholder="Enter Rent to Pay" keyboardType="numeric" value={formData.rentToPay} onChangeText={(value) => handleChange("rentToPay", value)} />
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, !isFormValid && styles.disabledButton]} onPress={handleSubmit} disabled={!isFormValid}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
+      <View style={styles.photoGrid}>
+        {[
+          { label: "Building", icon: "apartment" },
+          { label: "Living Room", icon: "weekend" },
+          { label: "Kitchen", icon: "kitchen" },
+          { label: "Bedroom", icon: "king-bed" },
+          { label: "Bathroom", icon: "bathtub" },
+          { label: "Balcony", icon: "balcony" },
+        ].map((item, index) => (
+          <TouchableOpacity key={index} style={styles.photoUpload} onPress={() => handleFileChange(index)}>
+            {formData.photos[index] ? (
+              <Image source={{ uri: formData.photos[index] }} style={styles.image} />
+            ) : (
+              <>
+                <Icon name={item.icon} size={40} color="#777" />
+                <Text style={styles.photoLabel}>{item.label}</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        ))}
       </View>
+
+      {/* Rent Details */}
+      <Text style={styles.sectionTitle}>Rent Details</Text>
+      {["1BHK", "2BHK", "3BHK", "4BHK"].map((type) => (
+        <View key={type} style={styles.inputRow}>
+          <Text style={styles.label}>{type} Rent (₹):</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={`Enter ${type} Rent`}
+            keyboardType="numeric"
+            onChangeText={(text) =>
+              setFormData((prevData) => ({
+                ...prevData,
+                rent: { ...prevData.rent, [type]: text },
+              }))
+            }
+          />
+        </View>
+      ))}
+
+      {/* Advance Payment */}
+      <View style={styles.inputRow}>
+        <Text style={styles.label}>Advance Payment (₹):</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Advance Amount"
+          keyboardType="numeric"
+          onChangeText={(text) => handleChange("advancePayment", text)}
+        />
+      </View>
+
+      {/* Wi-Fi Availability */}
+      <View style={styles.inputRow}>
+        <Text style={styles.label}>Wi-Fi Availability:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Wi-Fi Details"
+          onChangeText={(text) => handleChange("wifiAvailable", text)}
+        />
+      </View>
+
+      {/* Security Information */}
+      <Text style={styles.sectionTitle}>Security Features</Text>
+      {[
+        { key: "cctv", label: "CCTV Cameras" },
+        { key: "securityGuards", label: "Security Guards" },
+        { key: "gatedCommunity", label: "Gated Community" },
+        { key: "fireSafety", label: "Fire Safety Equipment" },
+      ].map((security) => (
+        <TouchableOpacity
+          key={security.key}
+          style={[styles.checkbox, formData.security[security.key] && styles.checkboxSelected]}
+          onPress={() =>
+            setFormData((prevData) => ({
+              ...prevData,
+              security: {
+                ...prevData.security,
+                [security.key]: !prevData.security[security.key],
+              },
+            }))
+          }
+        >
+          <Text style={styles.checkboxText}>
+            {formData.security[security.key] ? "✔" : "○"} {security.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </ScrollView>
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 15 },
-  label: { fontSize: 16, fontWeight: "600", marginTop: 10 },
-  input: { borderWidth: 1, padding: 10, marginVertical: 5, borderRadius: 5 },
-  photoUpload: { borderWidth: 1, padding: 10, marginVertical: 5, alignItems: "center" },
-  image: { width: 100, height: 100, marginTop: 5 },
-  buttonContainer: { flexDirection: "row", justifyContent: "space-between", marginTop: 15 },
-  button: { padding: 10, backgroundColor: "blue", borderRadius: 5, alignItems: "center" },
-  disabledButton: { backgroundColor: "gray" },
-  buttonText: { color: "white", fontWeight: "bold" },
+  container: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 5,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  photoGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  photoUpload: {
+    width: "30%",
+    aspectRatio: 1,
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  photoLabel: {
+    fontSize: 12,
+    textAlign: "center",
+    marginTop: 5,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+    borderRadius: 10,
+  },
+  checkbox: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 5,
+  },
+  checkboxSelected: {
+    backgroundColor: "#6846bd",
+  },
+  checkboxText: {
+    fontSize: 14,
+    color: "#000",
+  },
 });
 
 export default Apartment;
