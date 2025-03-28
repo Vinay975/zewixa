@@ -69,7 +69,7 @@ const HostelDataOne = () => {
           onValueChange={(itemValue) => setSharing(itemValue)}
           style={styles.picker}
         >
-          <Picker.Item label="Select Sharing" value="" />
+          <Picker.Item label="Select Sharing upto avaibilty" value="" />
           <Picker.Item label="1 Sharing" value="1 Sharing" />
           <Picker.Item label="2 Sharing" value="2 Sharing" />
           <Picker.Item label="3 Sharing" value="3 Sharing" />
