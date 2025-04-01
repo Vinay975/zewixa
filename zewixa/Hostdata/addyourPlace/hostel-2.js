@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -39,13 +40,58 @@ const HostelDataTwo = () => {
     },
   });
 
-  const pickImage = async (photoType) => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.IMAGE, // Updated from deprecated option
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+  // Function to handle changes in the meal input fields
+  const handleInputChange = (field, value, index, mealType) => {
+    setFormData((prev) => {
+      const updatedMeals = [...prev.meals]; // Copy existing meals array
+      updatedMeals[index] = { ...updatedMeals[index], [mealType]: value }; // Update specific meal
+      return { ...prev, meals: updatedMeals }; // Set new state
     });
+  };
+
+
+  // Function to capture or select image
+  const pickImage = async (photoType) => {
+    // Ask for permissions
+    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+    const { status: galleryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (cameraStatus !== "granted" || galleryStatus !== "granted") {
+      alert("Permission to access camera and gallery is required!");
+      return;
+    }
+
+    // Show selection prompt
+    Alert.alert(
+      "Upload Photo",
+      "Choose an option",
+      [
+        { text: "Take Photo", onPress: () => handleImage("camera", photoType) },
+        { text: "Choose from Gallery", onPress: () => handleImage("gallery", photoType) },
+        { text: "Cancel", style: "cancel" },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  // Function to handle image selection or capture
+  const handleImage = async (source, photoType) => {
+    let result;
+    if (source === "camera") {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        // allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+    }
 
     if (!result.canceled) {
       setFormData((prev) => ({
@@ -95,7 +141,7 @@ const HostelDataTwo = () => {
         </View>
       ))}
 
-      {/* WiFi */}
+      {/* WiFi Selection */}
       <Text style={styles.sectionTitle}>WiFi</Text>
       <Picker
         selectedValue={formData.wifi}
@@ -131,7 +177,7 @@ const HostelDataTwo = () => {
         )
       )}
 
-      {/* Navigation Buttons */}
+      {/* Navigation Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("FinalSubmit")}>
           <Text style={styles.buttonText}>Submit</Text>
@@ -143,7 +189,7 @@ const HostelDataTwo = () => {
 
 export default HostelDataTwo;
 
-/* Function to get appropriate place-related icons */
+/* Function to get appropriate icons */
 const getIcon = (type) => {
   switch (type) {
     case "main":
@@ -166,24 +212,29 @@ const getIcon = (type) => {
       return "image-outline";
   }
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#f9f9f9"
   },
+
+  /* Section Titles */
   sectionTitle: {
     fontSize: 22,
     fontWeight: "bold",
     marginVertical: 15,
-    color: "#000",
+    color: "#000"
   },
+
+  /* Photo Upload Styles */
   photoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 15,
+    flexWrap: "wrap",  /* Ensures wrapping in smaller screens */
+    marginBottom: 15
   },
+
   photoUpload: {
     flex: 1,
     alignItems: "center",
@@ -192,31 +243,39 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#fff"
   },
+
   photoLabel: {
     marginTop: 5,
     fontSize: 14,
     fontWeight: "bold",
     color: "#000",
-    textAlign: "center",
+    textAlign: "center"
   },
+
   previewImage: {
     width: 100,
     height: 100,
     marginTop: 5,
-    borderRadius: 10,
+    borderRadius: 10
   },
+
+  /* Meal Schedule Row */
   row: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    justifyContent: "space-between",
+    marginBottom: 10
   },
+
   dayText: {
     width: 80,
     fontSize: 16,
     fontWeight: "bold",
+    color: "#333"
   },
+
   input: {
     flex: 1,
     borderWidth: 1,
@@ -225,44 +284,63 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     borderRadius: 5,
     backgroundColor: "#fff",
+    textAlign: "center"  /* Centers input text */
   },
-  picker: {
+
+  /* Dropdown (WiFi Picker) */
+  pickerContainer: {
     borderWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 15,
+    borderRadius: 5,
+    overflow: "hidden",  /* Prevents picker from expanding */
+    marginBottom: 15
   },
+
+  picker: {
+    height: 50,
+    backgroundColor: "#fff",
+  },
+
+  /* Rent Details */
   rentRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 15,
+    marginBottom: 15
   },
+
   rentItem: {
     flex: 1,
-    marginHorizontal: 5,
+    marginHorizontal: 5
   },
+
   label: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
-    color: "#000",
+    color: "#000"
   },
+
+  /* Submit Button */
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     marginTop: 30,
-    marginBottom: 40,
+    marginBottom: 40
   },
+
   button: {
-    width: 120,
+    width: 150,
     paddingVertical: 12,
     backgroundColor: "#6846bd",
     borderRadius: 5,
-    alignItems: "center",
+    alignItems: "center"
   },
+
   buttonText: {
     fontSize: 18,
     color: "white",
-    textAlign: "center",
+    fontWeight: "bold",
+    textAlign: "center"
   },
 });
