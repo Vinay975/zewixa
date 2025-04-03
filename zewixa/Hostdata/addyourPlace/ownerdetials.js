@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
+import HostelDataOne from "./hostel-1";
 
 const AboutOwner = () => {
     const navigation = useNavigation();
@@ -40,14 +41,24 @@ const AboutOwner = () => {
             Alert.alert("Error", "Please fill all required fields.");
             return;
         }
-
+    
+        const ownerData = {
+            name,
+            mobile1,
+            mobile2,
+            email,
+            profileImage,
+        };
+    
+        console.log("Navigating with Data:", ownerData); // Debugging log
+    
         if (placeType === "Hostel") {
-            navigation.navigate("AboutHostel");
+            navigation.navigate("AboutHostel", { ownerData });  // FIXED: Changed from "HostelDataOne" to "AboutHostel"
         } else if (placeType === "Apartment") {
-            navigation.navigate("AboutApartment");
+            navigation.navigate("AboutApartment", { ownerData });
         }
     };
-
+        
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Fill the Form</Text>

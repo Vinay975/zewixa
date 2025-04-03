@@ -1,84 +1,96 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { Picker } from "@react-native-picker/picker"; // Corrected import
-import { useNavigation } from "@react-navigation/native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const HostelDataOne = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { ownerData } = route.params || {}; 
 
-  // State for form fields
+  
+  const ownerName = ownerData?.name ? `Hello Mr. ${ownerData.name}` : "Hello, Owner!";
+
+
   const [hostelName, setHostelName] = useState("");
   const [location, setLocation] = useState("");
   const [floors, setFloors] = useState("");
   const [rooms, setRooms] = useState("");
-  const [gender, setGender] = useState("");
-  const [sharing, setSharing] = useState("");
+  const [gender, setGender] = useState(""); 
+  const [acType, setAcType] = useState("");
+
+  const handleNext = () => {
+    if (!hostelName || !location || !floors || !rooms || !gender || !acType) {
+      Alert.alert("Error", "Please fill all the required fields.");
+      return;
+    }
+  
+    const hostelData = {
+      hostelName,
+      location,
+      floors,
+      rooms,
+      gender,
+      acType,
+      ownerData,
+    };
+  
+    navigation.navigate("AboutHostelTwo", { hostelData });
+  };
+  
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hostel Details</Text>
-
-      <TextInput 
-        style={styles.input} 
-        placeholder="Hostel Name" 
-        value={hostelName} 
-        onChangeText={setHostelName} 
-      />
-      
-      <TextInput 
-        style={styles.input} 
-        placeholder="Location" 
-        value={location} 
-        onChangeText={setLocation} 
-      />
-
-      <TextInput 
-        style={styles.input} 
-        placeholder="Number of Floors" 
-        keyboardType="numeric"
-        value={floors} 
-        onChangeText={setFloors} 
-      />
-
-      <TextInput 
-        style={styles.input} 
-        placeholder="Number of Rooms" 
-        keyboardType="numeric"
-        value={rooms} 
-        onChangeText={setRooms} 
-      />
-
-      <Text style={styles.label}>Gender</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={gender}
-          onValueChange={(itemValue) => setGender(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select Gender" value="" />
-          <Picker.Item label="Male" value="Male" />
-          <Picker.Item label="Female" value="Female" />
-          <Picker.Item label="Co-Ed" value="Co-Ed" />
-        </Picker>
+      {/* Greeting UI */}
+      <View style={styles.greetingContainer}>
+        <Text style={styles.greetingText}>{ownerName}</Text>
+        <Text style={styles.subGreeting}>Let's set up your hostel details.</Text>
       </View>
 
-      <Text style={styles.label}>Sharing Options</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={sharing}
-          onValueChange={(itemValue) => setSharing(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select Sharing upto avaibilty" value="" />
-          <Picker.Item label="1 Sharing" value="1 Sharing" />
-          <Picker.Item label="2 Sharing" value="2 Sharing" />
-          <Picker.Item label="3 Sharing" value="3 Sharing" />
-          <Picker.Item label="4 Sharing" value="4 Sharing" />
-          <Picker.Item label="5 Sharing" value="5 Sharing" />
-        </Picker>
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Hostel Name"
+        value={hostelName}
+        onChangeText={setHostelName}
+      />
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AboutHostelTwo")}>
+      <TextInput
+        style={styles.input}
+        placeholder="Location"
+        value={location}
+        onChangeText={setLocation}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Boys / Girls Hostel"
+        value={gender} 
+        onChangeText={setGender} 
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Ac / Non-Ac / Both"
+        value={acType}
+        onChangeText={setAcType} 
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Number of Floors"
+        keyboardType="numeric"
+        value={floors}
+        onChangeText={setFloors}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Number of Rooms"
+        keyboardType="numeric"
+        value={rooms}
+        onChangeText={setRooms}
+      />
+
+      <TouchableOpacity style={styles.button} onPress={handleNext}>
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
     </View>
@@ -95,11 +107,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     padding: 20,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
+  greetingContainer: {
+    backgroundColor: "#6846bd",
+    padding: 15,
+    borderRadius: 10,
     marginBottom: 20,
-    color: "#333",
+    alignItems: "center",
+    width: "90%",
+  },
+  greetingText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  subGreeting: {
+    fontSize: 14,
+    color: "#ddd",
+    marginTop: 5,
   },
   input: {
     width: "90%",
@@ -109,26 +133,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
     backgroundColor: "#fff",
-  },
-  label: {
-    fontSize: 16,
-    color: "#333",
-    alignSelf: "flex-start",
-    marginLeft: "5%",
-    marginBottom: 5,
-  },
-  pickerContainer: {
-    width: "90%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    backgroundColor: "#fff",
-    marginBottom: 15,
-    overflow: "hidden",
-  },
-  picker: {
-    width: "100%",
-    height: 50,
   },
   button: {
     paddingVertical: 12,

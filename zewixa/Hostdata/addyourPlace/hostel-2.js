@@ -9,14 +9,22 @@ import {
   Image,
   Alert,
 } from "react-native";
+import { useRoute } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+
 
 const HostelDataTwo = () => {
-  const navigation = useNavigation();
 
+  const API_URL = "http://192.168.181.213:5000/api/hostels";
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { hostelData } = route.params || { hostelData: {} };
+  const { ownerData } = hostelData || { ownerData: {} };
+  
   const [formData, setFormData] = useState({
     meals: Array(7).fill({ tiffin: "", lunch: "", snacks: "", dinner: "" }),
     photos: {
@@ -43,11 +51,52 @@ const HostelDataTwo = () => {
   // Function to handle changes in the meal input fields
   const handleInputChange = (field, value, index, mealType) => {
     setFormData((prev) => {
-      const updatedMeals = [...prev.meals]; // Copy existing meals array
-      updatedMeals[index] = { ...updatedMeals[index], [mealType]: value }; // Update specific meal
-      return { ...prev, meals: updatedMeals }; // Set new state
+      const updatedMeals = [...prev.meals];
+      updatedMeals[index] = { ...updatedMeals[index], [mealType]: value };
+      return { ...prev, meals: updatedMeals };
     });
   };
+
+  axios.get(API_URL)
+  .then((response) => console.log(response.data))
+  .catch((error) => console.error("API Error:", error));
+
+  const handleSubmit = async () => {
+  try {
+    const formDataToSend = new FormData(); // Avoid overwriting `formData`
+
+    // Add owner and hostel data as JSON
+    formDataToSend.append("ownerData", JSON.stringify(ownerData));
+    formDataToSend.append("hostelData", JSON.stringify(hostelData));
+
+    // Ensure we correctly append images
+    Object.keys(formData.photos).forEach((key) => {
+      if (formData.photos[key]) {
+        formDataToSend.append(key, {
+          uri: formData.photos[key],
+          name: `${key}.jpg`,
+          type: "image/jpeg",
+        });
+      }
+    });
+
+    console.log("📤 Sending Data to API:", formDataToSend); // Debugging
+
+    const response = await axios.post(`${API_URL}/api/create-hostel`, formDataToSend, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (response.status === 201) {
+      Alert.alert("Success", "Hostel data saved successfully!");
+      navigation.navigate("FinalSubmit");
+    }
+  } catch (error) {
+    console.error("❌ API Error:", error);
+    Alert.alert("Error", "Failed to save hostel data.");
+  }
+};
 
 
   // Function to capture or select image
@@ -179,7 +228,7 @@ const HostelDataTwo = () => {
 
       {/* Navigation Button */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("FinalSubmit")}>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </View>
