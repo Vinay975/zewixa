@@ -43,4 +43,4 @@ const HostelSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Hoste]l", HostelSchema);
+module.exports = mongoose.model("Hostel", HostelSchema);
