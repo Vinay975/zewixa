@@ -16,14 +16,22 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 const HostelDataTwo = () => {
-  const API_URL = "http://192.168.43.66:5000/api/create-hostel";
+  const API_URL = "http://192.168.30.213:5000/api/create-hostel";
   const navigation = useNavigation();
   const route = useRoute();
   const { hostelData } = route.params || { hostelData: {} };
   const { ownerData } = hostelData || { ownerData: {} };
 
   const [formData, setFormData] = useState({
-    meals: Array(7).fill({ tiffin: "", lunch: "", snacks: "", dinner: "" }),
+    meals: [
+      { day: "Monday", tiffin: "", lunch: "", snacks: "", dinner: "" },
+      { day: "Tuesday", tiffin: "", lunch: "", snacks: "", dinner: "" },
+      { day: "Wednesday", tiffin: "", lunch: "", snacks: "", dinner: "" },
+      { day: "Thursday", tiffin: "", lunch: "", snacks: "", dinner: "" },
+      { day: "Friday", tiffin: "", lunch: "", snacks: "", dinner: "" },
+      { day: "Saturday", tiffin: "", lunch: "", snacks: "", dinner: "" },
+      { day: "Sunday", tiffin: "", lunch: "", snacks: "", dinner: "" },
+    ],    
     photos: {
       main: null,
       messRoom: null,
@@ -124,36 +132,61 @@ const HostelDataTwo = () => {
 
   const handleSubmit = async () => {
     try {
+      // Step 1: Validate that at least main image is uploaded
+      const requiredPhotos = ["main", "messRoom", "topView", "washroom", "roomInterior", "commonArea", "balconyView", "laundryArea"];
+      const missingPhotos = requiredPhotos.filter((key) => !formData.photos[key]);
+  
+      if (missingPhotos.length > 0) {
+        Alert.alert("Missing Images", `Please upload the following images: ${missingPhotos.join(", ")}`);
+        return;
+      }
+  
+      // Step 2: Show preview log (for debugging)
+      console.log("All image URIs:");
+      Object.entries(formData.photos).forEach(([key, uri]) => {
+        console.log(`${key}: ${uri}`);
+      });
+  
+      // Step 3: Construct FormData
       const formDataToSend = new FormData();
       formDataToSend.append("ownerData", JSON.stringify(ownerData));
       formDataToSend.append("hostelData", JSON.stringify(hostelData));
       formDataToSend.append("meals", JSON.stringify(formData.meals));
       formDataToSend.append("wifi", formData.wifi);
       formDataToSend.append("rent", JSON.stringify(formData.rent));
-
+  
+      // Append images to formData
       Object.entries(formData.photos).forEach(([key, uri]) => {
         if (uri) {
+          const fileUriParts = uri.split("/");
+          const fileName = fileUriParts[fileUriParts.length - 1];
+          const fileType = fileName.split(".").pop();
+      
           formDataToSend.append(key, {
             uri,
-            name: `${key}.jpg`,
-            type: "image/jpeg",
+            name: fileName,
+            type: `image/${fileType === "jpg" ? "jpeg" : fileType}`,
           });
         }
       });
-
+      // Step 4: Submit to backend
       const response = await axios.post(API_URL, formDataToSend, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",  // Ensure the content type is multipart/form-data
+          "Accept": "application/json",
+        },
       });
-
+  
       if (response.status === 201) {
         Alert.alert("Success", "Hostel data saved successfully!");
         navigation.navigate("FinalSubmit");
       }
     } catch (error) {
-      console.error("Submission Error:", error);
+      console.error("Submission Error:", error.response?.data || error.message);
       Alert.alert("Error", "Failed to submit hostel data.");
     }
   };
+    
 
   return (
     <ScrollView style={styles.container}>

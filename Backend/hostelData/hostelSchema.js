@@ -1,46 +1,46 @@
 const mongoose = require("mongoose");
 
-const MealSchema = new mongoose.Schema({
-  day: { type: String, required: true },
-  tiffin: { type: String, default: "" },
-  lunch: { type: String, default: "" },
-  snacks: { type: String, default: "" },
-  dinner: { type: String, default: "" },
+const mealSchema = new mongoose.Schema({
+  tiffin: String,
+  lunch: String,
+  snacks: String,
+  dinner: String,
 });
 
-const HostelSchema = new mongoose.Schema({
-  owner: { 
-    name: { type: String, required: true },
-    phoneOne: { type: String, required: true },
-    phoneTwo: { type: String, required: true },
-    email: { type: String, required: true }
-  },
-  hostelName: { type: String, required: true },
-  location: { type: String, required: true },
-  gender: { type: String, required: true },
-  acType: { type: String, required: true }, 
-  floors: { type: Number, required: true },
-  rooms: { type: Number, required: true },
-  wifi: { type: String, enum: ["yes", "no"], required: true },
-  rent: {
-    OneSharing: { type: String, required: true },
-    TwoSharing: { type: String, required: true },
-    ThreeSharing: { type: String, required: true },
-    FourSharing: { type: String, required: true },
-    FiveSharing: { type: String, required: true },
-    Advance: { type: String, required: true },
-  },
-  meals: [MealSchema],
-  photos: {
-    main: String,
-    messRoom: String,
-    topView: String,
-    washroom: String,
-    roomInterior: String,
-    commonArea: String,
-    balconyView: String,
-    laundryArea: String,
-  },
+const rentSchema = new mongoose.Schema({
+  singleSharing: Number,
+  doubleSharing: Number,
+  tripleSharing: Number,
+  advance: Number,
 });
 
-module.exports = mongoose.model("Hostel", HostelSchema);
+const photoSchema = new mongoose.Schema({
+  main: Buffer,
+  messRoom: Buffer,
+  topView: Buffer,
+  washroom: Buffer,
+  roomInterior: Buffer,
+  commonArea: Buffer,
+  balconyView: Buffer,
+  laundryArea: Buffer,
+});
+
+const hostelSchema = new mongoose.Schema({
+  owner: {
+    name: String,
+    email: String,
+    phone: String,
+  },
+  hostelName: String,
+  location: String,
+  gender: String,
+  acType: String,
+  floors: Number,
+  rooms: Number,
+  wifi: Boolean,
+  rent: rentSchema,
+  meals: [mealSchema],
+  photos: photoSchema,
+});
+
+module.exports = mongoose.model("Hostel", hostelSchema);
