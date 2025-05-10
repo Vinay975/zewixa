@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import places from "../places";
+import FetchingHostelData from "../FecthingData/hosteldata";
 
 const Home = () => {
   return (
