@@ -7,14 +7,14 @@ import HostelDataOne from "./hostel-1";
 const AboutOwner = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { placeType } = route.params; 
+    const { placeType } = route.params;
 
     // State for input fields
     const [name, setName] = useState("");
     const [mobile1, setMobile1] = useState("");
     const [mobile2, setMobile2] = useState("");
     const [email, setEmail] = useState("");
-    const [profileImage, setProfileImage] = useState(null); 
+    const [profileImage, setProfileImage] = useState(null);
 
     // Function to pick an image from the gallery
     const pickImage = async () => {
@@ -41,7 +41,7 @@ const AboutOwner = () => {
             Alert.alert("Error", "Please fill all required fields.");
             return;
         }
-    
+
         const ownerData = {
             name,
             mobile1,
@@ -49,16 +49,16 @@ const AboutOwner = () => {
             email,
             profileImage,
         };
-    
+
         console.log("Navigating with Data:", ownerData); // Debugging log
-    
+
         if (placeType === "Hostel") {
             navigation.navigate("AboutHostel", { ownerData });  // FIXED: Changed from "HostelDataOne" to "AboutHostel"
         } else if (placeType === "Apartment") {
             navigation.navigate("AboutApartment", { ownerData });
         }
     };
-        
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Fill the Form</Text>

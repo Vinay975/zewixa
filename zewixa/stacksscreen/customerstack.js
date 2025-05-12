@@ -2,6 +2,8 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import BottomTab from "../bottomTab";
 import Settings from "../customerScreens/profileScreens/setting";
+import FetchingHostelData from "../FecthingData/hosteldata";
+import HostelDetails from "../FecthingData/displayingData";
 
 
 const CustomerBar = createStackNavigator();
@@ -19,7 +21,13 @@ const CustomerStack = ({ setIsHost }) => {
         component={Settings}
         options={{ headerShown: true }}
       />
+       <CustomerBar.Screen
+        name="HostelDetails"
+        component={HostelDetails}
+        options={{ headerShown: true }}
+      />
     </CustomerBar.Navigator>
+
   );
 };
 

@@ -8,11 +8,14 @@ import Scanner from "./bottomscreens/scanner";
 import WatchList from "./bottomscreens/watchlist";
 import AddHub from "./bottomscreens/addhub";
 import Profile from "./bottomscreens/profile";
+import { WatchlistProvider } from "./FecthingData/watchingDetails";
+
 
 const Tab = createBottomTabNavigator();
 
 const BottomTab = ({ setIsHost }) => {
   return (
+    <WatchlistProvider>
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
@@ -64,6 +67,7 @@ const BottomTab = ({ setIsHost }) => {
         {(props) => <Profile {...props} setIsHost={setIsHost} />}
       </Tab.Screen>
     </Tab.Navigator>
+    </WatchlistProvider>
   );
 };
 

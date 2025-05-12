@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,9 @@ import {
   ScrollView,
   Image,
   Alert,
+  Animated,
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,20 +19,10 @@ import axios from "axios";
 const HostelDataTwo = () => {
   const API_URL = "http://192.168.30.213:5000/api/create-hostel";
   const navigation = useNavigation();
-  const route = useRoute();
-  const { hostelData } = route.params || { hostelData: {} };
-  const { ownerData } = hostelData || { ownerData: {} };
+  const { hostelData } = useRoute().params || {};
+  const { ownerData } = hostelData || {};
 
   const [formData, setFormData] = useState({
-    meals: [
-      { day: "Monday", tiffin: "", lunch: "", snacks: "", dinner: "" },
-      { day: "Tuesday", tiffin: "", lunch: "", snacks: "", dinner: "" },
-      { day: "Wednesday", tiffin: "", lunch: "", snacks: "", dinner: "" },
-      { day: "Thursday", tiffin: "", lunch: "", snacks: "", dinner: "" },
-      { day: "Friday", tiffin: "", lunch: "", snacks: "", dinner: "" },
-      { day: "Saturday", tiffin: "", lunch: "", snacks: "", dinner: "" },
-      { day: "Sunday", tiffin: "", lunch: "", snacks: "", dinner: "" },
-    ],    
     photos: {
       main: null,
       messRoom: null,
@@ -41,6 +32,7 @@ const HostelDataTwo = () => {
       commonArea: null,
       balconyView: null,
       laundryArea: null,
+      messMenu: null,
     },
     wifi: "yes",
     rent: {
@@ -53,204 +45,181 @@ const HostelDataTwo = () => {
     },
   });
 
-  const handleInputChange = (field, value, index, mealType) => {
-    setFormData((prev) => {
-      const updatedMeals = [...prev.meals];
-      updatedMeals[index] = { ...updatedMeals[index], [mealType]: value };
-      return { ...prev, meals: updatedMeals };
-    });
-  };
+  // Pulse animation for messMenu icon
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1.1, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1,   duration: 800, useNativeDriver: true }),
+      ])
+    ).start();
+  }, [pulse]);
 
-  const handleRentChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      rent: {
-        ...prev.rent,
-        [field]: value,
-      },
-    }));
-  };
-
+  // Image picker common logic
   const pickImage = async (photoType) => {
-    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
-    const { status: galleryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (cameraStatus !== "granted" || galleryStatus !== "granted") {
-      Alert.alert("Permission required", "Allow camera and gallery access.");
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission required", "Allow gallery access.");
       return;
     }
-
     Alert.alert("Upload Photo", "Choose an option", [
-      { text: "Take Photo", onPress: () => handleImage("camera", photoType) },
+      { text: "Take Photo",          onPress: () => handleImage("camera", photoType) },
       { text: "Choose from Gallery", onPress: () => handleImage("gallery", photoType) },
-      { text: "Cancel", style: "cancel" },
+      { text: "Cancel",              style: "cancel" },
     ]);
   };
 
   const handleImage = async (source, photoType) => {
-    let result;
-    if (source === "camera") {
-      result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-    } else {
-      result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-    }
+    const result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 1 })
+        : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 1 });
 
     if (!result.canceled) {
       setFormData((prev) => ({
         ...prev,
-        photos: {
-          ...prev.photos,
-          [photoType]: result.assets[0].uri,
-        },
+        photos: { ...prev.photos, [photoType]: result.assets[0].uri },
       }));
     }
   };
 
-  const getIcon = (type) => {
-    const iconMap = {
-      main: "home-outline",
-      messRoom: "restaurant-outline",
-      topView: "images-outline",
-      washroom: "water-outline",
-      roomInterior: "bed-outline",
-      commonArea: "people-outline",
-      balconyView: "sunny-outline",
-      laundryArea: "shirt-outline",
-    };
-    return iconMap[type] || "image-outline";
+  // Rent input handler
+  const handleRentChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      rent: { ...prev.rent, [field]: value },
+    }));
   };
 
+  // Submit all data + images
   const handleSubmit = async () => {
+    // validate all photos
+    const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
+    if (missing.length) {
+      Alert.alert("Missing Images", `Please upload: ${missing.join(", ")}`);
+      return;
+    }
+
+    const fd = new FormData();
+    // JSON fields
+    fd.append("ownerData", JSON.stringify(ownerData));
+    fd.append("hostelData", JSON.stringify(hostelData));
+    fd.append("wifi", formData.wifi);
+    fd.append("rent", JSON.stringify(formData.rent));
+
+    // append ownerImage
+    if (ownerData.profileImage) {
+      const uriParts = ownerData.profileImage.split("/");
+      const name = uriParts[uriParts.length - 1];
+      const type = `image/${name.split(".").pop()}`;
+      fd.append("ownerImage", { uri: ownerData.profileImage, name, type });
+    }
+
+    // append hostel photos
+    Object.entries(formData.photos).forEach(([key, uri]) => {
+      const name = uri.split("/").pop();
+      const type = `image/${name.split(".").pop()}`;
+      fd.append(key, { uri, name, type });
+    });
+
     try {
-      // Step 1: Validate that at least main image is uploaded
-      const requiredPhotos = ["main", "messRoom", "topView", "washroom", "roomInterior", "commonArea", "balconyView", "laundryArea"];
-      const missingPhotos = requiredPhotos.filter((key) => !formData.photos[key]);
-  
-      if (missingPhotos.length > 0) {
-        Alert.alert("Missing Images", `Please upload the following images: ${missingPhotos.join(", ")}`);
-        return;
-      }
-  
-      // Step 2: Show preview log (for debugging)
-      console.log("All image URIs:");
-      Object.entries(formData.photos).forEach(([key, uri]) => {
-        console.log(`${key}: ${uri}`);
+      const res = await axios.post(API_URL, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-  
-      // Step 3: Construct FormData
-      const formDataToSend = new FormData();
-      formDataToSend.append("ownerData", JSON.stringify(ownerData));
-      formDataToSend.append("hostelData", JSON.stringify(hostelData));
-      formDataToSend.append("meals", JSON.stringify(formData.meals));
-      formDataToSend.append("wifi", formData.wifi);
-      formDataToSend.append("rent", JSON.stringify(formData.rent));
-  
-      // Append images to formData
-      Object.entries(formData.photos).forEach(([key, uri]) => {
-        if (uri) {
-          const fileUriParts = uri.split("/");
-          const fileName = fileUriParts[fileUriParts.length - 1];
-          const fileType = fileName.split(".").pop();
-      
-          formDataToSend.append(key, {
-            uri,
-            name: fileName,
-            type: `image/${fileType === "jpg" ? "jpeg" : fileType}`,
-          });
-        }
-      });
-      // Step 4: Submit to backend
-      const response = await axios.post(API_URL, formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",  // Ensure the content type is multipart/form-data
-          "Accept": "application/json",
-        },
-      });
-  
-      if (response.status === 201) {
-        Alert.alert("Success", "Hostel data saved successfully!");
+      if (res.status === 201) {
+        Alert.alert("Success", "Hostel data saved!");
         navigation.navigate("FinalSubmit");
       }
-    } catch (error) {
-      console.error("Submission Error:", error.response?.data || error.message);
+    } catch (err) {
+      console.error("Submission Error:", err);
       Alert.alert("Error", "Failed to submit hostel data.");
     }
   };
-    
+
+  // Icon mapping
+  const getIcon = (t) =>
+    ({
+      main:         "home-outline",
+      messRoom:     "restaurant-outline",
+      topView:      "images-outline",
+      washroom:     "water-outline",
+      roomInterior: "bed-outline",
+      commonArea:   "people-outline",
+      balconyView:  "sunny-outline",
+      laundryArea:  "shirt-outline",
+      messMenu:     "fast-food-outline",
+    }[t] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.sectionTitle}>Upload Hostel Images</Text>
+
+      {/* Standard hostel photos */}
       {[
         ["main", "messRoom"],
         ["topView", "washroom"],
         ["roomInterior", "commonArea"],
         ["balconyView", "laundryArea"],
-      ].map((pair, rowIndex) => (
-        <View key={rowIndex} style={styles.photoRow}>
-          {pair.map((photoType) => (
-            <TouchableOpacity key={photoType} style={styles.photoUpload} onPress={() => pickImage(photoType)}>
-              <Ionicons name={getIcon(photoType)} size={36} color="#6846bd" />
-              <Text style={styles.photoLabel}>{photoType.replace(/([A-Z])/g, " $1")}</Text>
-              {formData.photos[photoType] && (
-                <Image source={{ uri: formData.photos[photoType] }} style={styles.previewImage} />
+      ].map((row, i) => (
+        <View key={i} style={styles.photoRow}>
+          {row.map((type) => (
+            <TouchableOpacity
+              key={type}
+              style={styles.photoUpload}
+              onPress={() => pickImage(type)}
+            >
+              <Ionicons name={getIcon(type)} size={36} color="#6846bd" />
+              <Text style={styles.photoLabel}>{type.replace(/([A-Z])/g, " $1")}</Text>
+              {formData.photos[type] && (
+                <Image source={{ uri: formData.photos[type] }} style={styles.previewImage} />
               )}
             </TouchableOpacity>
           ))}
         </View>
       ))}
 
-      <Text style={styles.sectionTitle}>Meal Schedule</Text>
-      {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day, index) => (
-        <View key={index} style={styles.row}>
-          <Text style={styles.dayText}>{day}</Text>
-          {["tiffin", "lunch", "snacks", "dinner"].map((mealType) => (
-            <TextInput
-              key={mealType}
-              style={styles.input}
-              placeholder={mealType}
-              value={formData.meals[index][mealType]}
-              onChangeText={(value) => handleInputChange("meals", value, index, mealType)}
-            />
-          ))}
-        </View>
-      ))}
+      {/* Mess Menu with pulse */}
+      <Text style={styles.sectionTitle}>Upload Mess Menu Photo</Text>
+      <View style={styles.photoRow}>
+        <TouchableOpacity style={styles.photoUpload} onPress={() => pickImage("messMenu")}>
+          <Animated.View style={{ transform: [{ scale: pulse }] }}>
+            <Ionicons name={getIcon("messMenu")} size={36} color="#6846bd" />
+          </Animated.View>
+          <Text style={styles.photoLabel}>Mess Menu</Text>
+          {formData.photos.messMenu && (
+            <Image source={{ uri: formData.photos.messMenu }} style={styles.previewImage} />
+          )}
+        </TouchableOpacity>
+      </View>
 
+      {/* WiFi */}
       <Text style={styles.sectionTitle}>WiFi</Text>
       <Picker
         selectedValue={formData.wifi}
-        onValueChange={(value) => setFormData((prev) => ({ ...prev, wifi: value }))}
+        onValueChange={(v) => setFormData((p) => ({ ...p, wifi: v }))}
         style={styles.picker}
       >
         <Picker.Item label="Yes" value="yes" />
         <Picker.Item label="No" value="no" />
       </Picker>
 
+      {/* Rent details */}
       <Text style={styles.sectionTitle}>Rent Details</Text>
       {[
         ["OneSharing", "TwoSharing"],
         ["ThreeSharing", "FourSharing"],
         ["FiveSharing", "Advance"],
-      ].map((pair, index) => (
-        <View key={index} style={styles.rentRow}>
-          {pair.map((key) => (
+      ].map((pair, idx) => (
+        <View key={idx} style={styles.rentRow}>
+          {pair.map((k) => (
             <TextInput
-              key={key}
+              key={k}
               style={styles.input}
-              placeholder={`${key} Rent`}
+              placeholder={`${k} Rent`}
               keyboardType="numeric"
-              value={formData.rent[key]}
-              onChangeText={(value) => handleRentChange(key, value)}
+              value={formData.rent[k]}
+              onChangeText={(v) => handleRentChange(k, v)}
             />
           ))}
         </View>
@@ -264,40 +233,9 @@ const HostelDataTwo = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 15,
-    backgroundColor: "#fff",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginVertical: 12,
-    color: "#333",
-  },
-  row: {
-    marginBottom: 10,
-  },
-  rentRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 8,
-    margin: 5,
-    borderRadius: 5,
-  },
-  picker: {
-    marginVertical: 10,
-  },
-  photoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 15,
-  },
+  container: { padding: 15, backgroundColor: "#fff" },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12, color: "#333" },
+  photoRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 15 },
   photoUpload: {
     flex: 1,
     alignItems: "center",
@@ -307,32 +245,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
   },
-  photoLabel: {
-    marginTop: 6,
-    fontSize: 12,
-    textAlign: "center",
-  },
-  previewImage: {
-    width: 80,
-    height: 80,
-    marginTop: 5,
-    borderRadius: 8,
-  },
-  dayText: {
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  submitBtn: {
-    backgroundColor: "#6846bd",
-    padding: 12,
-    marginVertical: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  submitText: {
-    color: "#fff",
-    fontSize: 16,
-  },
+  photoLabel: { marginTop: 6, fontSize: 12, textAlign: "center" },
+  previewImage: { width: 80, height: 80, marginTop: 5, borderRadius: 8 },
+  picker: { marginVertical: 10 },
+  rentRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  input: { flex: 1, borderWidth: 1, borderColor: "#ccc", padding: 8, margin: 5, borderRadius: 5 },
+  submitBtn: { backgroundColor: "#6846bd", padding: 12, marginVertical: 20, borderRadius: 10, alignItems: "center" },
+  submitText: { color: "#fff", fontSize: 16 },
 });
 
 export default HostelDataTwo;

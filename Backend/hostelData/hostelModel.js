@@ -6,100 +6,111 @@ const Hostel = require("./hostelSchema");
 
 const router = express.Router();
 
-// Storage config for saving files to disk
+// Where to save uploaded files
+const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+// Multer storage config
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = "Backend/uploads";
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
-  },
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename:    (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
 });
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed."), false);
-    }
-  },
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => file.mimetype.startsWith("image/") 
+    ? cb(null, true) 
+    : cb(new Error("Only image files allowed"), false)
 });
 
-// POST route to upload hostel data with images
+// POST /api/create-hostel
 router.post(
   "/create-hostel",
   upload.fields([
-    { name: "main", maxCount: 1 },
-    { name: "messRoom", maxCount: 1 },
-    { name: "topView", maxCount: 1 },
-    { name: "washroom", maxCount: 1 },
+    { name: "main",         maxCount: 1 },
+    { name: "messRoom",     maxCount: 1 },
+    { name: "topView",      maxCount: 1 },
+    { name: "washroom",     maxCount: 1 },
     { name: "roomInterior", maxCount: 1 },
-    { name: "commonArea", maxCount: 1 },
-    { name: "balconyView", maxCount: 1 },
-    { name: "laundryArea", maxCount: 1 },
+    { name: "commonArea",   maxCount: 1 },
+    { name: "balconyView",  maxCount: 1 },
+    { name: "laundryArea",  maxCount: 1 },
+    { name: "messMenu",     maxCount: 1 },  // new
+    { name: "ownerImage",   maxCount: 1 },  // new
   ]),
   async (req, res) => {
     try {
-      const ownerData = JSON.parse(req.body.ownerData);
+      // 1) Parse JSON payloads
+      const ownerData  = JSON.parse(req.body.ownerData);
       const hostelData = JSON.parse(req.body.hostelData);
-      const rent = JSON.parse(req.body.rent);
-      const meals = JSON.parse(req.body.meals);
+      const rent       = JSON.parse(req.body.rent);
 
+    ownerData.phoneOne = ownerData.mobile1;
+    ownerData.phoneTwo = ownerData.mobile2;
+    delete ownerData.mobile1;
+    delete ownerData.mobile2;
+      // 2) Build photos subdocument
       const photos = {};
-      for (const key in req.files) {
-        photos[key] = `/uploads/${req.files[key][0].filename}`;
+      for (const key of [
+        "main","messRoom","topView","washroom",
+        "roomInterior","commonArea","balconyView",
+        "laundryArea","messMenu"
+      ]) {
+        if (req.files[key]) {
+          photos[key] = `/uploads/${req.files[key][0].filename}`;
+        }
       }
 
+      // 3) Attach ownerImage
+      if (req.files.ownerImage) {
+        ownerData.ownerImage = `/uploads/${req.files.ownerImage[0].filename}`;
+      }
+
+      // 4) Construct & save
       const hostel = new Hostel({
-        owner: ownerData,
+        owner:      ownerData,
         hostelName: hostelData.hostelName,
-        location: hostelData.location,
-        gender: hostelData.gender,
-        acType: hostelData.acType,
-        floors: hostelData.floors,
-        rooms: hostelData.rooms,
-        wifi: req.body.wifi === "true",
+        location:   hostelData.location,
+        gender:     hostelData.gender,
+        acType:     hostelData.acType,
+        floors:     hostelData.floors,
+        rooms:      hostelData.rooms,
+        wifi:       req.body.wifi === "true",
         rent,
-        meals,
-        photos,
+        photos
       });
 
       await hostel.save();
-      res.status(201).send("Hostel data saved successfully!");
       console.log("Saved hostel:", hostel._id);
+      res.status(201).send("Hostel created!");
     } catch (err) {
-      console.error("Error saving hostel data:", err);
-      res.status(500).send("Error saving hostel data.");
+      console.error("Error:", err);
+      res.status(500).send("Failed to create hostel.");
     }
   }
 );
 
-// GET all hostels
+// GET /api/hostels
 router.get("/hostels", async (req, res) => {
   try {
     const hostels = await Hostel.find();
     res.json(hostels);
   } catch (err) {
+    console.error("Fetch error:", err);
     res.status(500).json({ message: "Error fetching hostels" });
   }
 });
 
-router.delete('/delete-all-hostels', async (req, res) => {
+// DELETE /api/delete-all-hostels
+router.delete("/delete-all-hostels", async (req, res) => {
   try {
-    await Hostel.deleteMany({});  // Deletes all documents in the collection
-    res.status(200).send('All hostel data deleted successfully!');
+    await Hostel.deleteMany({});
+    res.send("All hostels deleted");
   } catch (err) {
-    console.error('Error deleting hostel data:', err);
-    res.status(500).send('Error deleting hostel data.');
+    console.error("Delete error:", err);
+    res.status(500).send("Error deleting hostels");
   }
 });
 
 module.exports = router;
-//http://192.168.30.213:5000/hostels
-//import FetchingHostelData from "../FecthingData/hosteldata";
