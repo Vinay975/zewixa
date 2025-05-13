@@ -65,7 +65,8 @@ export default function HomePage() {
             <TouchableOpacity
               key={h._id}
               style={styles.card}
-              onPress={()=>navigation.navigate('Details',{hostel:h})}
+             onPress={() => navigation.navigate('HostelDetails', { hostel: h })}
+
             >
               <Image
                 source={{ uri:`http://192.168.30.213:5000${h.photos.main}`}}

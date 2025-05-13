@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
 
 const rentSchema = new mongoose.Schema({
-  singleSharing: Number,
-  doubleSharing: Number,
-  tripleSharing: Number,
-  advance: Number,
+  OneSharing: Number,
+  TwoSharing: Number,
+  ThreeSharing: Number,
+  FourSharing:Number,
+  FiveSharing:Number,
+  Advance: Number,
 });
 
 const photoSchema = new mongoose.Schema({
