@@ -24,7 +24,7 @@ const hostelRoutes = require("./hostelData/hostelModel");
 const userRoutes = require("./userData/userRoute");
 
 app.use("/api", hostelRoutes);
-app.use("/api/auth", userRoutes);
+app.use('/', userRoutes);
 
 
 app.get("/", (req, res) => {

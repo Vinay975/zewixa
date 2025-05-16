@@ -5,29 +5,50 @@ const User = require('./userModel');
 
 const router = express.Router();
 
-// POST /signup - User Registration
+// Signup route
 router.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
 
+  if (!username || !email || !password) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+
   try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    // Check if email or username already exist
+    const existingUser = await User.findOne({
+      $or: [{ email: email.trim().toLowerCase() }, { username: username.trim() }],
+    });
     if (existingUser) {
-      return res.status(400).json({ message: 'Username or email already in use' });
+      return res.status(400).json({ success: false, message: 'Email or username already in use' });
     }
 
-    // Create a new user
-    const newUser = new User({ username, email, password });
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const newUser = new User({
+      username: username.trim(),
+      email: email.trim().toLowerCase(),
+      password: hashedPassword,
+    });
+
     await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully', user: { username, email } });
+    res.status(201).json({
+      success: true,
+      user: {
+        _id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// POST /signin - User Login
+// Signin route
 router.post('/signin', async (req, res) => {
   const { emailOrUsername, password } = req.body;
 
@@ -36,21 +57,29 @@ router.post('/signin', async (req, res) => {
   }
 
   try {
-    // Check if user exists by email or username
+    // Find user by email or username
     const user = await User.findOne({
-      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+      $or: [{ email: emailOrUsername.trim().toLowerCase() }, { username: emailOrUsername.trim() }],
     });
 
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-    // Compare the password
+    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-    // Create JWT token
+    // Generate JWT token
     const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
 
-    res.json({ message: 'Login successful', token });
+    res.json({
+      message: 'Login successful',
+      token,
+      user: { username: user.username, email: user.email },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

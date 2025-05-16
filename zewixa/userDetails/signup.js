@@ -17,35 +17,45 @@ const SignUp = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = async () => {
-    if (!username || !email || !password || !confirmPass) {
-      Alert.alert("Error", "All fields are required.");
-      return;
-    }
-    if (password !== confirmPass) {
-      Alert.alert("Error", "Passwords do not match.");
-      return;
-    }
+  if (!username || !email || !password || !confirmPass) {
+    Alert.alert("Error", "All fields are required.");
+    return;
+  }
+  if (password !== confirmPass) {
+    Alert.alert("Error", "Passwords do not match.");
+    return;
+  }
 
+  try {
+    const res = await fetch("http://192.168.30.213:5000/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+    });
+
+    const rawText = await res.text();
+    console.log("RAW SIGNUP RESPONSE:", rawText);
+
+    let data;
     try {
-      const res = await fetch("http://192.168.30.213:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        Alert.alert("Success", "Account created. Please sign in.");
-        navigation.navigate("SignIn");
-      } else {
-        Alert.alert("Error", data.message || "Something went wrong.");
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Network error. Try again.");
+      data = JSON.parse(rawText);
+    } catch (e) {
+      console.error("JSON parse error:", e, rawText);
+      Alert.alert("Error", "Unexpected response from server.");
+      return;
     }
-  };
+
+    if (res.ok) {
+      Alert.alert("Success", "Account created. Please sign in.");
+      navigation.navigate("SignIn");
+    } else {
+      Alert.alert("Error", data.message || "Something went wrong.");
+    }
+  } catch (error) {
+    console.error("Network or server error:", error);
+    Alert.alert("Error", "Network error. Try again.");
+  }
+};
 
   return (
     <View style={styles.container}>
