@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 //photos
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+
 // MongoDB connection
 mongoose.connect("mongodb+srv://Zewixa:Vinay123@hosteldata.wvwi4no.mongodb.net/hostelDB")
   .then(() => console.log("MongoDB Connected"))
@@ -22,9 +23,13 @@ mongoose.connect("mongodb+srv://Zewixa:Vinay123@hosteldata.wvwi4no.mongodb.net/h
 // ROUTES
 const hostelRoutes = require("./hostelData/hostelModel");
 const userRoutes = require("./userData/userRoute");
+const apartmentRoute = require("./apartmentData/apartmentRoute")
 
 app.use("/api", hostelRoutes);
+app.use("/api",apartmentRoute)
 app.use('/', userRoutes);
+
+
 
 
 app.get("/", (req, res) => {

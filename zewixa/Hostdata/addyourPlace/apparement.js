@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,16 +8,38 @@ import {
   ScrollView,
   Image,
   Alert,
+  Animated,
 } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import { Picker } from "@react-native-picker/picker";
+import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 
-const Apartment = () => {
+const ApartmentData = () => {
+  const API_URL = "http://192.168.30.213:5000/api/create-apartment";
+  const navigation = useNavigation();
+
+  const { ownerData } = useRoute().params || {};
+  console.log(ownerData)
+
   const [formData, setFormData] = useState({
-    photos: Array(6).fill(null), // each item: null or {uri}
-    rent: { "1BHK": "", "2BHK": "", "3BHK": "", "4BHK": "" },
+    photos: {
+      building: null,
+      livingRoom: null,
+      kitchen: null,
+      bedroom: null,
+      bathroom: null,
+      balcony: null,
+    },
+    rent: {
+      oneBHK: "",
+      twoBHK: "",
+      threeBHK: "",
+      fourBHK: "",
+    },
     advancePayment: "",
-    wifiAvailable: false,  // boolean now
+    wifiAvailable: "yes",
     security: {
       cctv: false,
       securityGuards: false,
@@ -26,206 +48,241 @@ const Apartment = () => {
     },
   });
 
-  const photoItems = [
-    { label: "Building", icon: "apartment" },
-    { label: "Living Room", icon: "weekend" },
-    { label: "Kitchen", icon: "kitchen" },
-    { label: "Bedroom", icon: "king-bed" },
-    { label: "Bathroom", icon: "bathtub" },
-    { label: "Balcony", icon: "balcony" },
-  ];
-
-  const pickImage = async (index) => {
+  // Image picker function
+  const pickImage = async (photoType) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permission required", "Please allow gallery access to select images.");
+      Alert.alert("Permission required", "Allow gallery access.");
       return;
     }
+    Alert.alert("Upload Photo", "Choose an option", [
+      { text: "Take Photo", onPress: () => handleImage("camera", photoType) },
+      { text: "Choose from Gallery", onPress: () => handleImage("gallery", photoType) },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      quality: 1,
-    });
+  const handleImage = async (source, photoType) => {
+    const result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 1 })
+        : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 1 });
 
-    if (!result.canceled && result.assets && result.assets[0].uri) {
-      const uri = result.assets[0].uri;
-      setFormData((prev) => {
-        const updatedPhotos = [...prev.photos];
-        updatedPhotos[index] = { uri };
-        return { ...prev, photos: updatedPhotos };
-      });
+    if (!result.canceled) {
+      setFormData((prev) => ({
+        ...prev,
+        photos: { ...prev.photos, [photoType]: result.assets[0].uri },
+      }));
     }
   };
 
+  // Rent input change handler
+  const handleRentChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      rent: { ...prev.rent, [field]: value },
+    }));
+  };
+
+  // Security checkbox toggle
+  const toggleSecurity = (field) => {
+    setFormData((prev) => ({
+      ...prev,
+      security: { ...prev.security, [field]: !prev.security[field] },
+    }));
+  };
+
+  // Submit function
+  const handleSubmit = async () => {
+    // Validate photos
+    const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
+    if (missing.length) {
+      Alert.alert("Missing Images", `Please upload: ${missing.join(", ")}`);
+      return;
+    }
+
+    const fd = new FormData();
+
+    fd.append("ownerData", JSON.stringify(ownerData||{}));
+    fd.append("rent", JSON.stringify(formData.rent));
+    fd.append("advancePayment", formData.advancePayment);
+    fd.append("wifiAvailable", formData.wifiAvailable);
+    fd.append("security", JSON.stringify(formData.security));
+
+    // Append photos
+    Object.entries(formData.photos).forEach(([key, uri]) => {
+      const name = uri.split("/").pop();
+      const type = `image/${name.split(".").pop()}`;
+      fd.append(key, { uri, name, type });
+    });
+
+    try {
+      const res = await axios.post(API_URL, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (res.status === 201) {
+        Alert.alert("Success", "Apartment data saved!");
+        navigation.navigate("FinalSubmit"); // or your next screen
+      }
+    } catch (err) {
+      console.error("Submission Error:", err);
+      Alert.alert("Error", "Failed to submit apartment data.");
+    }
+  };
+
+  // Icon map for photo types
+  const getIcon = (type) =>
+    ({
+      building: "business-outline",
+      livingRoom: "ios-tv-outline",
+      kitchen: "restaurant-outline",
+      bedroom: "bed-outline",
+      bathroom: "water-outline",
+      balcony: "sunny-outline",
+    }[type] || "image-outline");
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* PHOTO SELECTION */}
-      <Text style={styles.label}>Upload Photos</Text>
-      <View style={styles.photoGrid}>
-        {photoItems.map((item, index) => {
-          const photo = formData.photos[index];
-          return (
-            <TouchableOpacity
-              key={index}
-              style={styles.photoUpload}
-              onPress={() => pickImage(index)}
-            >
-              {photo ? (
-                <>
-                  <Image source={{ uri: photo.uri }} style={styles.image} />
-                  <Text style={styles.photoLabel}>{item.label}</Text>
-                </>
-              ) : (
-                <>
-                  <Icon name={item.icon} size={40} color="#6846bd" />
-                  <Text style={styles.photoLabel}>{item.label}</Text>
-                </>
-              )}
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+    <ScrollView style={styles.container}>
+      <Text style={styles.sectionTitle}>Upload Apartment Photos</Text>
 
-      {/* RENT DETAILS */}
+      {Object.keys(formData.photos).map((photoType) => (
+        <TouchableOpacity
+          key={photoType}
+          style={styles.photoUpload}
+          onPress={() => pickImage(photoType)}
+        >
+          <Ionicons name={getIcon(photoType)} size={36} color="#6846bd" />
+          <Text style={styles.photoLabel}>{photoType.charAt(0).toUpperCase() + photoType.slice(1)}</Text>
+          {formData.photos[photoType] && (
+            <Image source={{ uri: formData.photos[photoType] }} style={styles.previewImage} />
+          )}
+        </TouchableOpacity>
+      ))}
+
       <Text style={styles.sectionTitle}>Rent Details</Text>
-      {["1BHK", "2BHK", "3BHK", "4BHK"].map((type) => {
-        const val = formData.rent[type];
-        const showNotAvailable = val === "" || val === "0";
-        return (
-          <View key={type} style={styles.inputRow}>
-            <Text style={styles.label}>{type} Rent (₹):</Text>
-            <View style={{ flex: 1 }}>
-              <TextInput
-                style={[styles.input, { marginLeft: 10 }]}
-                placeholder={`Enter ${type} Rent`}
-                keyboardType="numeric"
-                value={val}
-                onChangeText={(text) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    rent: { ...prev.rent, [type]: text.replace(/[^0-9]/g, "") },
-                  }))
-                }
-              />
-              {showNotAvailable && (
-                <Text style={styles.notAvailableText}>Not Available</Text>
-              )}
-            </View>
-          </View>
-        );
-      })}
-
-      <View style={styles.inputRow}>
-        <Text style={styles.label}>Advance Payment (₹):</Text>
+      <View style={styles.rentRow}>
         <TextInput
           style={styles.input}
-          placeholder="Advance Amount"
+          placeholder="1 BHK Rent"
           keyboardType="numeric"
-          value={formData.advancePayment}
-          onChangeText={(text) =>
-            setFormData((prev) => ({ ...prev, advancePayment: text.replace(/[^0-9]/g, "") }))
-          }
+          value={formData.rent.oneBHK}
+          onChangeText={(v) => handleRentChange("oneBHK", v)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="2 BHK Rent"
+          keyboardType="numeric"
+          value={formData.rent.twoBHK}
+          onChangeText={(v) => handleRentChange("twoBHK", v)}
+        />
+      </View>
+      <View style={styles.rentRow}>
+        <TextInput
+          style={styles.input}
+          placeholder="3 BHK Rent"
+          keyboardType="numeric"
+          value={formData.rent.threeBHK}
+          onChangeText={(v) => handleRentChange("threeBHK", v)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="4 BHK Rent"
+          keyboardType="numeric"
+          value={formData.rent.fourBHK}
+          onChangeText={(v) => handleRentChange("fourBHK", v)}
         />
       </View>
 
-      {/* WIFI AVAILABILITY TOGGLE */}
-      <Text style={styles.sectionTitle}>Wi-Fi Availability</Text>
-      <TouchableOpacity
-        style={[
-          styles.checkbox,
-          formData.wifiAvailable && styles.checkboxSelected,
-          { marginBottom: 15 },
-        ]}
-        onPress={() =>
-          setFormData((prev) => ({ ...prev, wifiAvailable: !prev.wifiAvailable }))
-        }
-      >
-        <Text style={styles.checkboxText}>
-          {formData.wifiAvailable ? "✔" : "○"} Wi-Fi Available
-        </Text>
-      </TouchableOpacity>
+      <TextInput
+        style={styles.input}
+        placeholder="Advance Payment"
+        keyboardType="numeric"
+        value={formData.advancePayment}
+        onChangeText={(v) => setFormData((p) => ({ ...p, advancePayment: v }))}
+      />
 
-      {/* SECURITY CHECKBOXES */}
+      <Text style={styles.sectionTitle}>WiFi Available</Text>
+      <Picker
+        selectedValue={formData.wifiAvailable}
+        onValueChange={(v) => setFormData((p) => ({ ...p, wifiAvailable: v }))}
+        style={styles.picker}
+      >
+        <Picker.Item label="Yes" value="yes" />
+        <Picker.Item label="No" value="no" />
+      </Picker>
+
       <Text style={styles.sectionTitle}>Security Features</Text>
-      {[
-        { key: "cctv", label: "CCTV Cameras" },
-        { key: "securityGuards", label: "Security Guards" },
-        { key: "gatedCommunity", label: "Gated Community" },
-        { key: "fireSafety", label: "Fire Safety Equipment" },
-      ].map((item) => (
+      {Object.keys(formData.security).map((key) => (
         <TouchableOpacity
-          key={item.key}
-          style={[styles.checkbox, formData.security[item.key] && styles.checkboxSelected]}
-          onPress={() =>
-            setFormData((prev) => ({
-              ...prev,
-              security: { ...prev.security, [item.key]: !prev.security[item.key] },
-            }))
-          }
+          key={key}
+          style={styles.checkboxContainer}
+          onPress={() => toggleSecurity(key)}
         >
-          <Text style={styles.checkboxText}>
-            {formData.security[item.key] ? "✔" : "○"} {item.label}
+          <Ionicons
+            name={formData.security[key] ? "checkbox-outline" : "square-outline"}
+            size={24}
+            color="#6846bd"
+          />
+          <Text style={styles.checkboxLabel}>
+            {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")}
           </Text>
         </TouchableOpacity>
       ))}
 
-      {/* SUBMIT BUTTON */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+        <Text style={styles.submitText}>Submit Apartment</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  label: { fontSize: 16, fontWeight: "600", marginBottom: 5 },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", marginTop: 20, marginBottom: 10 },
-  inputRow: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
+  container: { padding: 15, backgroundColor: "#fff" },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12, color: "#333" },
+  photoUpload: {
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 8,
+  },
+  photoLabel: { marginTop: 6, fontSize: 14, textAlign: "center" },
+  previewImage: { width: 120, height: 120, marginTop: 5, borderRadius: 8 },
+  rentRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
   input: {
     flex: 1,
     borderWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
+    padding: 8,
+    margin: 5,
     borderRadius: 5,
-    marginLeft: 10,
+    fontSize: 14,
   },
-  photoGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  photoUpload: {
-    width: "30%",
-    aspectRatio: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
+  picker: { marginVertical: 10 },
+  checkboxContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    marginBottom: 8,
   },
-  image: { width: "100%", height: "100%", borderRadius: 10 },
-  photoLabel: { fontSize: 12, marginTop: 5, textAlign: "center", color: "#333" },
-  notAvailableText: { color: "red", fontSize: 12, marginTop: 3 },
-  checkbox: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 5,
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#444",
   },
-  checkboxSelected: { backgroundColor: "#6846bd" },
-  checkboxText: { fontSize: 14, color: "#000" },
-  buttonContainer: { alignItems: "center", marginTop: 20 },
-  button: {
-    width: 120,
-    paddingVertical: 12,
+  submitBtn: {
     backgroundColor: "#6846bd",
-    borderRadius: 5,
+    padding: 14,
+    marginVertical: 20,
+    borderRadius: 10,
     alignItems: "center",
   },
-  buttonText: { fontSize: 18, color: "white" },
+  submitText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });
 
-export default Apartment;
+export default ApartmentData;
