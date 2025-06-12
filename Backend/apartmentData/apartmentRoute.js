@@ -71,6 +71,16 @@ router.post("/create-apartment", cpUpload, async (req, res) => {
   }
 });
 
+router.get("/apartment", async (req, res) => {
+  try {
+    const apartment = await Apartment.find();
+    res.json(apartment);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    res.status(500).json({ message: "Error fetching Apartments" });
+  }
+});
+
 module.exports = router;
 
 

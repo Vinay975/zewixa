@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import Home from "./bottomscreens/home";
-import Scanner from "./bottomscreens/scanner";
+// import Scanner from "./bottomscreens/scanner";
 import WatchList from "./bottomscreens/watchlist";
 import AddHub from "./bottomscreens/addhub";
 import Profile from "./bottomscreens/profile";
@@ -59,7 +59,7 @@ const BottomTab = ({ setIsHost }) => {
           }}
         />
         <Tab.Screen name="WatchList" component={WatchList} />
-        <Tab.Screen name="Scanner" component={Scanner} />
+        {/* <Tab.Screen name="Scanner" component={Scanner} /> */}
         <Tab.Screen
           name="Booking"
           component={AddHub}

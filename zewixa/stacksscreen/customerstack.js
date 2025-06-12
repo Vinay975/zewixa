@@ -5,6 +5,13 @@ import BottomTab from "../bottomTab";
 import Settings from "../customerScreens/profileScreens/setting";
 import FetchingHostelData from "../FecthingData/hosteldata";
 import HostelDetails from "../FecthingData/displayingData";
+import ApartmentDetails from '../FecthingData/apartmentDetails';
+
+
+import ContactUs from '../SupportPage/contact';
+import HelpCentre from '../SupportPage/helpCentre';
+import TermsOfService from '../SupportPage/termsofservice';
+import PrivacyPolicy from '../SupportPage/privacypolice';
 import SignIn from "../userDetails/signin";
 import SignUp from "../userDetails/signup";
 import { AuthContext } from "../userDetails/userAuth";
@@ -27,6 +34,27 @@ const CustomerStack = ({ setIsHost }) => {
         component={Settings}
         options={{ headerShown: true }}
       />
+      
+      <CustomerBar.Screen
+        name="ContactUs   "
+        component={ContactUs}
+        options={{ headerShown: true }}
+      />
+      <CustomerBar.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicy}
+        options={{ headerShown: true }}
+      />
+      <CustomerBar.Screen
+        name="TermsOfService"
+        component={TermsOfService}
+        options={{ headerShown: true }}
+      />
+       <CustomerBar.Screen
+        name="HelpCentre"
+        component={HelpCentre}
+        options={{ headerShown: true }}
+      />
       <CustomerBar.Screen name="SignIn"
         options={{ headerShown: true }}>
         {(props) => (
@@ -43,6 +71,11 @@ const CustomerStack = ({ setIsHost }) => {
       <CustomerBar.Screen
         name="HostelDetails"
         component={HostelDetails}
+        options={{ headerShown: true }}
+      />
+       <CustomerBar.Screen
+        name="ApartmentDetails"
+        component={ApartmentDetails}
         options={{ headerShown: true }}
       />
     </CustomerBar.Navigator>

@@ -12,36 +12,50 @@ import { WatchlistContext } from '../FecthingData/watchingDetails';
 
 export default function HomePage() {
   const [hostels, setHostels] = useState([]);
+  const [apartments, setApartments] = useState([]);
+  const [showHostels, setShowHostels] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
-  // const { watchlist, toggleWatch } = useContext(WatchlistContext);
   const { watchlist, toggleWatch } = useContext(WatchlistContext);
 
   useEffect(() => {
     axios.get('http://192.168.30.213:5000/api/hostels')
       .then(({ data }) => setHostels(data))
       .catch(console.error);
+
+    axios.get('http://192.168.30.213:5000/api/apartment')
+      .then(({ data }) => setApartments(data))
+      .catch(console.error);
   }, []);
 
   const applyFilter = (h) => {
     const q = search.toLowerCase();
     if (q && !(
-      h.hostelName.toLowerCase().includes(q) ||
-      h.location.toLowerCase().includes(q)
+      h.hostelName?.toLowerCase().includes(q) ||
+      h.location?.toLowerCase().includes(q) ||
+      h.ownerData?.ownerName?.toLowerCase().includes(q)
     )) return false;
+
     if (filter.acOnly && h.acType !== 'AC') return false;
-    if (filter.gender && filter.gender!=='All' && h.gender !== filter.gender) return false;
-    const rent = h.rent.singleSharing;
+    if (filter.gender && filter.gender !== 'All' && h.gender !== filter.gender) return false;
+
+    const rent = h.rent?.singleSharing || h.rent?.["1BHK"] || 0;
     if (filter.minRent && rent < +filter.minRent) return false;
     if (filter.maxRent && rent > +filter.maxRent) return false;
+
     return true;
   };
 
+  const displayedItems = showHostels ? hostels : apartments;
+
   return (
     <View style={styles.screen}>
-      {/* Header */}
+
+
+
+      {/* Search Header */}
       <View style={styles.header}>
         <Ionicons name="location-outline" size={24} color="#6846bd" />
         <TextInput
@@ -53,47 +67,80 @@ export default function HomePage() {
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <Ionicons name="filter-outline" size={24} color="#6846bd" />
         </TouchableOpacity>
-        {/* <TouchableOpacity onPress={()=>navigation.navigate('WatchList')}>
-          <Ionicons name="heart" size={24} color="tomato" style={{ marginLeft:12 }}/>
-        </TouchableOpacity> */}
+      </View>
+      {/* Toggle Buttons */}
+      <View style={styles.toggleContainer}>
+        <TouchableOpacity
+          style={[styles.toggleButton, showHostels && styles.activeToggle]}
+          onPress={() => setShowHostels(true)}
+        >
+          <Text style={[styles.toggleText, showHostels && styles.activeToggleText]}>Hostels</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.toggleButton, !showHostels && styles.activeToggle]}
+          onPress={() => setShowHostels(false)}
+        >
+          <Text style={[styles.toggleText, !showHostels && styles.activeToggleText]}>Apartments</Text>
+        </TouchableOpacity>
       </View>
 
+      {/* List */}
       <ScrollView contentContainerStyle={styles.list}>
-        {hostels.filter(applyFilter).map(h => {
-          const liked = watchlist.some(w=>w._id===h._id);
+        {displayedItems.filter(applyFilter).map(item => {
+          const liked = watchlist.some(w => w._id === item._id);
+          const isHostel = showHostels;
+
           return (
             <TouchableOpacity
-              key={h._id}
+              key={item._id}
               style={styles.card}
-             onPress={() => navigation.navigate('HostelDetails', { hostel: h })}
-
+              onPress={() => navigation.navigate(
+                isHostel ? 'HostelDetails' : 'ApartmentDetails',
+                isHostel ? { hostel: item } : { apartment: item }
+              )}
             >
               <Image
-                source={{ uri:`http://192.168.30.213:5000${h.photos.main}`}}
+                source={{ uri: `http://192.168.30.213:5000${item.photos?.main || item.photos?.building}` }}
                 style={styles.cardImage}
               />
               <View style={styles.cardInfo}>
-                <View style={styles.row}>
-                  <MaterialIcons name="home" size={16} color="#6846bd"/>
-                  <Text style={styles.text}>{h.hostelName}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Ionicons name="location-outline" size={16} color="#6846bd"/>
-                  <Text style={styles.text}>{h.location}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Ionicons
-                    name={h.gender==='Male'?'male-outline':'female-outline'}
-                    size={16} color="#6846bd"
-                  />
-                  <Text style={styles.text}>{h.gender}</Text>
-                </View>
+                {isHostel ? (
+                  <>
+                    <View style={styles.row}>
+                      <MaterialIcons name="home" size={16} color="#6846bd" />
+                      <Text style={styles.text}>{item.hostelName}</Text>
+                    </View>
+                    <View style={styles.row}>
+                      <Ionicons name="location-outline" size={16} color="#6846bd" />
+                      <Text style={styles.text}>{item.location}</Text>
+                    </View>
+                    <View style={styles.row}>
+                      <Ionicons
+                        name={item.gender === 'Male' ? 'male-outline' : 'female-outline'}
+                        size={16}
+                        color="#6846bd"
+                      />
+                      <Text style={styles.text}>{item.gender}</Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <View style={styles.row}>
+                      <MaterialIcons name="person" size={16} color="#6846bd" />
+                      <Text style={styles.text}>Owner: {item.ownerData?.name || 'N/A'}</Text>
+                    </View>
+                    <View style={styles.row}>
+                      <Ionicons name="location-outline" size={16} color="#6846bd" />
+                      <Text style={styles.text}>{item.ownerData?.location || item.location || 'N/A'}</Text>
+                    </View>
+                  </>
+                )}
               </View>
-              <TouchableOpacity onPress={()=>toggleWatch(h)} style={styles.heartBtn}>
+              <TouchableOpacity onPress={() => toggleWatch(item)} style={styles.heartBtn}>
                 <Ionicons
-                  name={liked?'heart':'heart-outline'}
+                  name={liked ? 'heart' : 'heart-outline'}
                   size={24}
-                  color={liked?'tomato':'#ccc'}
+                  color={liked ? 'tomato' : '#ccc'}
                 />
               </TouchableOpacity>
             </TouchableOpacity>
@@ -103,33 +150,74 @@ export default function HomePage() {
 
       <FilterModal
         visible={modalVisible}
-        onClose={()=>setModalVisible(false)}
-        onApply={(f)=>{ setFilter(f); setModalVisible(false);} }
+        onClose={() => setModalVisible(false)}
+        onApply={(f) => { setFilter(f); setModalVisible(false); }}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex:1, backgroundColor:'#f2f2f2' },
+  screen: { flex: 1, backgroundColor: '#f2f2f2' },
+  toggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 8
+  },
+  toggleButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 40,
+    borderRadius: 20,
+    marginHorizontal: 25,
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 2,
+    elevation: 2,
+    shadowColor: '#000',
+  },
+  activeToggle: {
+    backgroundColor: '#6846bd'
+  },
+  toggleText: {
+    fontSize: 18,
+    color: '#6846bd'
+  },
+  activeToggleText: {
+    color: '#fff',
+    fontWeight: 'bold'
+  },
   header: {
-    flexDirection:'row', alignItems:'center',
-    padding:8, margin:12,
-    backgroundColor:'#fff', borderRadius:8,
-    borderWidth:1, borderColor:'#ddd'
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    margin: 12,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd'
   },
-  search: { flex:1, marginHorizontal:8, fontSize:16 },
-  list: { padding:12 },
+  search: {
+    flex: 1,
+    marginHorizontal: 8,
+    fontSize: 16
+  },
+  list: { padding: 12 },
   card: {
-    flexDirection:'row', alignItems:'center',
-    backgroundColor:'#fff', borderRadius:8,
-    marginBottom:12, padding:8,
-    elevation:2, shadowColor:'#000', shadowOffset:{width:0,height:2},
-    shadowOpacity:0.1, shadowRadius:4
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 12,
+    padding: 8,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4
   },
-  cardImage: { width:80, height:80, borderRadius:8 },
-  cardInfo: { flex:1, marginLeft:8 },
-  row: { flexDirection:'row', alignItems:'center', marginBottom:4 },
-  text: { marginLeft:4, fontSize:14, color:'#333' },
-  heartBtn: { padding:4 }
+  cardImage: { width: 80, height: 80, borderRadius: 8 },
+  cardInfo: { flex: 1, marginLeft: 8 },
+  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  text: { marginLeft: 4, fontSize: 14, color: '#333' },
+  heartBtn: { padding: 4 }
 });

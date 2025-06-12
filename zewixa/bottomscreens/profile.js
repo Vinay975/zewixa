@@ -147,7 +147,7 @@ const Profile = ({ navigation, setIsHost }) => {
       <View style={styles.optionsContainer}>
         <OptionRow
           title="Help Center"
-          onPress={() => navigation.navigate("HelpCenter")}
+          onPress={() => navigation.navigate("HelpCentre")}
           iconName="help-circle-outline"
         />
         <OptionRow
