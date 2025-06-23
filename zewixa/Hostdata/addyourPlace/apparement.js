@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 const ApartmentData = () => {
-  const API_URL = "http://192.168.30.213:5000/api/create-apartment";
+ const API_URL = "https://zewixa-backend.onrender.com/api/create-apartment";
   const navigation = useNavigation();
 
   const { ownerData } = useRoute().params || {};

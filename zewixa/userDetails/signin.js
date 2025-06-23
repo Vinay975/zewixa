@@ -23,7 +23,7 @@ const SignIn = ({ navigation }) => {
     }
 
     try {
-      const res = await fetch('http://192.168.30.213:5000/signin', {
+      const res = await fetch('https://zewixa-backend.onrender.com/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
