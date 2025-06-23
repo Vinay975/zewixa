@@ -51,7 +51,7 @@ export default function HostelDetails({ route }) {
       {/* Profile Section */}
       <View style={styles.profileCard}>
         <Image
-          source={{ uri: `http://192.168.30.213:5000${hostel.owner?.ownerImage}` }}
+           source={{ uri: `https://zewixa-backend.onrender.com${hostel.owner?.ownerImage}` }}
           style={styles.ownerImage}
         />
         <View style={styles.ownerInfo}>
@@ -104,9 +104,9 @@ export default function HostelDetails({ route }) {
       {hostel.photos?.messMenu && (
         <View>
           <Text style={styles.sectionTitle}>Mess Menu</Text>
-          <TouchableOpacity onPress={() => openImageModal(`http://192.168.30.213:5000${hostel.photos.messMenu}`)}>
+          <TouchableOpacity onPress={() => openImageModal(`https://zewixa-backend.onrender.com${hostel.photos.messMenu}`)}>
             <Image
-              source={{ uri: `http://192.168.30.213:5000${hostel.photos.messMenu}` }}
+               source={{ uri: `https://zewixa-backend.onrender.com${hostel.photos.messMenu}` }}
               style={styles.photoItem}
             />
           </TouchableOpacity>
@@ -121,11 +121,11 @@ export default function HostelDetails({ route }) {
           return (
             <TouchableOpacity
               key={key}
-              onPress={() => openImageModal(`http://192.168.30.213:5000${uri}`)}
+              onPress={() => openImageModal(`https://zewixa-backend.onrender.com${uri}`)}
               style={styles.imageWrapper}
             >
               <Image
-                source={{ uri: `http://192.168.30.213:5000${uri}` }}
+                source={{ uri: `https://zewixa-backend.onrender.com${uri}` }}
                 style={styles.gridPhoto}
               />
               <Text style={styles.photoLabel}>{key.replace(/([A-Z])/g, ' $1')}</Text>

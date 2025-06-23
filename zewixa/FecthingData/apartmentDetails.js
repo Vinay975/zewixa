@@ -7,11 +7,11 @@ export default function ApartmentDetails({ route }) {
 
     const photo = (key) =>
         apartment.photos?.[key]
-            ? `http://192.168.30.213:5000/${apartment.photos[key]}`
+            ? `https://zewixa-backend.onrender.com/${apartment.photos[key]}`
             : null;
 
     const profilePhoto = apartment.ownerData?.profileImage
-        ? `http://192.168.30.213:5000/${apartment.ownerData.profileImage}`
+        ? `https://zewixa-backend.onrender.com/${apartment.ownerData.profileImage}`
         : null;
 
     const openDialer = () => {
