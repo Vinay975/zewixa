@@ -7,7 +7,7 @@ const Hostel = require("./hostelSchema");
 const router = express.Router();
 
 // Where to save uploaded files
-const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
+const UPLOAD_DIR = path.join(__dirname, "..", "uploads", "forHostelPhotos");
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 // Multer storage config
@@ -58,13 +58,14 @@ router.post(
         "laundryArea","messMenu"
       ]) {
         if (req.files[key]) {
-          photos[key] = `/uploads/${req.files[key][0].filename}`;
+          photos[key] = `/uploads/forHostelPhotos/${req.files[key][0].filename}`;
         }
       }
 
       // 3) Attach ownerImage
       if (req.files.ownerImage) {
-        ownerData.ownerImage = `/uploads/${req.files.ownerImage[0].filename}`;
+        ownerData.ownerImage = `/uploads/forHostelPhotos/${req.files.ownerImage[0].filename}`;
+
       }
 
       // 4) Construct & save

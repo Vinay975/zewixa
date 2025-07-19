@@ -21,11 +21,11 @@ export default function HomePage() {
   const { watchlist, toggleWatch } = useContext(WatchlistContext);
 
   useEffect(() => {
-    axios.get('http://192.168.30.213:5000/api/hostels')
+    axios.get('https://myapp-kida.onrender.com/api/hostels')
       .then(({ data }) => setHostels(data))
       .catch(console.error);
 
-    axios.get('http://192.168.30.213:5000/api/apartment')
+    axios.get('https://myapp-kida.onrender.com/api/apartment')
       .then(({ data }) => setApartments(data))
       .catch(console.error);
   }, []);
@@ -100,7 +100,7 @@ export default function HomePage() {
               )}
             >
               <Image
-                source={{ uri: `http://192.168.30.213:5000${item.photos?.main || item.photos?.building}` }}
+                source={{ uri: `https://myapp-kida.onrender.com${item.photos?.main || item.photos?.building}` }}
                 style={styles.cardImage}
               />
               <View style={styles.cardInfo}>

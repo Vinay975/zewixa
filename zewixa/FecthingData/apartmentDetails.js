@@ -7,11 +7,11 @@ export default function ApartmentDetails({ route }) {
 
     const photo = (key) =>
         apartment.photos?.[key]
-            ? `https://zewixa-backend.onrender.com/${apartment.photos[key]}`
+            ? `https://myapp-kida.onrender.com/${apartment.photos[key]}`
             : null;
 
     const profilePhoto = apartment.ownerData?.profileImage
-        ? `https://zewixa-backend.onrender.com/${apartment.ownerData.profileImage}`
+        ? `https://myapp-kida.onrender.com${apartment.ownerData.profileImage}`
         : null;
 
     const openDialer = () => {
