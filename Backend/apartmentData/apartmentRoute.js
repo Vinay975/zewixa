@@ -10,7 +10,7 @@ router.use(express.json());
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Make sure this folder exists
+    cb(null, "uploads/"); 
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -27,12 +27,13 @@ const cpUpload = upload.fields([
   { name: "bedroom", maxCount: 1 },
   { name: "bathroom", maxCount: 1 },
   { name: "balcony", maxCount: 1 },
+  { name: "owner", maxCount: 1 },
 ]);
 router.post("/create-apartment", cpUpload, async (req, res) => {
   try {
     const { ownerData, rent, advancePayment, wifiAvailable, security } = req.body;
 
-    // Parse JSON fields
+  
     const owner = ownerData ? JSON.parse(ownerData) : {};
     console.log(owner);
     const rentParsed = rent ? JSON.parse(rent) : {};
@@ -49,7 +50,10 @@ router.post("/create-apartment", cpUpload, async (req, res) => {
 
     // Create new Apartment document
     const apartment = new Apartment({
-      ownerData: owner,
+      ownerData: {
+        ...owner,
+        photo: photos.owner || "", 
+      },
       photos,
       rent: {
         "1BHK": rentParsed.oneBHK || "",

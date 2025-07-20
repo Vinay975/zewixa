@@ -4,8 +4,8 @@ const apartmentSchema = new mongoose.Schema({
   ownerData: {
     name: String,
     email: String,
-    mobile1: String,   
-  mobile2: String,
+    mobile1: String,
+    mobile2: String,
     profileImage: String,
   },
   photos: {

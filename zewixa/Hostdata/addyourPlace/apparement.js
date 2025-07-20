@@ -31,6 +31,7 @@ const ApartmentData = () => {
       bedroom: null,
       bathroom: null,
       balcony: null,
+      owner: null,
     },
     rent: {
       oneBHK: "",

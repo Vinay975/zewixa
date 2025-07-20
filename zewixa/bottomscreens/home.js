@@ -25,7 +25,7 @@ export default function HomePage() {
       .then(({ data }) => setHostels(data))
       .catch(console.error);
 
-    axios.get('https://myapp-kida.onrender.com/api/apartment')
+    axios.get('https://myapp-kida.onrender.com/api/get-apartment-data')
       .then(({ data }) => setApartments(data))
       .catch(console.error);
   }, []);
