@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 const ApartmentData = () => {
- const API_URL = "https://myapp-kida.onrender.com/api/create-apartment";
+  const API_URL = "https://myapp-kida.onrender.com/api/create-apartment";
   const navigation = useNavigation();
 
   const { ownerData } = useRoute().params || {};
@@ -102,23 +102,24 @@ const ApartmentData = () => {
       return;
     }
 
-    const fd = new FormData();
 
-    fd.append("ownerData", JSON.stringify(ownerData||{}));
-    fd.append("rent", JSON.stringify(formData.rent));
-    fd.append("advancePayment", formData.advancePayment);
-    fd.append("wifiAvailable", formData.wifiAvailable);
-    fd.append("security", JSON.stringify(formData.security));
+    const formDataToSend = new FormData();
+
+    formDataToSend.append("ownerData", JSON.stringify(ownerData));
+    formDataToSend.append("rent", JSON.stringify(formData.rent));
+    formDataToSend.append("advancePayment", formData.advancePayment);
+    formDataToSend.append("wifiAvailable", formData.wifiAvailable);
+    formDataToSend.append("security", JSON.stringify(formData.security));
 
     // Append photos
     Object.entries(formData.photos).forEach(([key, uri]) => {
       const name = uri.split("/").pop();
       const type = `image/${name.split(".").pop()}`;
-      fd.append(key, { uri, name, type });
+      formDataToSend.append(key, { uri, name, type });
     });
 
     try {
-      const res = await axios.post(API_URL, fd, {
+      const res = await axios.post(API_URL, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (res.status === 201) {
@@ -133,14 +134,14 @@ const ApartmentData = () => {
 
   // Icon map for photo types
   const getIcon = (type) =>
-    ({
-      building: "business-outline",
-      livingRoom: "ios-tv-outline",
-      kitchen: "restaurant-outline",
-      bedroom: "bed-outline",
-      bathroom: "water-outline",
-      balcony: "sunny-outline",
-    }[type] || "image-outline");
+  ({
+    building: "business-outline",
+    livingRoom: "ios-tv-outline",
+    kitchen: "restaurant-outline",
+    bedroom: "bed-outline",
+    bathroom: "water-outline",
+    balcony: "sunny-outline",
+  }[type] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>
