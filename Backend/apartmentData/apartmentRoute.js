@@ -1,90 +1,110 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-const Apartment = require("./apartmentModel");
 const fs = require("fs");
+const Apartment = require("./apartmentModel");
+
 const router = express.Router();
-router.use(express.urlencoded({ extended: true }));
-router.use(express.json());
 
+// Create upload directory if it doesn't exist
+const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
+// Configure multer storage
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); 
+  destination: function (req, file, cb) {
+    cb(null, UPLOAD_DIR);
   },
-  filename: (req, file, cb) => {
+  filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + "-" + uniqueSuffix + ext);
   },
 });
 
+// Setup multer upload with required fields
 const upload = multer({ storage });
 
-const cpUpload = upload.fields([
+const uploadFields = upload.fields([
+  { name: "owner", maxCount: 1 },
   { name: "building", maxCount: 1 },
   { name: "livingRoom", maxCount: 1 },
   { name: "kitchen", maxCount: 1 },
   { name: "bedroom", maxCount: 1 },
   { name: "bathroom", maxCount: 1 },
   { name: "balcony", maxCount: 1 },
-  { name: "owner", maxCount: 1 },
 ]);
-router.post("/create-apartment", cpUpload, async (req, res) => {
+
+// Route to create apartment
+router.post("/create-apartment", uploadFields, async (req, res) => {
   try {
-    const { ownerData, rent, advancePayment, wifiAvailable, security } = req.body;
+    console.log("BODY:", req.body);
+    console.log("FILES:", Object.keys(req.files || {}));
 
-  
-    const owner = ownerData ? JSON.parse(ownerData) : {};
-    console.log(owner);
-    const rentParsed = rent ? JSON.parse(rent) : {};
-    const securityParsed = security ? JSON.parse(security) : {};
-    const wifiBool = wifiAvailable === "yes" || wifiAvailable === true;
+    const {
+      ownerData,
+      rentOne,
+      rentTwo,
+      rentThree,
+      rentFour,
+      rentFive,
+      advance,
+      wifiAvailable,
+      wifiProvider,
+      securityDeposit,
+      cctv,
+      nightGuard,
+    } = req.body;
 
-    // Build photos object from uploaded files
-    const photos = {};
-    if (req.files) {
-      Object.entries(req.files).forEach(([key, files]) => {
-        photos[key] = files[0].path; // save the file path
-      });
+    if (!ownerData) {
+      return res.status(400).json({ message: "Missing ownerData in request body" });
     }
 
-    // Create new Apartment document
+    const owner = JSON.parse(ownerData); // because you stringify in frontend
+
+    const getFilename = (field) => req.files?.[field]?.[0]?.filename || "";
+
     const apartment = new Apartment({
-      ownerData: {
-        ...owner,
-        photo: photos.owner || "", 
+      ownerName: owner.name,
+      ownerEmail: owner.email,
+      ownerMobile: owner.mobile,
+      ownerPhoto: getFilename("owner"),
+      photos: {
+        building: getFilename("building"),
+        livingRoom: getFilename("livingRoom"),
+        kitchen: getFilename("kitchen"),
+        bedroom: getFilename("bedroom"),
+        bathroom: getFilename("bathroom"),
+        balcony: getFilename("balcony"),
       },
-      photos,
       rent: {
-        "1BHK": rentParsed.oneBHK || "",
-        "2BHK": rentParsed.twoBHK || "",
-        "3BHK": rentParsed.threeBHK || "",
-        "4BHK": rentParsed.fourBHK || "",
+        oneSharing: rentOne,
+        twoSharing: rentTwo,
+        threeSharing: rentThree,
+        fourSharing: rentFour,
+        fiveSharing: rentFive,
+        advance,
       },
-      advancePayment,
-      wifiAvailable: wifiBool,
-      security: securityParsed,
+      wifi: {
+        available: wifiAvailable === "true",
+        provider: wifiProvider || "",
+      },
+      security: {
+        deposit: securityDeposit,
+        cctv: cctv === "true",
+        nightGuard: nightGuard === "true",
+      },
     });
 
     await apartment.save();
 
     res.status(201).json({ message: "Apartment created successfully", apartment });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.get("/get-apartment-data", async (req, res) => {
-  try {
-    const apartment = await Apartment.find();
-    res.json(apartment);
-  } catch (err) {
-    console.error("Fetch error:", err);
-    res.status(500).json({ message: "Error fetching Apartments" });
+    console.error("CREATE APARTMENT ERROR:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
 module.exports = router;
-
-

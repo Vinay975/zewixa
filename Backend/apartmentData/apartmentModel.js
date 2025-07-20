@@ -1,13 +1,10 @@
 const mongoose = require("mongoose");
 
 const apartmentSchema = new mongoose.Schema({
-  ownerData: {
-    name: String,
-    email: String,
-    mobile1: String,
-    mobile2: String,
-    profileImage: String,
-  },
+  ownerName: String,
+  ownerEmail: String,
+  ownerMobile: String,
+  ownerPhoto: String,
   photos: {
     building: String,
     livingRoom: String,
@@ -17,19 +14,22 @@ const apartmentSchema = new mongoose.Schema({
     balcony: String,
   },
   rent: {
-    "1BHK": String,
-    "2BHK": String,
-    "3BHK": String,
-    "4BHK": String,
+    oneSharing: String,
+    twoSharing: String,
+    threeSharing: String,
+    fourSharing: String,
+    fiveSharing: String,
+    advance: String,
   },
-  advancePayment: String,
-  wifiAvailable: Boolean,
+  wifi: {
+    available: Boolean,
+    provider: String,
+  },
   security: {
+    deposit: String,
     cctv: Boolean,
-    securityGuards: Boolean,
-    gatedCommunity: Boolean,
-    fireSafety: Boolean,
+    nightGuard: Boolean,
   },
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model("Apartment", apartmentSchema);
