@@ -21,7 +21,7 @@ const ApartmentData = () => {
   const navigation = useNavigation();
 
   const { ownerData } = useRoute().params || {};
-  console.log(ownerData)
+  // console.log(ownerData)
 
   const [formData, setFormData] = useState({
     photos: {

@@ -104,7 +104,7 @@ export default function HomePage() {
   source={{
     uri: showHostels
       ? `https://myapp-kida.onrender.com${item.photos?.main}`
-      : `https://myapp-kida.onrender.com/uploads/${item.photos?.building}`
+      : `https://myapp-kida.onrender.com/${item.photos?.building}`
   }}
   style={styles.cardImage}
 />

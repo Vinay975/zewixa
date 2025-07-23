@@ -6,13 +6,13 @@ const Apartment = require("./apartmentModel");
 
 const router = express.Router();
 
-// Create uploads dir
-const UPLOAD_DIR = path.join(__dirname, "..", "uploads","forApartmentPhotos");
+// -------------------- Upload Directory Setup --------------------
+const UPLOAD_DIR = path.join(__dirname, "..", "uploads", "forApartmentPhotos");
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
-// Multer config
+// -------------------- Multer Config --------------------
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, UPLOAD_DIR);
@@ -35,6 +35,7 @@ const uploadFields = upload.fields([
   { name: "bathroom", maxCount: 1 },
   { name: "balcony", maxCount: 1 },
 ]);
+
 
 router.post("/create-apartment", uploadFields, async (req, res) => {
   try {
@@ -61,21 +62,26 @@ router.post("/create-apartment", uploadFields, async (req, res) => {
     const rentObj = JSON.parse(rent);
     const securityObj = JSON.parse(security || "{}");
 
-    const getFilename = (field) => req.files?.[field]?.[0]?.filename || "";
+    const getPhotoPath = (field) => {
+      const file = req.files?.[field]?.[0];
+      return file ? `/uploads/forApartmentPhotos/${file.filename}` : "";
+    };
 
     const apartment = new Apartment({
       ownerName: owner.name,
       ownerEmail: owner.email,
       ownerMobile: owner.mobile,
-      ownerPhoto: getFilename("owner"),
+      ownerPhoto: getPhotoPath("owner"),
+
       photos: {
-        building: getFilename("building"),
-        livingRoom: getFilename("livingRoom"),
-        kitchen: getFilename("kitchen"),
-        bedroom: getFilename("bedroom"),
-        bathroom: getFilename("bathroom"),
-        balcony: getFilename("balcony"),
+        building: getPhotoPath("building"),
+        livingRoom: getPhotoPath("livingRoom"),
+        kitchen: getPhotoPath("kitchen"),
+        bedroom: getPhotoPath("bedroom"),
+        bathroom: getPhotoPath("bathroom"),
+        balcony: getPhotoPath("balcony"),
       },
+
       rent: {
         oneSharing: rentObj.oneBHK,
         twoSharing: rentObj.twoBHK,
@@ -83,21 +89,26 @@ router.post("/create-apartment", uploadFields, async (req, res) => {
         fourSharing: rentObj.fourBHK,
         advance: advancePayment,
       },
+
       wifi: {
         available: wifiAvailable === "yes",
-        provider: "", // optional if you want
+        provider: "", // optional
       },
+
       security: {
         deposit: "",
-        cctv: securityObj.cctv,
+        cctv: securityObj.cctv || false,
         nightGuard: securityObj.securityGuards || false,
         gatedCommunity: securityObj.gatedCommunity || false,
         fireSafety: securityObj.fireSafety || false,
       },
+
+      createdAt: new Date(),
     });
 
     await apartment.save();
     res.status(201).json({ message: "Apartment created successfully", apartment });
+
   } catch (error) {
     console.error("CREATE ERROR:", error);
     res.status(500).json({ message: "Server error", error: error.message });
