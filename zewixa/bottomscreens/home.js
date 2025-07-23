@@ -50,6 +50,7 @@ export default function HomePage() {
 
   const displayedItems = showHostels ? hostels : apartments;
 
+
   return (
     <View style={styles.screen}>
 
@@ -99,10 +100,16 @@ export default function HomePage() {
                 isHostel ? { hostel: item } : { apartment: item }
               )}
             >
-              <Image
-                source={{ uri: `https://myapp-kida.onrender.com${item.photos?.main || item.photos?.building}` }}
-                style={styles.cardImage}
-              />
+             <Image
+  source={{
+    uri: showHostels
+      ? `https://myapp-kida.onrender.com${item.photos?.main}`
+      : `https://myapp-kida.onrender.com/uploads/${item.photos?.building}`
+  }}
+  style={styles.cardImage}
+/>
+
+
               <View style={styles.cardInfo}>
                 {isHostel ? (
                   <>

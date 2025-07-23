@@ -19,6 +19,8 @@ export default function ApartmentDetails({ route }) {
             Linking.openURL(`tel:${apartment.ownerData.mobile1}`);
         }
     };
+    // console.log("Owner Image Path:", apartment.ownerData?.profileImage);
+
 
     return (
         <ScrollView style={styles.container}>

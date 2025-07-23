@@ -46,6 +46,8 @@ export default function HostelDetails({ route }) {
     }
   };
 
+
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Profile Section */}

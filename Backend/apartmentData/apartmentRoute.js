@@ -7,7 +7,7 @@ const Apartment = require("./apartmentModel");
 const router = express.Router();
 
 // Create uploads dir
-const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
+const UPLOAD_DIR = path.join(__dirname, "..", "uploads","forApartmentPhotos");
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
