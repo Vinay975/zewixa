@@ -53,7 +53,7 @@ export default function HostelDetails({ route }) {
       {/* Profile Section */}
       <View style={styles.profileCard}>
         <Image
-          source={{ uri: `https://myapp-kida.onrender.com${hostel.ownerPhoto}` }}
+          source={{ uri: `https://myapp-kida.onrender.com${hostel.owner.ownerImage}` }}
 
           style={styles.ownerImage}
         />

@@ -7,7 +7,7 @@ export default function ApartmentDetails({ route }) {
 
     const photo = (key) =>
         apartment.photos?.[key]
-            ? `https://myapp-kida.onrender.com/${apartment.photos[key]}`
+            ? `https://myapp-kida.onrender.com/${apartment.photos[key]}`    
             : null;
 
     const profilePhoto = apartment.ownerData?.profileImage
@@ -114,7 +114,7 @@ export default function ApartmentDetails({ route }) {
 const styles = StyleSheet.create({
     container: { padding: 16, backgroundColor: '#fff' },
     ownerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-    ownerImage: { width: 70, height: 70, borderRadius: 35, marginRight: 12 },
+    ownerImage: { width: 70, height: 70, borderRadius: 35, marginRight: 12, backgroundColor: 'red', },
     ownerDetails: { flex: 1 },
     ownerName: { fontSize: 18, fontWeight: 'bold', color: '#6846bd' },
     ownerDetail: { fontSize: 14, color: '#444', marginTop: 2 },
