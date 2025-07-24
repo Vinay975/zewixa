@@ -6,14 +6,13 @@ const Apartment = require("./apartmentModel");
 
 const router = express.Router();
 
-// === Uploads Folder Path ===
 const APARTMENT_UPLOADS_DIR = path.join(__dirname, "..", "uploads", "forApartmentPhotos");
 
 if (!fs.existsSync(APARTMENT_UPLOADS_DIR)) {
   fs.mkdirSync(APARTMENT_UPLOADS_DIR, { recursive: true });
 }
 
-// === Multer Storage ===
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, APARTMENT_UPLOADS_DIR);
@@ -27,7 +26,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// === Define Upload Fields ===
+
 const uploadFields = upload.fields([
   { name: "ownerPhoto", maxCount: 1 },
   { name: "building", maxCount: 1 },
@@ -38,7 +37,7 @@ const uploadFields = upload.fields([
   { name: "balcony", maxCount: 1 },
 ]);
 
-// === Apartment Route ===
+
 router.post("/create-apartment", uploadFields, async (req, res) => {
   try {
     const {
@@ -115,4 +114,3 @@ router.post("/create-apartment", uploadFields, async (req, res) => {
 });
 
 module.exports = router;
-  
