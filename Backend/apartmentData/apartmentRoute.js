@@ -116,7 +116,7 @@ router.post("/create-apartment", uploadFields, async (req, res) => {
 router.get("/get-apartment-data", async (req, res) => {
   try {
     const apartments = await Apartment.find();
-    res.status(200).json({apartments});
+    res.status(200).json(apartments);
   } catch (error) {
     console.error("FETCH ERROR:", error);
     res.status(500).json({ message: "Server error", error: error.message });
