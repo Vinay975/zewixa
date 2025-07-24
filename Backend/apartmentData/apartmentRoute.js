@@ -113,4 +113,18 @@ router.post("/create-apartment", uploadFields, async (req, res) => {
   }
 });
 
+router.get("/get-apartment-data", async (req, res) => {
+  try {
+    const apartments = await Apartment.find();
+
+    res.status(200).json({
+      message: "Apartments fetched successfully",
+      apartments,
+    });
+  } catch (error) {
+    console.error("FETCH ERROR:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 module.exports = router;
