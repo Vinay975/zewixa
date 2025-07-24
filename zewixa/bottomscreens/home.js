@@ -25,9 +25,9 @@ export default function HomePage() {
       .then(({ data }) => setHostels(data))
       .catch(console.error);
 
-    axios.get('https://myapp-kida.onrender.com/api/get/apartment-data')
+    axios.get('https://myapp-kida.onrender.com/api/get-apartment-data')
       .then(({ data }) => setApartments(data))
-      .catch("Error is ",console.error);
+      .catch("Error is",console.error);
   }, []);
 
   const applyFilter = (h) => {

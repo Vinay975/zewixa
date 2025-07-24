@@ -113,7 +113,7 @@ router.post("/create-apartment", uploadFields, async (req, res) => {
   }
 });
 
-router.get("/get/apartment-data", async (req, res) => {
+router.get("/get-apartment-data", async (req, res) => {
   try {
     const apartments = await Apartment.find();
     res.status(200).json({apartments});
