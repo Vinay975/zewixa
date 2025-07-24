@@ -31,7 +31,6 @@ const ApartmentData = () => {
       bedroom: null,
       bathroom: null,
       balcony: null,
-      ownerPhoto: null,
     },
     rent: {
       oneBHK: "",
@@ -141,7 +140,7 @@ const ApartmentData = () => {
     bedroom: "bed-outline",
     bathroom: "water-outline",
     balcony: "sunny-outline",
-  });
+  }[type] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>
