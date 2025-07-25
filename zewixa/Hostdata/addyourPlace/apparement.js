@@ -94,23 +94,32 @@ const ApartmentData = () => {
 
   // Submit function
   const handleSubmit = async () => {
-    // Validate photos
     const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
     if (missing.length) {
       Alert.alert("Missing Images", `Please upload: ${missing.join(", ")}`);
       return;
     }
 
-
     const formDataToSend = new FormData();
 
+    // 1. Append owner data
     formDataToSend.append("ownerData", JSON.stringify(ownerData));
+
+    // 2. Append owner image
+    if (ownerData?.profileImage) {
+      const uri = ownerData.profileImage;
+      const name = uri.split("/").pop();
+      const type = `image/${name.split(".").pop()}`;
+      formDataToSend.append("ownerPhoto", { uri, name, type });
+    }
+
+    // 3. Other fields
     formDataToSend.append("rent", JSON.stringify(formData.rent));
     formDataToSend.append("advancePayment", formData.advancePayment);
     formDataToSend.append("wifiAvailable", formData.wifiAvailable);
     formDataToSend.append("security", JSON.stringify(formData.security));
 
-    // Append photos
+    // 4. Apartment photos
     Object.entries(formData.photos).forEach(([key, uri]) => {
       const name = uri.split("/").pop();
       const type = `image/${name.split(".").pop()}`;
@@ -121,9 +130,10 @@ const ApartmentData = () => {
       const res = await axios.post(API_URL, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       if (res.status === 201) {
         Alert.alert("Success", "Apartment data saved!");
-        navigation.navigate("FinalSubmit"); // or your next screen
+        navigation.navigate("FinalSubmit");
       }
     } catch (err) {
       console.error("Submission Error:", err);

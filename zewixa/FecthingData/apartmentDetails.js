@@ -7,16 +7,16 @@ export default function ApartmentDetails({ route }) {
 
     const photo = (key) =>
         apartment.photos?.[key]
-            ? `https://myapp-kida.onrender.com/${apartment.photos[key]}`    
+            ? `https://myapp-kida.onrender.com${apartment.photos[key]}`    
             : null;
 
     const profilePhoto = apartment.ownerData?.profileImage
-        ? `https://myapp-kida.onrender.com${apartment.ownerData.profileImage}`
+        ? `https://myapp-kida.onrender.com${apartment.ownerPhoto}`
         : null;
 
     const openDialer = () => {
         if (apartment.ownerData?.mobile1) {
-            Linking.openURL(`tel:${apartment.ownerData.mobile1}`);
+            Linking.openURL(`tel:${apartment.ownerMobile}`);
         }
     };
     // console.log("Owner Image Path:", apartment.ownerData?.profileImage);
@@ -29,11 +29,11 @@ export default function ApartmentDetails({ route }) {
                 {profilePhoto && <Image source={{ uri: profilePhoto }} style={styles.ownerImage} />}
                 <View style={styles.ownerDetails}>
                     <Text style={styles.ownerName}>
-                        <Ionicons name="person-circle" size={20} color="#6846bd" /> {apartment.ownerData?.name}
+                        <Ionicons name="person-circle" size={20} color="#6846bd" /> {apartment.ownerName}
                     </Text>
-                    <Text style={styles.ownerDetail}>📧 {apartment.ownerData?.email}</Text>
-                    <Text style={styles.ownerDetail}>📞 {apartment.ownerData?.mobile1}</Text>
-                    <Text style={styles.ownerDetail}>📞 {apartment.ownerData?.mobile2}</Text>
+                    <Text style={styles.ownerDetail}>📧 {apartment.ownerEmail}</Text>
+                    <Text style={styles.ownerDetail}>📞 {apartment.ownerMobile}</Text>
+                    <Text style={styles.ownerDetail}>📞 {apartment.ownerMobile2}</Text>
                 </View>
             </View>
 

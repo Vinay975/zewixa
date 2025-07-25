@@ -100,14 +100,14 @@ export default function HomePage() {
                 isHostel ? { hostel: item } : { apartment: item }
               )}
             >
-             <Image
-  source={{
-    uri: showHostels
-      ? `https://myapp-kida.onrender.com${item.photos?.main}`
-      : `https://myapp-kida.onrender.com/${item.photos?.building}`
-  }}
-  style={styles.cardImage}
-/>
+              <Image
+                source={{
+                  uri: showHostels
+                    ? `https://myapp-kida.onrender.com${item.photos?.main}`
+                    : `https://myapp-kida.onrender.com${item.photos?.building}`
+                }}
+                style={styles.cardImage}
+              />
 
 
               <View style={styles.cardInfo}>
@@ -134,11 +134,11 @@ export default function HomePage() {
                   <>
                     <View style={styles.row}>
                       <MaterialIcons name="person" size={16} color="#6846bd" />
-                      <Text style={styles.text}>Owner: {item.ownerData?.name || 'N/A'}</Text>
+                      <Text style={styles.text}>Owner: {item.ownerName || 'N/A'}</Text>
                     </View>
                     <View style={styles.row}>
                       <Ionicons name="location-outline" size={16} color="#6846bd" />
-                      <Text style={styles.text}>{item.ownerData?.location || item.location || 'N/A'}</Text>
+                      <Text style={styles.text}>{item.location || 'N/A'}</Text>
                     </View>
                   </>
                 )}

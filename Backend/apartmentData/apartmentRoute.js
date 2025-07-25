@@ -64,7 +64,8 @@ router.post("/create-apartment", uploadFields, async (req, res) => {
     const apartment = new Apartment({
       ownerName: owner.name,
       ownerEmail: owner.email,
-      ownerMobile: owner.mobile,
+      ownerMobile1: owner.mobile1,
+      ownerMobile2:owner.mobile2,
       ownerPhoto: getPhotoPath("ownerPhoto"),
 
       photos: {
