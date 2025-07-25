@@ -58,49 +58,60 @@ export default function HostelDetails({ route }) {
           style={styles.ownerImage}
         />
         <View style={styles.ownerInfo}>
-          <Text style={styles.ownerName}><Ionicons name="person" size={18} color="#6846bd" /> {hostel.owner?.name || 'Owner Name'}</Text>
-          <Text style={styles.ownerPhone}><Ionicons name="call" size={16} color="#6846bd" /> {hostel.owner?.phoneOne || 'Not Available'}</Text>
+          <Text style={styles.ownerName}>Name : {hostel.owner?.name || 'Owner Name'}</Text>
+          <Text style={styles.ownerPhone}>Mobile :  {hostel.owner?.phoneOne || 'Not Available'}</Text>
           {hostel.owner?.phoneTwo && (
-            <Text style={styles.ownerPhone}><Ionicons name="call" size={16} color="#6846bd" /> {hostel.owner.phoneTwo}</Text>
+            <Text style={styles.ownerPhone}>Mobile :  {hostel.owner.phoneTwo}</Text>
           )}
-          <Text style={styles.ownerLocation}><Ionicons name="location" size={16} color="#6846bd" /> {hostel.location || 'Location not available'}</Text>
-          <Text style={styles.ownerEmail}><MaterialIcons name="email" size={16} color="#6846bd" /> {hostel.owner?.email || 'Email not available'}</Text>
+          <Text style={styles.ownerLocation}>Location :  {hostel.location || 'Location not available'}</Text>
+          <Text style={styles.ownerEmail}>Email : {hostel.owner?.email || 'Email not available'}</Text>
         </View>
       </View>
 
       {/* Hostel Information Section */}
+      {/* Hostel Information */}
       <View style={styles.infoCard}>
-        <Text style={styles.sectionTitle}>
-          <FontAwesome5 name="info-circle" size={20} color="#6846bd" /> Hostel Information
-        </Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoText}>
-            <Ionicons name="wifi" size={16} color="#666" /> WiFi: {hostel.wifi ? 'Available' : 'Not Available'}
-          </Text>
-          <Text style={styles.infoText}>
-            <FontAwesome5 name="snowflake" size={14} color="#666" /> AC Type: {hostel.acType || 'Not available'}
-          </Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoText}>
-            <FontAwesome5 name="building" size={14} color="#666" /> Floors: {hostel.floors || 'Not specified'}
-          </Text>
-          <Text style={styles.infoText}>
-            <FontAwesome5 name="door-open" size={14} color="#666" /> Rooms: {hostel.rooms || 'Not specified'}
-          </Text>
-        </View>
+        <Text style={styles.sectionTitle}>Hostel Information</Text>
+
+        {[
+          {
+            label: 'WiFi',
+            value: hostel.wifi ? 'Available' : 'Not Available',
+          },
+          {
+            label: 'AC Type',
+            value: hostel.acType || 'Not available',
+          },
+          {
+            label: 'Floors',
+            value: hostel.floors || 'Not specified',
+          },
+          {
+            label: 'Rooms',
+            value: hostel.rooms || 'Not specified',
+          },
+        ].map((row, idx) => (
+          <View style={styles.infoRow} key={idx}>
+            <View style={styles.infoLeft}>
+              {row.icon}
+              <Text style={styles.infoLabel}>{row.label}</Text>
+            </View>
+            <Text style={styles.infoValue}>{row.value}</Text>
+          </View>
+        ))}
       </View>
+
 
 
       {/* Rent Details Section */}
       <View style={styles.rentCard}>
-        <Text style={styles.sectionTitle}><Ionicons name="cash" size={20} color="#6846bd" /> Rent Details</Text>
-        {hostel.rent?.OneSharing && <Text style={styles.rentText}>Single Sharing: ₹{hostel.rent.OneSharing}</Text>}
-        {hostel.rent?.TwoSharing && <Text style={styles.rentText}>Double Sharing: ₹{hostel.rent.TwoSharing}</Text>}
-        {hostel.rent?.ThreeSharing && <Text style={styles.rentText}>Triple Sharing: ₹{hostel.rent.ThreeSharing}</Text>}
-        {hostel.rent?.FourSharing && <Text style={styles.rentText}>Four Sharing: ₹{hostel.rent.FourSharing}</Text>}
-        {hostel.rent?.FiveSharing && <Text style={styles.rentText}>Five Sharing: ₹{hostel.rent.FiveSharing}</Text>}
-        {hostel.rent?.Advance && <Text style={styles.rentText}>Advance: ₹{hostel.rent.Advance}</Text>}
+        <Text style={styles.sectionTitle}> Rent Details</Text>
+        {hostel.rent?.OneSharing && <Text style={styles.rentText}>Single Sharing : ₹{hostel.rent.OneSharing}</Text>}
+        {hostel.rent?.TwoSharing && <Text style={styles.rentText}>Double Sharing : ₹{hostel.rent.TwoSharing}</Text>}
+        {hostel.rent?.ThreeSharing && <Text style={styles.rentText}>Triple Sharing : ₹{hostel.rent.ThreeSharing}</Text>}
+        {hostel.rent?.FourSharing && <Text style={styles.rentText}>Four Sharing : ₹{hostel.rent.FourSharing}</Text>}
+        {hostel.rent?.FiveSharing && <Text style={styles.rentText}>Five Sharing : ₹{hostel.rent.FiveSharing}</Text>}
+        {hostel.rent?.Advance && <Text style={styles.rentText}>Advance to pay : ₹{hostel.rent.Advance}</Text>}
       </View>
 
       {/* Mess Menu */}
@@ -188,8 +199,9 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 55,
     marginRight: 16,
-    borderWidth: 3,
-    borderColor: '#6846bd',
+    borderWidth: 2,
+    elevation: 3,
+    borderColor: 'white',
   },
   ownerInfo: {
     flex: 1,
@@ -221,21 +233,41 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     elevation: 3,
   },
+
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#6846bd',
-    marginBottom: 10,
+    // color: '#6846bd',
+    marginBottom: 12,
   },
+
   infoRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    margin: 8,
+    paddingVertical: 10,
+    paddingHorizontal:20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  infoText: {
+
+  infoLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  infoLabel: {
     fontSize: 16,
-    color: '#444',
+    color: '#333',
+    fontWeight: '600',
   },
+
+  infoValue: {
+    fontSize: 16,
+    color: '#555',
+  },
+
   rentCard: {
     backgroundColor: '#fff',
     padding: 16,

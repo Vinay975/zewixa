@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+// 🟣 Imports
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +9,6 @@ import {
   ScrollView,
   Image,
   Alert,
-  Animated,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -19,9 +19,7 @@ import axios from "axios";
 const ApartmentData = () => {
   const API_URL = "https://myapp-kida.onrender.com/api/create-apartment";
   const navigation = useNavigation();
-
   const { ownerData } = useRoute().params || {};
-  // console.log(ownerData)
 
   const [formData, setFormData] = useState({
     photos: {
@@ -32,14 +30,10 @@ const ApartmentData = () => {
       bathroom: null,
       balcony: null,
     },
-    rent: {
-      oneBHK: "",
-      twoBHK: "",
-      threeBHK: "",
-      fourBHK: "",
-    },
-    advancePayment: "",
+    bhkUnits: [],
     wifiAvailable: "yes",
+    isElectricityIncluded: "no",
+    location: "",
     security: {
       cctv: false,
       securityGuards: false,
@@ -48,7 +42,6 @@ const ApartmentData = () => {
     },
   });
 
-  // Image picker function
   const pickImage = async (photoType) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -76,15 +69,6 @@ const ApartmentData = () => {
     }
   };
 
-  // Rent input change handler
-  const handleRentChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      rent: { ...prev.rent, [field]: value },
-    }));
-  };
-
-  // Security checkbox toggle
   const toggleSecurity = (field) => {
     setFormData((prev) => ({
       ...prev,
@@ -92,7 +76,27 @@ const ApartmentData = () => {
     }));
   };
 
-  // Submit function
+  const addBhkUnit = () => {
+    setFormData((prev) => ({
+      ...prev,
+      bhkUnits: [
+        ...prev.bhkUnits,
+        {
+          apartmentType: "1BHK",
+          monthlyRent: "",
+          securityDeposit: "",
+          maintenanceCharges: "",
+        },
+      ],
+    }));
+  };
+
+  const updateBhkUnit = (index, field, value) => {
+    const updatedUnits = [...formData.bhkUnits];
+    updatedUnits[index][field] = value;
+    setFormData((prev) => ({ ...prev, bhkUnits: updatedUnits }));
+  };
+
   const handleSubmit = async () => {
     const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
     if (missing.length) {
@@ -101,11 +105,8 @@ const ApartmentData = () => {
     }
 
     const formDataToSend = new FormData();
-
-    // 1. Append owner data
     formDataToSend.append("ownerData", JSON.stringify(ownerData));
 
-    // 2. Append owner image
     if (ownerData?.profileImage) {
       const uri = ownerData.profileImage;
       const name = uri.split("/").pop();
@@ -113,13 +114,12 @@ const ApartmentData = () => {
       formDataToSend.append("ownerPhoto", { uri, name, type });
     }
 
-    // 3. Other fields
-    formDataToSend.append("rent", JSON.stringify(formData.rent));
-    formDataToSend.append("advancePayment", formData.advancePayment);
+    formDataToSend.append("location", formData.location);
     formDataToSend.append("wifiAvailable", formData.wifiAvailable);
+    formDataToSend.append("isElectricityIncluded", formData.isElectricityIncluded);
     formDataToSend.append("security", JSON.stringify(formData.security));
+    formDataToSend.append("bhkUnits", JSON.stringify(formData.bhkUnits));
 
-    // 4. Apartment photos
     Object.entries(formData.photos).forEach(([key, uri]) => {
       const name = uri.split("/").pop();
       const type = `image/${name.split(".").pop()}`;
@@ -141,7 +141,6 @@ const ApartmentData = () => {
     }
   };
 
-  // Icon map for photo types
   const getIcon = (type) =>
   ({
     building: "business-outline",
@@ -156,63 +155,78 @@ const ApartmentData = () => {
     <ScrollView style={styles.container}>
       <Text style={styles.sectionTitle}>Upload Apartment Photos</Text>
 
-      {Object.keys(formData.photos).map((photoType) => (
-        <TouchableOpacity
-          key={photoType}
-          style={styles.photoUpload}
-          onPress={() => pickImage(photoType)}
-        >
-          <Ionicons name={getIcon(photoType)} size={36} color="#6846bd" />
-          <Text style={styles.photoLabel}>{photoType.charAt(0).toUpperCase() + photoType.slice(1)}</Text>
-          {formData.photos[photoType] && (
-            <Image source={{ uri: formData.photos[photoType] }} style={styles.previewImage} />
-          )}
-        </TouchableOpacity>
+      {Object.keys(formData.photos).reduce((rows, key, index, array) => {
+        if (index % 2 === 0) {
+          rows.push(array.slice(index, index + 2));
+        }
+        return rows;
+      }, []).map((row, rowIndex) => (
+        <View key={rowIndex} style={styles.photoRow}>
+          {row.map((photoType) => (
+            <TouchableOpacity key={photoType} style={styles.photoUpload} onPress={() => pickImage(photoType)}>
+              <Ionicons name={getIcon(photoType)} size={32} color="#6846bd" />
+              <Text style={styles.photoLabel}>{photoType.charAt(0).toUpperCase() + photoType.slice(1)}</Text>
+              {formData.photos[photoType] && (
+                <Image source={{ uri: formData.photos[photoType] }} style={styles.previewImage} />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
       ))}
 
-      <Text style={styles.sectionTitle}>Rent Details</Text>
-      <View style={styles.rentRow}>
-        <TextInput
-          style={styles.input}
-          placeholder="1 BHK Rent"
-          keyboardType="numeric"
-          value={formData.rent.oneBHK}
-          onChangeText={(v) => handleRentChange("oneBHK", v)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="2 BHK Rent"
-          keyboardType="numeric"
-          value={formData.rent.twoBHK}
-          onChangeText={(v) => handleRentChange("twoBHK", v)}
-        />
-      </View>
-      <View style={styles.rentRow}>
-        <TextInput
-          style={styles.input}
-          placeholder="3 BHK Rent"
-          keyboardType="numeric"
-          value={formData.rent.threeBHK}
-          onChangeText={(v) => handleRentChange("threeBHK", v)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="4 BHK Rent"
-          keyboardType="numeric"
-          value={formData.rent.fourBHK}
-          onChangeText={(v) => handleRentChange("fourBHK", v)}
-        />
-      </View>
 
+      <Text style={styles.sectionTitle}>Apartment Location</Text>
       <TextInput
         style={styles.input}
-        placeholder="Advance Payment"
-        keyboardType="numeric"
-        value={formData.advancePayment}
-        onChangeText={(v) => setFormData((p) => ({ ...p, advancePayment: v }))}
+        placeholder="Location"
+        value={formData.location}
+        onChangeText={(v) => setFormData((p) => ({ ...p, location: v }))}
       />
 
-      <Text style={styles.sectionTitle}>WiFi Available</Text>
+      <Text style={styles.sectionTitle}>Add BHK Units</Text>
+      {formData.bhkUnits.map((unit, index) => (
+        <View key={index} style={styles.card}>
+          <Picker
+            selectedValue={unit.apartmentType}
+            onValueChange={(v) => updateBhkUnit(index, "apartmentType", v)}
+            style={styles.picker}
+          >
+            <Picker.Item label="1 BHK" value="1BHK" />
+            <Picker.Item label="2 BHK" value="2BHK" />
+            <Picker.Item label="3 BHK" value="3BHK" />
+            <Picker.Item label="4 BHK" value="4BHK" />
+          </Picker>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Monthly Rent"
+            keyboardType="numeric"
+            value={unit.monthlyRent}
+            onChangeText={(v) => updateBhkUnit(index, "monthlyRent", v)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Security Deposit"
+            keyboardType="numeric"
+            value={unit.securityDeposit}
+            onChangeText={(v) => updateBhkUnit(index, "securityDeposit", v)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Maintenance Charges"
+            keyboardType="numeric"
+            value={unit.maintenanceCharges}
+            onChangeText={(v) => updateBhkUnit(index, "maintenanceCharges", v)}
+          />
+        </View>
+      ))}
+
+      <TouchableOpacity style={styles.addBtn} onPress={addBhkUnit}>
+        <Ionicons name="add-circle-outline" size={20} color="#6846bd" />
+        <Text style={styles.addText}>Add Another BHK</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.sectionTitle}>WiFi</Text>
       <Picker
         selectedValue={formData.wifiAvailable}
         onValueChange={(v) => setFormData((p) => ({ ...p, wifiAvailable: v }))}
@@ -222,13 +236,19 @@ const ApartmentData = () => {
         <Picker.Item label="No" value="no" />
       </Picker>
 
+      <Text style={styles.sectionTitle}>Electricity Included</Text>
+      <Picker
+        selectedValue={formData.isElectricityIncluded}
+        onValueChange={(v) => setFormData((p) => ({ ...p, isElectricityIncluded: v }))}
+        style={styles.picker}
+      >
+        <Picker.Item label="Yes" value="yes" />
+        <Picker.Item label="No" value="no" />
+      </Picker>
+
       <Text style={styles.sectionTitle}>Security Features</Text>
       {Object.keys(formData.security).map((key) => (
-        <TouchableOpacity
-          key={key}
-          style={styles.checkboxContainer}
-          onPress={() => toggleSecurity(key)}
-        >
+        <TouchableOpacity key={key} style={styles.checkboxContainer} onPress={() => toggleSecurity(key)}>
           <Ionicons
             name={formData.security[key] ? "checkbox-outline" : "square-outline"}
             size={24}
@@ -250,28 +270,52 @@ const ApartmentData = () => {
 const styles = StyleSheet.create({
   container: { padding: 15, backgroundColor: "#fff" },
   sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12, color: "#333" },
-  photoUpload: {
-    flexDirection: "column",
-    alignItems: "center",
+  photoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 15,
+  },
+  photoUpload: {
+    width: "48%",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 10,
     borderRadius: 8,
+    backgroundColor: "#f2f2f2",
   },
-  photoLabel: { marginTop: 6, fontSize: 14, textAlign: "center" },
-  previewImage: { width: 120, height: 120, marginTop: 5, borderRadius: 8 },
-  rentRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  photoLabel: {
+    marginTop: 6,
+    fontSize: 13,
+    textAlign: "center",
+    fontWeight: "500",
+    color: "#444",
+  },
+  previewImage: {
+    width: "100%",
+    height: 100,
+    borderRadius: 8,
+    marginTop: 8,
+    resizeMode: "cover",
+  },
+
   input: {
-    flex: 1,
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 8,
-    margin: 5,
+    marginBottom: 10,
     borderRadius: 5,
     fontSize: 14,
   },
-  picker: { marginVertical: 10 },
+  picker: { marginBottom: 12 },
+  card: {
+    borderWidth: 1,
+    borderColor: "#aaa",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: "#f9f9f9",
+  },
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -281,6 +325,17 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 14,
     color: "#444",
+  },
+  addBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  addText: {
+    marginLeft: 6,
+    color: "#6846bd",
+    fontSize: 15,
+    fontWeight: "500",
   },
   submitBtn: {
     backgroundColor: "#6846bd",

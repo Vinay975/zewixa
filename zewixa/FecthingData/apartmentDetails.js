@@ -7,12 +7,13 @@ export default function ApartmentDetails({ route }) {
 
     const photo = (key) =>
         apartment.photos?.[key]
-            ? `https://myapp-kida.onrender.com${apartment.photos[key]}`    
+            ? `https://myapp-kida.onrender.com${apartment.photos[key]}`
             : null;
 
-    const profilePhoto = apartment.ownerData?.profileImage
+    const profilePhoto = apartment.ownerPhoto
         ? `https://myapp-kida.onrender.com${apartment.ownerPhoto}`
         : null;
+
 
     const openDialer = () => {
         if (apartment.ownerData?.mobile1) {
@@ -29,42 +30,65 @@ export default function ApartmentDetails({ route }) {
                 {profilePhoto && <Image source={{ uri: profilePhoto }} style={styles.ownerImage} />}
                 <View style={styles.ownerDetails}>
                     <Text style={styles.ownerName}>
-                        <Ionicons name="person-circle" size={20} color="#6846bd" /> {apartment.ownerName}
+                       Name : {apartment.ownerName}
                     </Text>
-                    <Text style={styles.ownerDetail}>📧 {apartment.ownerEmail}</Text>
-                    <Text style={styles.ownerDetail}>📞 {apartment.ownerMobile}</Text>
-                    <Text style={styles.ownerDetail}>📞 {apartment.ownerMobile2}</Text>
+                    <Text style={styles.ownerDetail}>Email : {apartment.ownerEmail}</Text>
+                    <Text style={styles.ownerDetail}>phn : {apartment.ownerMobile1}</Text>
+                    <Text style={styles.ownerDetail}>phn :  {apartment.ownerMobile2}</Text>
                 </View>
             </View>
 
             {/* Apartment Photos */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Photos</Text>
-                <View style={styles.photoGrid}>
-                    {['building', 'livingRoom', 'kitchen', 'bedroom', 'bathroom', 'balcony'].map((key) =>
-                        photo(key) ? (
-                            <Image key={key} source={{ uri: photo(key) }} style={styles.gridImage} />
-                        ) : null
-                    )}
-                </View>
+            <View style={styles.photoGrid}>
+                {[
+                    ['building', 'Building'],
+                    ['livingRoom', 'Living Room'],
+                    ['kitchen', 'Kitchen'],
+                    ['bedroom', 'Bedroom'],
+                    ['bathroom', 'Bathroom'],
+                    ['balcony', 'Balcony'],
+                ].map(([key, label]) =>
+                    photo(key) ? (
+                        <View key={key} style={styles.photoWrapper}>
+                            <Image source={{ uri: photo(key) }} style={styles.gridImage} />
+                            <Text style={styles.photoLabel}>{label}</Text>
+                        </View>
+                    ) : null
+                )}
             </View>
+
 
             {/* Rent Section */}
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Rent Details</Text>
+
                 <View style={styles.rentCard}>
-                    {Object.entries(apartment.rent || {}).map(([type, value]) => (
-                        <View style={styles.rentRow} key={type}>
-                            <FontAwesome5 name="rupee-sign" size={16} color="#6846bd" />
-                            <Text style={styles.rentText}>{type}: ₹{value}</Text>
-                        </View>
-                    ))}
+                    {/* Sharing Rents */}
+                    {/* <Text style={styles.rentHeading}>Per Month Rent</Text> */}
+                    {Object.entries(apartment.rent || {}).map(([type, value]) => {
+                        const labelMap = {
+                            oneSharing: "One Sharing",
+                            twoSharing: "Two Sharing",
+                            threeSharing: "Three Sharing",
+                            fourSharing: "Four Sharing",
+                        };
+
+                        if (type === "advance") return null; // skip advance for now
+
+                        return (
+                            <View style={styles.rentRow} key={type}>
+                                <Text style={styles.rentText}>{labelMap[type] || type}: ₹{value}</Text>
+                            </View>
+                        );
+                    })}
+
+                    {/* Advance Payment */}
                     <View style={styles.rentRow}>
-                        <MaterialCommunityIcons name="cash-refund" size={18} color="#6846bd" />
-                        <Text style={styles.rentText}>Advance: ₹{apartment.advancePayment}</Text>
+                        <Text style={styles.rentText}>Advance to pay: ₹{apartment.rent?.advance || "N/A"}</Text>
                     </View>
                 </View>
             </View>
+
 
             {/* WiFi */}
             <View style={styles.section}>
@@ -110,91 +134,146 @@ export default function ApartmentDetails({ route }) {
         </ScrollView>
     );
 }
-
 const styles = StyleSheet.create({
-    container: { padding: 16, backgroundColor: '#fff' },
-    ownerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-    ownerImage: { width: 70, height: 70, borderRadius: 35, marginRight: 12, backgroundColor: 'red', },
-    ownerDetails: { flex: 1 },
-    ownerName: { fontSize: 18, fontWeight: 'bold', color: '#6846bd' },
-    ownerDetail: { fontSize: 14, color: '#444', marginTop: 2 },
+    container: {
+        padding: 16,
+        backgroundColor: '#fdfdfd',
+    },
+    ownerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 16,
+        marginBottom: 16,
+        elevation: 3,
+        height: 170,
+    },
+    ownerImage: {
+        width: 110,
+        height: 110,
+        borderRadius: 50,
+        marginRight: 16,
+        borderWidth: 2,
+        borderColor: '#cbcacd0b',
+        backgroundColor: '#eee',
+        elevation: 3,
+    },
+    ownerDetails: {
+        flex: 1,
+    },
+    ownerName: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#333',
+        marginBottom: 4,
+    },
+    ownerDetail: {
+        fontSize: 15,
+        color: '#555',
+        marginBottom: 4,
+    },
 
-    section: { marginTop: 20 },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#6846bd' },
+    section: {
+        marginTop: 20,
+        backgroundColor: '#fff',
+        padding: 16,
+        borderRadius: 10,
+        elevation: 2,
+        marginBottom: 10,
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        // color: '#6846bd',
+        marginBottom: 12,
+    },
 
-    photoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-    gridImage: {
+    photoGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        gap: 12,
+    },
+    photoWrapper: {
         width: '48%',
+        marginBottom: 12,
+    },
+    gridImage: {
+        width: '100%',
         height: 150,
-        marginBottom: 8,
-        borderRadius: 10
+        borderRadius: 10,
+    },
+    photoLabel: {
+        textAlign: 'center',
+        marginTop: 6,
+        fontWeight: '600',
+        fontSize: 14,
+        color: '#444',
     },
 
     rentCard: {
         backgroundColor: '#f8f6ff',
         padding: 12,
         borderRadius: 8,
-        elevation: 2
+        elevation: 2,
     },
+    rentHeading: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#333",
+        marginBottom: 6,
+        marginTop: 10,
+    },
+
     rentRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 8
+        marginBottom: 8,
     },
     rentText: {
         marginLeft: 8,
         fontSize: 15,
-        color: '#333'
+        color: '#333',
     },
 
     infoRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 8
+        marginBottom: 8,
     },
     infoText: {
         marginLeft: 8,
         fontSize: 15,
-        color: '#333'
+        color: '#333',
     },
 
-    btnContainer: {
+    footer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         marginTop: 30,
-        gap: 10
+        marginBottom: 30,
     },
     callBtn: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#6846bd',
         padding: 12,
-        borderRadius: 8,
-        justifyContent: 'center'
+        borderRadius: 30,
+        paddingHorizontal: 30,
     },
     bookBtn: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'tomato',
         padding: 12,
-        borderRadius: 8,
-        justifyContent: 'center'
+        borderRadius: 30,
+        paddingHorizontal: 30,
     },
     btnText: {
         color: '#fff',
         marginLeft: 8,
         fontSize: 16,
-        fontWeight: '600'
+        fontWeight: '600',
     },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 30,
-        gap: 10,
-        marginBottom: 40, // Ensures not cut off
-        paddingBottom: 20,
-    },
-
 });
