@@ -30,6 +30,7 @@ const upload = multer({ storage }).fields([
   { name: "bedroom", maxCount: 1 },
   { name: "bathroom", maxCount: 1 },
   { name: "balcony", maxCount: 1 },
+  { name: "ownerPhoto", maxCount: 1 },
 ]);
 
 router.post("/create-apartment", upload, async (req, res) => {
