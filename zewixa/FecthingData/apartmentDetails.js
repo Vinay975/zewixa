@@ -7,11 +7,11 @@ export default function ApartmentDetails({ route }) {
 
     const photo = (key) =>
         apartment.photos?.[key]
-            ? `https://myapp-kida.onrender.com${apartment.photos[key]}`
+            ? `https://myapp-5u6v.onrender.com${apartment.photos[key]}`
             : null;
 
     const profilePhoto = apartment.ownerPhoto
-        ? `https://myapp-kida.onrender.com${apartment.ownerPhoto}`
+        ? `https://myapp-5u6v.onrender.com${apartment.ownerPhoto}`
         : null;
 
 

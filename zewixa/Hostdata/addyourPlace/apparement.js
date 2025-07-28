@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 const ApartmentData = () => {
-  const API_URL = "https://myapp-kida.onrender.com/api/create-apartment";
+  const API_URL = "https://myapp-5u6v.onrender.com/api/create-apartment";
   const navigation = useNavigation();
   const { ownerData } = useRoute().params || {};
 

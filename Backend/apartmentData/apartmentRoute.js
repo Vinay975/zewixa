@@ -74,10 +74,11 @@ router.post("/create-apartment", upload, async (req, res) => {
         fireSafety: securityData.fireSafety,
       },
     });
-
+    console.log(newApartment);
     await newApartment.save();
     res.status(201).json({ message: "Apartment created successfully", apartment: newApartment });
   } catch (error) {
+    
     console.error("Apartment creation error:", error);
     res.status(500).json({ message: "Server error", error });
   }
