@@ -32,7 +32,7 @@ const upload = multer({ storage }).fields([
   { name: "balcony", maxCount: 1 },
 ]);
 
-router.post("/create-apartment", upload, async (req, res) => {
+router.post("/create-apartment", multer({ storage }).any(), async (req, res) => {
   try {
     const {
       location,
