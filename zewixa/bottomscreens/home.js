@@ -134,7 +134,8 @@ export default function HomePage() {
                   <>
                     <View style={styles.row}>
                       <MaterialIcons name="person" size={16} color="#6846bd" />
-                      <Text style={styles.text}>Owner: {item.ownerName || 'N/A'}</Text>
+                      <Text style={styles.text}>Owner: {item.ownerData?.name || 'N/A'}</Text>
+
                     </View>
                     <View style={styles.row}>
                       <Ionicons name="location-outline" size={16} color="#6846bd" />

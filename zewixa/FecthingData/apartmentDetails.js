@@ -1,6 +1,9 @@
 import React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, Linking } from 'react-native';
-import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import {
+    View, Text, Image, ScrollView, StyleSheet,
+    TouchableOpacity, Linking
+} from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function ApartmentDetails({ route }) {
     const { apartment } = route.params;
@@ -10,31 +13,30 @@ export default function ApartmentDetails({ route }) {
             ? `https://myapp-5u6v.onrender.com${apartment.photos[key]}`
             : null;
 
-    const profilePhoto = apartment.ownerPhoto
-        ? `https://myapp-5u6v.onrender.com${apartment.ownerPhoto}`
+    const profilePhoto = apartment.ownerData?.profileImage
+        ? `https://myapp-5u6v.onrender.com${apartment.ownerData.profileImage}`
         : null;
-
 
     const openDialer = () => {
         if (apartment.ownerData?.mobile1) {
-            Linking.openURL(`tel:${apartment.ownerMobile}`);
+            Linking.openURL(`tel:${apartment.ownerData.mobile1}`);
         }
     };
-    // console.log("Owner Image Path:", apartment.ownerData?.profileImage);
-
 
     return (
         <ScrollView style={styles.container}>
             {/* Owner Info */}
             <View style={styles.ownerRow}>
-                {profilePhoto && <Image source={{ uri: profilePhoto }} style={styles.ownerImage} />}
+                {profilePhoto && <Image
+                    source={{ uri: apartment.ownerData?.profileImage }}
+                    style={styles.ownerImage}
+                />}
                 <View style={styles.ownerDetails}>
-                    <Text style={styles.ownerName}>
-                       Name : {apartment.ownerName}
-                    </Text>
-                    <Text style={styles.ownerDetail}>Email : {apartment.ownerEmail}</Text>
-                    <Text style={styles.ownerDetail}>phn : {apartment.ownerMobile1}</Text>
-                    <Text style={styles.ownerDetail}>phn :  {apartment.ownerMobile2}</Text>
+                    <Text style={styles.ownerName}>Name: {apartment.ownerData?.name}</Text>
+                    <Text style={styles.ownerDetail}>Email: {apartment.ownerData?.email}</Text>
+                    <Text style={styles.ownerDetail}>Phone 1: {apartment.ownerData?.mobile1}</Text>
+                    <Text style={styles.ownerDetail}>Phone 2: {apartment.ownerData?.mobile2}</Text>
+                    <Text style={styles.ownerDetail}>Location : {apartment.location || 'N/A'}</Text>
                 </View>
             </View>
 
@@ -58,44 +60,40 @@ export default function ApartmentDetails({ route }) {
             </View>
 
 
-            {/* Rent Section */}
+
+            {/* Rent Details */}
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Rent Details</Text>
-
                 <View style={styles.rentCard}>
-                    {/* Sharing Rents */}
-                    {/* <Text style={styles.rentHeading}>Per Month Rent</Text> */}
-                    {Object.entries(apartment.rent || {}).map(([type, value]) => {
-                        const labelMap = {
-                            oneSharing: "One Sharing",
-                            twoSharing: "Two Sharing",
-                            threeSharing: "Three Sharing",
-                            fourSharing: "Four Sharing",
-                        };
-
-                        if (type === "advance") return null; // skip advance for now
-
-                        return (
-                            <View style={styles.rentRow} key={type}>
-                                <Text style={styles.rentText}>{labelMap[type] || type}: ₹{value}</Text>
-                            </View>
-                        );
-                    })}
-
-                    {/* Advance Payment */}
-                    <View style={styles.rentRow}>
-                        <Text style={styles.rentText}>Advance to pay: ₹{apartment.rent?.advance || "N/A"}</Text>
-                    </View>
+                    {(apartment.bhkUnits || []).map((unit, index) => (
+                        <View style={styles.rentRow} key={index}>
+                            <Text style={styles.rentText}>
+                                {unit.apartmentType}: ₹{unit.monthlyRent} | Deposit: ₹{unit.securityDeposit} | Maintenance: ₹{unit.maintenanceCharges}
+                            </Text>
+                        </View>
+                    ))}
                 </View>
             </View>
-
 
             {/* WiFi */}
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>WiFi</Text>
                 <View style={styles.infoRow}>
                     <Ionicons name="wifi" size={20} color="#6846bd" />
-                    <Text style={styles.infoText}>{apartment.wifiAvailable ? 'Available' : 'Not Available'}</Text>
+                    <Text style={styles.infoText}>
+                        {apartment.wifiAvailable === 'yes' ? 'Available' : 'Not Available'}
+                    </Text>
+                </View>
+            </View>
+
+            {/* Electricity */}
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Electricity</Text>
+                <View style={styles.infoRow}>
+                    <Ionicons name="flash-outline" size={20} color="#6846bd" />
+                    <Text style={styles.infoText}>
+                        Electricity Included: {apartment.isElectricityIncluded === 'yes' ? 'Yes' : 'No'}
+                    </Text>
                 </View>
             </View>
 
@@ -120,7 +118,7 @@ export default function ApartmentDetails({ route }) {
                 </View>
             </View>
 
-            {/* Call and Book Buttons */}
+            {/* Call & Book Buttons */}
             <View style={styles.footer}>
                 <TouchableOpacity onPress={openDialer} style={styles.callBtn}>
                     <Ionicons name="call" size={20} color="#fff" />
@@ -134,6 +132,7 @@ export default function ApartmentDetails({ route }) {
         </ScrollView>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         padding: 16,
@@ -147,7 +146,8 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         marginBottom: 16,
         elevation: 3,
-        height: 170,
+        borderWidth: 1,
+        borderColor: '#eee',
     },
     ownerImage: {
         width: 110,
@@ -173,20 +173,16 @@ const styles = StyleSheet.create({
         color: '#555',
         marginBottom: 4,
     },
-
     section: {
-        marginTop: 20,
-        backgroundColor: '#fff',
-        padding: 16,
-        borderRadius: 10,
-        elevation: 2,
-        marginBottom: 10,
+        marginBottom: 20,
+        paddingHorizontal: 16,
     },
+
     sectionTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        // color: '#6846bd',
+        fontSize: 18,
+        fontWeight: "bold",
         marginBottom: 12,
+        color: "#333",
     },
 
     photoGrid: {
@@ -211,32 +207,32 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#444',
     },
-
     rentCard: {
-        backgroundColor: '#f8f6ff',
-        padding: 12,
-        borderRadius: 8,
-        elevation: 2,
+        backgroundColor: "#f8f8fc",
+        borderRadius: 12,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
-    rentHeading: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#333",
-        marginBottom: 6,
-        marginTop: 10,
-    },
-
     rentRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    rentText: {
-        marginLeft: 8,
-        fontSize: 15,
-        color: '#333',
+        backgroundColor: "#fff",
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: "#e0e0e0",
     },
 
+    rentText: {
+        fontSize: 14,
+        color: "#444",
+        lineHeight: 20,
+    },
     infoRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -247,7 +243,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#333',
     },
-
     footer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
