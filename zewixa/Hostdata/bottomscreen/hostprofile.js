@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import { Button } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -23,7 +30,7 @@ const HostProfile = ({ navigation, setIsHost }) => {
     outputRange: ["#6846bd", "#34a853"], // Purple (Host) → Green (Visitor)
   });
 
-  const switchIcon = isVisitor ? "account" : "home-city"; // Person Icon for Visitor, Home Icon for Host
+  const switchIcon = isVisitor ? "account" : "home-city";
   const switchText = isVisitor ? "Visitor Mode" : "Host Mode";
 
   return (
@@ -31,10 +38,10 @@ const HostProfile = ({ navigation, setIsHost }) => {
       {/* Profile Card */}
       <View style={styles.profileCard}>
         <Image
-          source={{ uri: "https://i.pravatar.cc/150?img=4" }} // Placeholder Profile Image
+          source={{ uri: "https://i.pravatar.cc/150?img=4" }}
           style={styles.profileImage}
         />
-        <Text style={styles.name}>John Doe</Text>
+        <Text style={styles.name}>Welcome Guest</Text>
         <Text style={styles.role}>{isVisitor ? "🚶 Visitor" : "🏠 Host"}</Text>
       </View>
 
@@ -54,7 +61,7 @@ const HostProfile = ({ navigation, setIsHost }) => {
         </View>
       </View>
 
-      {/* Animated Switch to Visitor Mode */}
+      {/* Switch Button */}
       <TouchableOpacity onPress={handleToggleSwitch} style={styles.switchContainer}>
         <Animated.View style={[styles.switchButton, { backgroundColor: switchBackgroundColor }]}>
           <Icon name={switchIcon} size={24} color="white" />
@@ -62,13 +69,23 @@ const HostProfile = ({ navigation, setIsHost }) => {
         </Animated.View>
       </TouchableOpacity>
 
-      {/* Action Buttons */}
+      {/* Sign In and Sign Up Buttons */}
       <View style={styles.buttonContainer}>
-        <Button mode="contained" icon="pencil" style={styles.button} onPress={() => alert("Edit Profile")}>
-          Edit Profile
+        <Button
+          mode="contained"
+          icon="login"
+          style={styles.button}
+          onPress={() => navigation.navigate("HostSignIn")}
+        >
+          Sign In
         </Button>
-        <Button mode="contained" icon="logout" style={styles.button} onPress={() => alert("Logout")}>
-          Logout
+        <Button
+          mode="contained"
+          icon="account-plus"
+          style={styles.button}
+          onPress={() => navigation.navigate("HostSignUp")}
+        >
+          Sign Up
         </Button>
       </View>
     </View>

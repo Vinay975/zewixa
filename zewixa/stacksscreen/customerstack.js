@@ -14,7 +14,7 @@ import TermsOfService from '../SupportPage/termsofservice';
 import PrivacyPolicy from '../SupportPage/privacypolice';
 import SignIn from "../userDetails/signin";
 import SignUp from "../userDetails/signup";
-import { AuthContext } from "../userDetails/userAuth";
+// import { AuthContext } from "../userDetails/userAuth";
 
 
 const CustomerBar = createStackNavigator();

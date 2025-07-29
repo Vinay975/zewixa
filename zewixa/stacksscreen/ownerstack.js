@@ -8,6 +8,8 @@ import HostelDataOne from "../Hostdata/addyourPlace/hostel-1";
 import HostelDataTwo from "../Hostdata/addyourPlace/hostel-2";
 import Apartment from "../Hostdata/addyourPlace/apparement";
 import FinalSubmit from "../Hostdata/addyourPlace/finalSubmit";
+import HostSignIn from "../Hostdata/hostUserData/hostsignin";
+import HostSignUp from "../Hostdata/hostUserData/hostsignup";
 
 const OwnerBar = createStackNavigator();
 
@@ -43,6 +45,8 @@ const OwnerStack = ({ setIsHost }) => {
       <OwnerBar.Screen name="AboutHostelTwo" component={HostelDataTwo} />
       <OwnerBar.Screen name="AboutApartment" component={Apartment} />
       <OwnerBar.Screen name="FinalSubmit" component={FinalSubmit} />
+      <OwnerBar.Screen name="HostSignUp" component={HostSignUp}/>
+      <OwnerBar.Screen name="HostSignIn" component={HostSignIn}/>
     </OwnerBar.Navigator>
   );
 };

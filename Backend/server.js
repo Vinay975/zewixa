@@ -24,10 +24,12 @@ mongoose.connect("mongodb+srv://Zewixa:Vinay123@hosteldata.wvwi4no.mongodb.net/h
 const hostelRoutes = require("./hostelData/hostelModel");
 const userRoutes = require("./userData/userRoute");
 const apartmentRoute = require("./apartmentData/apartmentRoute")
+const hostUserRoute = require('./hostDataForLogin/hostdataRoute')
 
 app.use("/api", hostelRoutes);
 app.use("/api",apartmentRoute)
 app.use('/', userRoutes);
+app.use('/host',hostUserRoute)
 
 
 
