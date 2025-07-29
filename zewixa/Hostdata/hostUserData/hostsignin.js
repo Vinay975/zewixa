@@ -42,7 +42,7 @@ const HostSignIn = ({ navigation }) => {
 
       if (res.status === 200 || res.status === 201) {
         console.log('Login successful:', data);
-        navigation.navigate('BottomTab', { screen: 'Profile' });
+        navigation.navigate('Host', { screen: 'Profile' });
       } else {
         Alert.alert('Error', data.message || 'Invalid credentials');
       }

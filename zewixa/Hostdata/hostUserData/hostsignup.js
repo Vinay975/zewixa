@@ -47,7 +47,7 @@ const HostSignUp = ({ navigation }) => {
 
       if (res.ok) {
         Alert.alert("Success", "Account created. Please sign in.");
-        navigation.navigate("SignIn");
+        navigation.navigate("HostSignIn");
       } else {
         Alert.alert("Error", data.message || "Something went wrong.");
       }
