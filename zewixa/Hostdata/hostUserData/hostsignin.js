@@ -46,7 +46,8 @@
         }
 
         if (res.status === 200 || res.status === 201) {
-          signInHost(data.token, data.host);
+          // console.log('Received host data:', data.host);
+          signInHost(data.token, data.user);
           // console.log('Login successful:', data);
           navigation.navigate('Host', { screen: 'Profile' });
         } else {
