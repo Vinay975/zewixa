@@ -14,7 +14,8 @@ const SignIn = ({ navigation }) => {
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { signIn } = useContext(AuthContext);
+  const { signInCustomer } = useContext(AuthContext);
+
 
   const handleSignIn = async () => {
     if (!emailOrUsername.trim() || !password) {
@@ -47,7 +48,7 @@ const SignIn = ({ navigation }) => {
       console.log('SIGNIN RESPONSE:', data);
 
       if (res.status === 200 || res.status === 201) {
-        signIn(data.token, data.user);
+        signInCustomer(data.token, data.user);
         navigation.navigate('BottomTab', { screen: 'Profile' });
       } else {
         Alert.alert('Error', data.message || 'Invalid credentials');

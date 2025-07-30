@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,15 @@ import {
 } from "react-native";
 import { Button } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { AuthContext } from "../../userDetails/userAuth";
 
 const HostProfile = ({ navigation, setIsHost }) => {
   const [isVisitor, setIsVisitor] = useState(false);
   const animatedValue = new Animated.Value(isVisitor ? 1 : 0);
+
+  const { hostInfo, signOutHost } = useContext(AuthContext);
+  console.log("Host Info:", hostInfo);
+
 
   const handleToggleSwitch = () => {
     Animated.timing(animatedValue, {
@@ -27,7 +32,7 @@ const HostProfile = ({ navigation, setIsHost }) => {
 
   const switchBackgroundColor = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#6846bd", "#34a853"], // Purple (Host) → Green (Visitor)
+    outputRange: ["#6846bd", "#34a853"],
   });
 
   const switchIcon = isVisitor ? "account" : "home-city";
@@ -41,8 +46,16 @@ const HostProfile = ({ navigation, setIsHost }) => {
           source={{ uri: "https://i.pravatar.cc/150?img=4" }}
           style={styles.profileImage}
         />
-        <Text style={styles.name}>Welcome Guest</Text>
-        <Text style={styles.role}>{isVisitor ? "🚶 Visitor" : "🏠 Host"}</Text>
+        <Text style={styles.name}>
+          {hostInfo ? hostInfo.username || "Host User" : "Welcome Guest"}
+        </Text>
+        <Text style={styles.role}>
+          {hostInfo
+            ? `📧 ${hostInfo.email || "No email"}`
+            : isVisitor
+            ? "🚶 Visitor"
+            : "🏠 Host"}
+        </Text>
       </View>
 
       {/* Host Information */}
@@ -61,32 +74,53 @@ const HostProfile = ({ navigation, setIsHost }) => {
         </View>
       </View>
 
-      {/* Switch Button */}
-      <TouchableOpacity onPress={handleToggleSwitch} style={styles.switchContainer}>
-        <Animated.View style={[styles.switchButton, { backgroundColor: switchBackgroundColor }]}>
+      {/* Mode Switch */}
+      <TouchableOpacity
+        onPress={handleToggleSwitch}
+        style={styles.switchContainer}
+      >
+        <Animated.View
+          style={[
+            styles.switchButton,
+            { backgroundColor: switchBackgroundColor },
+          ]}
+        >
           <Icon name={switchIcon} size={24} color="white" />
           <Text style={styles.switchText}>{switchText}</Text>
         </Animated.View>
       </TouchableOpacity>
 
-      {/* Sign In and Sign Up Buttons */}
+      {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <Button
-          mode="contained"
-          icon="login"
-          style={styles.button}
-          onPress={() => navigation.navigate("HostSignIn")}
-        >
-          Sign In
-        </Button>
-        <Button
-          mode="contained"
-          icon="account-plus"
-          style={styles.button}
-          onPress={() => navigation.navigate("HostSignUp")}
-        >
-          Sign Up
-        </Button>
+        {hostInfo ? (
+          <Button
+            mode="contained"
+            icon="logout"
+            style={styles.button}
+            onPress={signOutHost}
+          >
+            Logout
+          </Button>
+        ) : (
+          <>
+            <Button
+              mode="contained"
+              icon="login"
+              style={styles.button}
+              onPress={() => navigation.navigate("HostSignIn")}
+            >
+              Sign In
+            </Button>
+            <Button
+              mode="contained"
+              icon="account-plus"
+              style={styles.button}
+              onPress={() => navigation.navigate("HostSignUp")}
+            >
+              Sign Up
+            </Button>
+          </>
+        )}
       </View>
     </View>
   );
@@ -97,27 +131,22 @@ export default HostProfile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
-    alignItems: "center",
-    padding: 20,
+    backgroundColor: "#f4f4f4",
+    padding: 16,
   },
   profileCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    padding: 20,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
+    backgroundColor: "#fff",
+    padding: 24,
+    borderRadius: 16,
     elevation: 5,
-    marginBottom: 20,
-    width: "100%",
+    marginBottom: 24,
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   name: {
     fontSize: 22,
@@ -126,62 +155,47 @@ const styles = StyleSheet.create({
   },
   role: {
     fontSize: 16,
-    color: "#6846bd",
-    fontWeight: "600",
-    marginTop: 5,
+    color: "#888",
   },
   infoSection: {
-    width: "100%",
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
+    marginBottom: 24,
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
   },
   infoItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 5,
+    marginBottom: 12,
   },
   infoText: {
-    fontSize: 16,
     marginLeft: 10,
-    color: "#333",
+    fontSize: 16,
+    color: "#444",
   },
   switchContainer: {
-    width: "100%",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 24,
   },
   switchButton: {
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
-    borderRadius: 10,
-    width: "60%",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    borderRadius: 24,
+    paddingHorizontal: 20,
   },
   switchText: {
-    fontSize: 16,
     color: "white",
-    fontWeight: "bold",
-    marginLeft: 10,
+    fontSize: 16,
+    marginLeft: 8,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
+    marginTop: 10,
+    gap: 12,
   },
   button: {
-    flex: 1,
-    marginHorizontal: 5,
+    marginVertical: 5,
+    borderRadius: 12,
     backgroundColor: "#6846bd",
   },
 });

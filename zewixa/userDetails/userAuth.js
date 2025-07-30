@@ -1,29 +1,42 @@
-// userAuth.js
 import React, { createContext, useState } from "react";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userToken, setUserToken] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+  const [userToken, setUserToken] = useState(null);     // Common if needed
+  const [customerInfo, setCustomerInfo] = useState(null);
+  const [hostInfo, setHostInfo] = useState(null);
 
-  const signIn = (token, user) => {
+  const signInCustomer = (token, user) => {
     setUserToken(token);
-    setUserInfo(user);
+    setCustomerInfo(user); // { username, email }
   };
 
-  const signOut = () => {
+  const signInHost = (token, host) => {
+    setUserToken(token);
+    setHostInfo(host); // { username, email }
+  };
+
+  const signOutCustomer = () => {
     setUserToken(null);
-    setUserInfo(null);
+    setCustomerInfo(null);
+  };
+
+  const signOutHost = () => {
+    setUserToken(null);
+    setHostInfo(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
         userToken,
-        userInfo,
-        signIn,
-        signOut,
+        customerInfo,
+        hostInfo,
+        signInCustomer,
+        signInHost,
+        signOutCustomer,
+        signOutHost,
       }}
     >
       {children}
