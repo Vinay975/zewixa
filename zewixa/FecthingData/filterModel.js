@@ -4,8 +4,6 @@ import { View, Text, Modal, TouchableOpacity, StyleSheet, Switch, TextInput } fr
 export default function FilterModal({ visible, onClose, onApply }) {
   const [acOnly, setAcOnly] = useState(false);
   const [gender, setGender] = useState('All');
-  const [minRent, setMinRent] = useState('');
-  const [maxRent, setMaxRent] = useState('');
 
   return (
     <Modal transparent visible={visible} animationType="slide">
@@ -18,7 +16,7 @@ export default function FilterModal({ visible, onClose, onApply }) {
           </View>
           <View style={styles.row}>
             <Text>Gender</Text>
-            {['All','Boys','Girls','Co-ed'].map((g) => (
+            {['All','Boys','Girls','Co-Ed'].map((g) => (
               <TouchableOpacity
                 key={g}
                 style={[styles.btn, gender === g && styles.btnActive]}
@@ -28,22 +26,10 @@ export default function FilterModal({ visible, onClose, onApply }) {
               </TouchableOpacity>
             ))}
           </View>
-          <View style={styles.row}>
-            <Text>Rent</Text>
-            <TextInput
-              style={styles.input} placeholder="Min"
-              keyboardType="numeric"
-              value={minRent} onChangeText={setMinRent}
-            />
-            <TextInput
-              style={styles.input} placeholder="Max"
-              keyboardType="numeric"
-              value={maxRent} onChangeText={setMaxRent}
-            />
-          </View>
+         
           <TouchableOpacity
             style={styles.apply}
-            onPress={() => onApply({ acOnly, gender, minRent, maxRent })}
+            onPress={() => onApply({ acOnly, gender })}
           >
             <Text style={{ color: 'white' }}>Apply</Text>
           </TouchableOpacity>

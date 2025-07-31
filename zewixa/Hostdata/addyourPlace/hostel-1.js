@@ -1,29 +1,52 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Modal,
+  FlatList,
+  Dimensions,
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
+
+const { width } = Dimensions.get("window");
 
 const HostelDataOne = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { ownerData } = route.params || {}; 
+  const { ownerData } = route.params || {};
 
-  
   const ownerName = ownerData?.name ? `Hello Mr. ${ownerData.name}` : "Hello, Owner!";
-
 
   const [hostelName, setHostelName] = useState("");
   const [location, setLocation] = useState("");
   const [floors, setFloors] = useState("");
   const [rooms, setRooms] = useState("");
-  const [gender, setGender] = useState(""); 
+
+  const [gender, setGender] = useState("");
   const [acType, setAcType] = useState("");
+
+  const [genderModalVisible, setGenderModalVisible] = useState(false);
+  const [acModalVisible, setAcModalVisible] = useState(false);
+
+  const genderOptions = ["Boys", "Girls", "Co-Ed"];
+  const acOptions = ["AC", "Non-AC", "Both"];
+
 
   const handleNext = () => {
     if (!hostelName || !location || !floors || !rooms || !gender || !acType) {
       Alert.alert("Error", "Please fill all the required fields.");
       return;
     }
-  
+
+    
+  if (parseInt(rooms) < 1) {
+  Alert.alert("Error", "Number of rooms must be at least 1.");
+  return;
+}
     const hostelData = {
       hostelName,
       location,
@@ -33,10 +56,9 @@ const HostelDataOne = () => {
       acType,
       ownerData,
     };
-  
+
     navigation.navigate("AboutHostelTwo", { hostelData });
   };
-  
 
   return (
     <View style={styles.container}>
@@ -60,19 +82,17 @@ const HostelDataOne = () => {
         onChangeText={setLocation}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Boys / Girls Hostel"
-        value={gender} 
-        onChangeText={setGender} 
-      />
+      <TouchableOpacity style={styles.input} onPress={() => setGenderModalVisible(true)}>
+        <Text style={{ color: gender ? "#000" : "#aaa" }}>
+          {gender || "Select Gender Type"}
+        </Text>
+      </TouchableOpacity>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Ac / Non-Ac / Both"
-        value={acType}
-        onChangeText={setAcType} 
-      />
+      <TouchableOpacity style={styles.input} onPress={() => setAcModalVisible(true)}>
+        <Text style={{ color: acType ? "#000" : "#aaa" }}>
+          {acType || "Select AC Type"}
+        </Text>
+      </TouchableOpacity>
 
       <TextInput
         style={styles.input}
@@ -93,6 +113,54 @@ const HostelDataOne = () => {
       <TouchableOpacity style={styles.button} onPress={handleNext}>
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
+
+      {/* Gender Picker Modal */}
+      <Modal transparent visible={genderModalVisible} animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Gender Type</Text>
+            <FlatList
+              data={genderOptions}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={() => {
+                    setGender(item);
+                    setGenderModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.modalOptionText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      {/* AC Type Picker Modal */}
+      <Modal transparent visible={acModalVisible} animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select AC Type</Text>
+            <FlatList
+              data={acOptions}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={() => {
+                    setAcType(item);
+                    setAcModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.modalOptionText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -127,7 +195,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "90%",
-    padding: 10,
+    padding: 12,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
@@ -150,5 +218,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
     fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: width * 0.8,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  modalOption: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  modalOptionText: {
+    fontSize: 16,
+    textAlign: "center",
   },
 });

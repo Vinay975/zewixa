@@ -1,108 +1,208 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useContext, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  Animated,
+  StyleSheet,
+  Modal,
+  Linking,
+} from "react-native";
+import { AuthContext } from "../../userDetails/userAuth";
 import { useNavigation } from "@react-navigation/native";
-
+import { Ionicons } from "@expo/vector-icons";
 
 const Host = () => {
+  const { hostInfo } = useContext(AuthContext);
+  const navigation = useNavigation();
 
-  const Navigator = useNavigation();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [modalVisible, setModalVisible] = useState(false);
+ 
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleStartHosting = () => {
+    if (hostInfo) {
+      navigation.navigate("AboutPlace");
+    } else {
+      Alert.alert(
+        "Login Required",
+        "Please log in as a host to list your property.",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Login", onPress: () => navigation.navigate("HostSignIn") },
+        ]
+      );
+    }
+  };
+
+  const openVideo = (lang) => {
+    const urls = {
+      Telugu: "https://youtu.be/telugu-example",
+      Hindi: "https://youtu.be/hindi-example",
+      English: "https://youtu.be/english-example",
+    };
+    Linking.openURL(urls[lang]);
+    setModalVisible(false);
+  };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.placeContainer} onPress={() => Navigator.navigate("AboutPlace")}>
-        <Ionicons name="add-circle" size={40} color="#6846bd" />
-        <Text style={styles.sectionHeaderText}>Add Your Place</Text>
+      <Text style={styles.title}>Become a Host</Text>
+      <Text style={styles.subtitle}>
+        List your hostel or apartment and connect with tenants easily.
+      </Text>
+
+      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+        <TouchableOpacity
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={handleStartHosting}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Host Your Property</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      <TouchableOpacity
+        style={styles.videoButton}
+        onPress={() => setModalVisible(true)}
+      >
+        <Ionicons name="play-circle" size={28} color="#6846bd" />
+        <Text style={styles.videoText}>How to Fill Form?</Text>
       </TouchableOpacity>
+
+      {/* 📽️ Modal for video language options */}
+      <Modal transparent visible={modalVisible} animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Watch Tutorial In</Text>
+            {["Telugu", "Hindi", "English"].map((lang) => (
+              <TouchableOpacity
+                key={lang}
+                style={styles.langOption}
+                onPress={() => openVideo(lang)}
+              >
+                <Text style={styles.langText}>{lang}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={styles.closeBtn}
+            >
+              <Text style={{ color: "#6846bd", fontWeight: "bold" }}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+
+
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
+export default Host;
+
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f5f5f5",
+    flex: 1,
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: "#f9f9f9",
   },
-  placeContainer: {
-    width: 400,
-    height: 130,
-    backgroundColor: "#fff",
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 30,
+    paddingHorizontal: 10,
+  },
+  videoButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 25,
+  },
+  videoText: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: "#6846bd",
+    fontWeight: "600",
+  },
+  button: {
+    backgroundColor: "#6846bd",
+    paddingVertical: 16,
+    paddingHorizontal: 25,
+    borderRadius: 12,
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#6846bd",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+    letterSpacing: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
-    margin: 10,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
   },
-  sectionHeaderText: {
-    fontSize: 22,
+  modalContainer: {
+    backgroundColor: "#fff",
+    width: "80%",
+    padding: 24,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#6846bd",
-  },
-  faqContainer: {
-    width: "96%",
-    height: 300,
-    paddingVertical: 20,
-    // backgroundColor:"red"
-  },
-  faqTitle: {
-    fontSize: 26,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 20,
     color: "#333",
   },
-  faqItem: {
-    marginBottom: 15,
+  langOption: {
     padding: 10,
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
+    width: "100%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
-  questionContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    // backgroundColor:"red"
+  langText: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#444",
   },
-  question: {
-    fontSize: 20,
-    // fontWeight: "bold",
-    color: "#222",
-  },
-  answer: {
-    fontSize: 18,
-    color: "#555",
-    marginTop: 5,
-  },
-  askDoubtsBox: {
-    width: "90%",
-    height: 80,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginTop: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  askDoubtsText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#6846bd",
-  },
-  askDoubtsIcon: {
-    marginRight: 10,
+  closeBtn: {
+    marginTop: 15,
   },
 });
-
-export default Host;

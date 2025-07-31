@@ -17,12 +17,12 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 const HostelDataTwo = () => {
- const API_URL = "https://myapp-5u6v.onrender.com/api/create-hostel";
+  const API_URL = "https://myapp-5u6v.onrender.com/api/create-hostel";
   const navigation = useNavigation();
   const { hostelData } = useRoute().params || {};
   const { ownerData } = hostelData || {};
 
-  const [formData, setFormData] = useState({
+  const [isSubmitting, setIsSubmitting] = useState(false); const [formData, setFormData] = useState({
     photos: {
       main: null,
       messRoom: null,
@@ -51,7 +51,7 @@ const HostelDataTwo = () => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, { toValue: 1.1, duration: 800, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 1,   duration: 800, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: true }),
       ])
     ).start();
   }, [pulse]);
@@ -64,9 +64,9 @@ const HostelDataTwo = () => {
       return;
     }
     Alert.alert("Upload Photo", "Choose an option", [
-      { text: "Take Photo",          onPress: () => handleImage("camera", photoType) },
+      { text: "Take Photo", onPress: () => handleImage("camera", photoType) },
       { text: "Choose from Gallery", onPress: () => handleImage("gallery", photoType) },
-      { text: "Cancel",              style: "cancel" },
+      { text: "Cancel", style: "cancel" },
     ]);
   };
 
@@ -94,10 +94,14 @@ const HostelDataTwo = () => {
 
   // Submit all data + images
   const handleSubmit = async () => {
+
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     // validate all photos
     const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
     if (missing.length) {
       Alert.alert("Missing Images", `Please upload: ${missing.join(", ")}`);
+      setIsSubmitting(false);
       return;
     }
 
@@ -134,22 +138,24 @@ const HostelDataTwo = () => {
     } catch (err) {
       console.error("Submission Error:", err);
       Alert.alert("Error", "Failed to submit hostel data.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // Icon mapping
   const getIcon = (t) =>
-    ({
-      main:         "home-outline",
-      messRoom:     "restaurant-outline",
-      topView:      "images-outline",
-      washroom:     "water-outline",
-      roomInterior: "bed-outline",
-      commonArea:   "people-outline",
-      balconyView:  "sunny-outline",
-      laundryArea:  "shirt-outline",
-      messMenu:     "fast-food-outline",
-    }[t] || "image-outline");
+  ({
+    main: "home-outline",
+    messRoom: "restaurant-outline",
+    topView: "images-outline",
+    washroom: "water-outline",
+    roomInterior: "bed-outline",
+    commonArea: "people-outline",
+    balconyView: "sunny-outline",
+    laundryArea: "shirt-outline",
+    messMenu: "fast-food-outline",
+  }[t] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>
@@ -225,8 +231,14 @@ const HostelDataTwo = () => {
         </View>
       ))}
 
-      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Submit</Text>
+      <TouchableOpacity
+        style={[styles.submitBtn, isSubmitting && { backgroundColor: "#aaa" }]}
+        onPress={handleSubmit}
+        disabled={isSubmitting}
+      >
+        <Text style={styles.submitText}>
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );

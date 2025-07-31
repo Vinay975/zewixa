@@ -5,20 +5,24 @@ import {
   StyleSheet, TouchableOpacity, TextInput
 } from 'react-native';
 import axios from 'axios';
+import { Alert } from "react-native";
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import FilterModal from '../FecthingData/filterModel';
 import { WatchlistContext } from '../FecthingData/watchingDetails';
+import { AuthContext } from '../userDetails/userAuth';
 
-export default function HomePage() {
+export default function HomePage({ route }) {
   const [hostels, setHostels] = useState([]);
   const [apartments, setApartments] = useState([]);
   const [showHostels, setShowHostels] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
-  const navigation = useNavigation();
   const { watchlist, toggleWatch } = useContext(WatchlistContext);
+  // const { hostel } = route.params;
+  const { customerInfo } = useContext(AuthContext);
+  const navigation = useNavigation();
 
   useEffect(() => {
     axios.get('https://myapp-5u6v.onrender.com/api/hostels')
@@ -95,10 +99,17 @@ export default function HomePage() {
             <TouchableOpacity
               key={item._id}
               style={styles.card}
-              onPress={() => navigation.navigate(
-                isHostel ? 'HostelDetails' : 'ApartmentDetails',
-                isHostel ? { hostel: item } : { apartment: item }
-              )}
+              onPress={() => {
+                if (!customerInfo) {
+                  Alert.alert("Login Required", "Please login to view details.");
+                  navigation.navigate("SignIn");
+                } else {
+                  navigation.navigate(
+                    isHostel ? "HostelDetails" : "ApartmentDetails",
+                    isHostel ? { hostel: item } : { apartment: item }
+                  );
+                }
+              }}
             >
               <Image
                 source={{
@@ -144,13 +155,24 @@ export default function HomePage() {
                   </>
                 )}
               </View>
-              <TouchableOpacity onPress={() => toggleWatch(item)} style={styles.heartBtn}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (!customerInfo) {
+                    Alert.alert("Login Required", "Login to save to watchlist.");
+                    navigation.navigate("SignIn");
+                  } else {
+                    toggleWatch(item);
+                  }
+                }}
+                style={styles.heartBtn}
+              >
                 <Ionicons
                   name={liked ? 'heart' : 'heart-outline'}
                   size={24}
                   color={liked ? 'tomato' : '#ccc'}
                 />
               </TouchableOpacity>
+
             </TouchableOpacity>
           );
         })}

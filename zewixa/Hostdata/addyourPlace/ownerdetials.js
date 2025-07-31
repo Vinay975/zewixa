@@ -42,6 +42,16 @@ const AboutOwner = () => {
             return;
         }
 
+
+        if (mobile1.length !== 10 || isNaN(mobile1)) {
+            Alert.alert("Invalid Mobile Number", "Mobile Number 1 must be exactly 10 digits.");
+            return;
+        }
+
+        if (mobile2 && (mobile2.length !== 10 || isNaN(mobile2))) {
+            Alert.alert("Invalid Mobile Number", "Mobile Number 2 must be exactly 10 digits if provided.");
+            return;
+        }
         const ownerData = {
             name,
             mobile1,
