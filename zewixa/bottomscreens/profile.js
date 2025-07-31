@@ -12,7 +12,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { AuthContext } from "../userDetails/userAuth"; // adjust path as needed
 
 const Profile = ({ navigation, setIsHost }) => {
-  const { userInfo: user, signOut } = useContext(AuthContext);
+  const { customerInfo: user, signOutCustomer } = useContext(AuthContext);
   const isLoggedIn = !!user;
 
   const handleLogout = () => {
@@ -21,7 +21,7 @@ const Profile = ({ navigation, setIsHost }) => {
       "Are you sure you want to logout?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Logout", style: "destructive", onPress: signOut },
+        { text: "Logout", style: "destructive", onPress: signOutCustomer },
       ]
     );
   };
@@ -102,11 +102,17 @@ const Profile = ({ navigation, setIsHost }) => {
 
       {/* Add Your Place Section */}
       <TouchableOpacity
-        style={styles.placecontainer}
+        style={styles.placeContainer}
         onPress={() => setIsHost(false)}
+        activeOpacity={0.8}
       >
-        <Text style={styles.sectionHeaderText}>Add Your Place</Text>
+        <Ionicons name="home-outline" size={30} color="#6846bd" />
+        <View style={{ marginLeft: 12 }}>
+          <Text style={styles.placeTitle}>Go to Host Mode</Text>
+          <Text style={styles.placeSubtitle}>List your hostel or apartment and manage your properties</Text>
+        </View>
       </TouchableOpacity>
+
 
       {/* Account Options */}
       <View style={styles.sectionHeader}>
@@ -120,7 +126,7 @@ const Profile = ({ navigation, setIsHost }) => {
         />
         <OptionRow
           title="Security"
-          onPress={() => navigation.navigate("Settings")}
+          onPress={() => navigation.navigate("Security")}
           iconName="lock-closed-outline"
         />
         <OptionRow
@@ -133,11 +139,7 @@ const Profile = ({ navigation, setIsHost }) => {
           onPress={() => navigation.navigate("Notifications")}
           iconName="notifications-outline"
         />
-        <OptionRow
-          title="Privacy"
-          onPress={() => navigation.navigate("Privacy")}
-          iconName="shield-checkmark-outline"
-        />
+
       </View>
 
       {/* Support Section */}
@@ -202,41 +204,41 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   topRightContainer: {
-  position: "absolute",
-  right: 10,
-  top: 10,
-  flexDirection: "row",
-  alignItems: "center",
-  zIndex: 10,
-},
+    position: "absolute",
+    right: 10,
+    top: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    zIndex: 10,
+  },
 
-signInButton: {
-  flexDirection: "row",
-  alignItems: "center",
-  paddingHorizontal: 8,
-  paddingVertical: 4,
-  backgroundColor: "#fff",
-  borderRadius: 20,
-  borderWidth: 1,
-  borderColor: "#6846bd",
-},
+  signInButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#6846bd",
+  },
 
-signInText: {
-  color: "#6846bd",
-  fontSize: 18,
-  fontWeight: "600",
-},
+  signInText: {
+    color: "#6846bd",
+    fontSize: 18,
+    fontWeight: "600",
+  },
 
-logoutButton: {
-  paddingHorizontal: 8,
-  paddingVertical: 4,
-  backgroundColor: "#fff",
-  borderRadius: 20,
-  borderWidth: 1,
-  borderColor: "#6846bd",
-  justifyContent: "center",
-  alignItems: "center",
-},
+  logoutButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#6846bd",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
   userName: {
     fontSize: 20,
@@ -307,4 +309,26 @@ logoutButton: {
     fontSize: 18,
     color: "#333",
   },
+  placeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    margin: 10,
+    elevation: 3,
+  },
+
+  placeTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+
+  placeSubtitle: {
+    fontSize: 14,
+    color: '#777',
+    marginTop: 4,
+  },
+
 });

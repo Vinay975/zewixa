@@ -7,7 +7,10 @@ import FetchingHostelData from "../FecthingData/hosteldata";
 import HostelDetails from "../FecthingData/displayingData";
 import ApartmentDetails from '../FecthingData/apartmentDetails';
 
-
+import PersonInfo from '../UserAccountData/personInfo';
+import Security from '../UserAccountData/security';
+import Payments from '../UserAccountData/payments';
+import Notifications from '../UserAccountData/notifications';
 import ContactUs from '../SupportPage/contact';
 import HelpCentre from '../SupportPage/helpCentre';
 import TermsOfService from '../SupportPage/termsofservice';
@@ -30,13 +33,28 @@ const CustomerStack = ({ setIsHost }) => {
 
       {/* 👇 Show the header only for Settings */}
       <CustomerBar.Screen
-        name="Settings"
-        component={Settings}
+        name="PersonalInformation"
+        component={PersonInfo}
+        options={{ headerShown: true }}
+      />
+       <CustomerBar.Screen
+        name="Security"
+        component={Security}
+        options={{ headerShown: true }}
+      />
+       <CustomerBar.Screen
+        name="Payments"
+        component={Payments}
+        options={{ headerShown: true }}
+      />
+       <CustomerBar.Screen
+        name="Notifications"
+        component={Notifications}
         options={{ headerShown: true }}
       />
       
       <CustomerBar.Screen
-        name="ContactUs   "
+        name="ContactUs"
         component={ContactUs}
         options={{ headerShown: true }}
       />
