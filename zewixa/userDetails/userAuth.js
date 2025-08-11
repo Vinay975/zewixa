@@ -3,18 +3,18 @@ import React, { createContext, useState } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userToken, setUserToken] = useState(null);     // Common if needed
+  const [userToken, setUserToken] = useState(null);     
   const [customerInfo, setCustomerInfo] = useState(null);
   const [hostInfo, setHostInfo] = useState(null);
 
   const signInCustomer = (token, user) => {
     setUserToken(token);
-    setCustomerInfo(user); // { username, email }
+    setCustomerInfo(user); 
   };
 
   const signInHost = (token, host) => {
     setUserToken(token);
-    setHostInfo(host); // { username, email }
+    setHostInfo(host); 
   };
 
   const signOutCustomer = () => {
