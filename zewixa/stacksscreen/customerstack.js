@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import { useState } from 'react';
 import { createStackNavigator } from "@react-navigation/stack";
 import BottomTab from "../bottomTab";
-import Settings from "../customerScreens/profileScreens/setting";
-import FetchingHostelData from "../FecthingData/hosteldata";
+// import Settings from "../customerScreens/profileScreens/setting";
+// import FetchingHostelData from "../FecthingData/hosteldata";
 import HostelDetails from "../FecthingData/displayingData";
 import ApartmentDetails from '../FecthingData/apartmentDetails';
 

@@ -24,7 +24,7 @@ const SignIn = ({ navigation }) => {
     }
 
     try {
-      const res = await fetch('https://myapp-5u6v.onrender.com/signin', {
+      const res = await fetch('https://zewixa-jz2h.onrender.com/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

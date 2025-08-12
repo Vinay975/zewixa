@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 const HostelDataTwo = () => {
-  const API_URL = "https://myapp-5u6v.onrender.com/api/create-hostel";
+  const API_URL = "https://zewixa-jz2h.onrender.com/api/create-hostel";
   const navigation = useNavigation();
   const { hostelData } = useRoute().params || {};
   const { ownerData } = hostelData || {};

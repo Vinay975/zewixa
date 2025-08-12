@@ -32,7 +32,7 @@ export default function WatchList() {
         const owner = item.ownerData?.name || 'Owner';
         const gender = isHostel ? item.gender : null;
         const imageUri =
-          `https://myapp-5u6v.onrender.com` +
+          `https://zewixa-jz2h.onrender.com` +
           (isHostel ? item.photos?.main : item.photos?.building);
 
         return (

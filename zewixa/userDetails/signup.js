@@ -27,7 +27,7 @@ const SignUp = ({ navigation }) => {
     }
 
     try {
-      const res = await fetch("https://myapp-5u6v.onrender.com/signup", {
+      const res = await fetch("https://zewixa-jz2h.onrender.com/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),

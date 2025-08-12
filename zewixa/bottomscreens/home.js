@@ -25,11 +25,11 @@ export default function HomePage({ route }) {
   const navigation = useNavigation();
 
   useEffect(() => {
-    axios.get('https://myapp-5u6v.onrender.com/api/hostels')
+    axios.get('https://zewixa-jz2h.onrender.com/api/hostels')
       .then(({ data }) => setHostels(data))
       .catch(console.error);
 
-    axios.get('https://myapp-5u6v.onrender.com/api/get-apartment-data')
+    axios.get('https://zewixa-jz2h.onrender.com/api/get-apartment-data')
       .then(({ data }) => setApartments(data))
       .catch(console.error);
   }, []);
@@ -114,8 +114,8 @@ export default function HomePage({ route }) {
               <Image
                 source={{
                   uri: showHostels
-                    ? `https://myapp-5u6v.onrender.com${item.photos?.main}`
-                    : `https://myapp-5u6v.onrender.com${item.photos?.building}`
+                    ? `https://zewixa-jz2h.onrender.com${item.photos?.main}`
+                    : `https://zewixa-jz2h.onrender.com/${item.photos?.building}`
                 }}
                 style={styles.cardImage}
               />

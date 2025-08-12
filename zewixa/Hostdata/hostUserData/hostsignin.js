@@ -26,7 +26,7 @@
       }
 
       try {
-        const res = await fetch('https://myapp-5u6v.onrender.com/host/signin', {
+        const res = await fetch('https://zewixa-jz2h.onrender.com/host/signin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
