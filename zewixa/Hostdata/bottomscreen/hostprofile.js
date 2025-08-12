@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
+  ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import * as ImagePicker from "expo-image-picker";
@@ -54,51 +55,65 @@ const HostProfile = ({ navigation, setIsHost }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.profileCard}>
-        <TouchableOpacity
-          style={styles.logout}
-          onPress={
-            hostInfo ? signOutHost : () => navigation.navigate("HostSignIn")
-          }
-        >
-          <Icon name={hostInfo ? "logout" : "login"} size={18} color="#fff" />
-          <Text style={styles.logoutText}>
-            {hostInfo ? "Logout" : "Login"}
-          </Text>
-        </TouchableOpacity>
+      {/* Scrollable Content */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.profileCard}>
+          <TouchableOpacity
+            style={styles.logout}
+            onPress={
+              hostInfo ? signOutHost : () => navigation.navigate("HostSignIn")
+            }
+          >
+            <Icon name={hostInfo ? "logout" : "login"} size={18} color="#fff" />
+            <Text style={styles.logoutText}>
+              {hostInfo ? "Logout" : "Login"}
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={pickImage}>
-          {hostImage === "please select image" ? (
-            <View style={styles.initialCircle}>
-              <Text style={styles.initialText}>
-                {hostInfo?.username?.charAt(0)?.toUpperCase() || "H"}
-              </Text>
-            </View>
-          ) : (
-            <Image source={{ uri: hostImage }} style={styles.profileImage} />
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity onPress={pickImage}>
+            {hostImage === "please select image" ? (
+              <View style={styles.initialCircle}>
+                <Text style={styles.initialText}>
+                  {hostInfo?.username?.charAt(0)?.toUpperCase() || "H"}
+                </Text>
+              </View>
+            ) : (
+              <Image source={{ uri: hostImage }} style={styles.profileImage} />
+            )}
+          </TouchableOpacity>
 
-        <View style={styles.profileDetails}>
-
-          <Text style={styles.name}>Welcome {hostInfo?.username || "Guest"}</Text>
-          <Text style={styles.email}>
-            {hostInfo?.email ? `${hostInfo.email}` : isVisitor ? "Visitor" : "Host"}
-          </Text>
+          <View style={styles.profileDetails}>
+            <Text style={styles.name}>Welcome {hostInfo?.username || "Guest"}</Text>
+            <Text style={styles.email}>
+              {hostInfo?.email ? `${hostInfo.email}` : isVisitor ? "Visitor" : "Host"}
+            </Text>
+          </View>
         </View>
-      </View>
 
-      <TouchableOpacity onPress={handleToggleSwitch} style={styles.switchContainer}>
-        <Animated.View
-          style={[
-            styles.switchButton,
-            { backgroundColor: switchBackgroundColor },
-          ]}
-        >
-          <Icon name={switchIcon} size={24} color="white" />
-          <Text style={styles.switchText}>{switchText}</Text>
-        </Animated.View>
-      </TouchableOpacity>
+        {hostInfo && (
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={styles.optionRow}
+              onPress={() => navigation.navigate("EditPlace")}
+            >
+              <Icon name="home-edit" size={22} color="#6846bd" />
+              <Text style={styles.optionText}>Edit / Update Your Place</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Fixed Switch Button */}
+      <View style={styles.fixedSwitch}>
+        <TouchableOpacity onPress={handleToggleSwitch}>
+          <Animated.View
+            style={[styles.switchButton, { backgroundColor: switchBackgroundColor }]}
+          >
+            <Icon name={switchIcon} size={24} color="white" />
+            <Text style={styles.switchText}>{switchText}</Text>
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -109,8 +124,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f2f2f2",
+  },
+  scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 20,
+    paddingBottom: 80, // so content is above fixed button
   },
   profileCard: {
     position: "relative",
@@ -118,13 +136,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    marginBottom: 30,
+    marginBottom: 20,
     alignItems: "center",
-    flexDirection: "column",
   },
   profileImage: {
     width: 120,
@@ -132,28 +145,15 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 4,
     borderColor: "#6846bd",
-    marginBottom: 15, 
+    marginBottom: 15,
   },
-
   logoutText: {
     color: "#fff",
     marginLeft: 6,
     fontSize: 13,
   },
-  // profileImage: {
-  //   width: 100,
-  //   height: 100,
-  //   borderRadius: 50,
-  //   borderWidth: 3,
-  //   borderColor: "#f5f4f7c3",
-  // },
   profileDetails: {
-    alignItems: "center", // Center text
-  },
-  welcome: {
-    fontSize: 18,
-    color: "#777",
-    marginBottom: 4,
+    alignItems: "center",
   },
   name: {
     fontSize: 24,
@@ -175,11 +175,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    zIndex: 10,
-  },
-  switchContainer: {
-    alignItems: "center",
-    marginBottom: 30,
   },
   switchButton: {
     flexDirection: "row",
@@ -209,5 +204,26 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-
+  section: {
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 20,
+  },
+  optionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  optionText: {
+    fontSize: 15,
+    marginLeft: 10,
+    color: "#333",
+  },
+  fixedSwitch: {
+    position: "absolute",
+    bottom: 15,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
 });

@@ -10,7 +10,10 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
+import Slider from "@react-native-community/slider";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+
 
 const { width } = Dimensions.get("window");
 
@@ -29,12 +32,14 @@ const HostelDataOne = () => {
   const [gender, setGender] = useState("");
   const [acType, setAcType] = useState("");
 
+  const [totalCapacity, setTotalCapacity] = useState(50);
+  const [currentPeople, setCurrentPeople] = useState(20);
+
   const [genderModalVisible, setGenderModalVisible] = useState(false);
   const [acModalVisible, setAcModalVisible] = useState(false);
 
   const genderOptions = ["Boys", "Girls", "Co-Ed"];
   const acOptions = ["AC", "Non-AC", "Both"];
-
 
   const handleNext = () => {
     if (!hostelName || !location || !floors || !rooms || !gender || !acType) {
@@ -42,11 +47,16 @@ const HostelDataOne = () => {
       return;
     }
 
-    
-  if (parseInt(rooms) < 1) {
-  Alert.alert("Error", "Number of rooms must be at least 1.");
-  return;
-}
+    if (parseInt(rooms) < 1) {
+      Alert.alert("Error", "Number of rooms must be at least 1.");
+      return;
+    }
+
+    if (currentPeople > totalCapacity) {
+      Alert.alert("Error", "Current people cannot exceed total capacity.");
+      return;
+    }
+
     const hostelData = {
       hostelName,
       location,
@@ -54,6 +64,8 @@ const HostelDataOne = () => {
       rooms,
       gender,
       acType,
+      totalCapacity,
+      currentPeople,
       ownerData,
     };
 
@@ -62,19 +74,21 @@ const HostelDataOne = () => {
 
   return (
     <View style={styles.container}>
-      {/* Greeting UI */}
+      {/* Greeting */}
       <View style={styles.greetingContainer}>
         <Text style={styles.greetingText}>{ownerName}</Text>
-        <Text style={styles.subGreeting}>Let's set up your hostel details.</Text>
+        <Text style={styles.subGreeting}>
+          Let’s set up your hostel details to welcome your guests.
+        </Text>
       </View>
 
+      {/* Basic Inputs */}
       <TextInput
         style={styles.input}
         placeholder="Hostel Name"
         value={hostelName}
         onChangeText={setHostelName}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Location"
@@ -110,11 +124,40 @@ const HostelDataOne = () => {
         onChangeText={setRooms}
       />
 
+      {/* Sliders */}
+      <View style={styles.sliderContainer}>
+        <Text style={styles.sliderLabel}>Total Capacity: {totalCapacity}</Text>
+        <Slider
+          style={{ width: "90%" }}
+          minimumValue={10}
+          maximumValue={500}
+          step={1}
+          value={totalCapacity}
+          minimumTrackTintColor="#6846bd"
+          maximumTrackTintColor="#ccc"
+          onValueChange={setTotalCapacity}
+        />
+      </View>
+
+      <View style={styles.sliderContainer}>
+        <Text style={styles.sliderLabel}>Current People: {currentPeople}</Text>
+        <Slider
+          style={{ width: "90%" }}
+          minimumValue={0}
+          maximumValue={totalCapacity}
+          step={1}
+          value={currentPeople}
+          minimumTrackTintColor="#ff9800"
+          maximumTrackTintColor="#ccc"
+          onValueChange={setCurrentPeople}
+        />
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={handleNext}>
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
 
-      {/* Gender Picker Modal */}
+      {/* Gender Modal */}
       <Modal transparent visible={genderModalVisible} animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -138,7 +181,7 @@ const HostelDataOne = () => {
         </View>
       </Modal>
 
-      {/* AC Type Picker Modal */}
+      {/* AC Modal */}
       <Modal transparent visible={acModalVisible} animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -170,8 +213,6 @@ export default HostelDataOne;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#f9f9f9",
     padding: 20,
   },
@@ -181,10 +222,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     alignItems: "center",
-    width: "90%",
   },
   greetingText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#fff",
   },
@@ -192,9 +232,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#ddd",
     marginTop: 5,
+    textAlign: "center",
   },
   input: {
-    width: "90%",
+    width: "100%",
     padding: 12,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -202,9 +243,17 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: "#fff",
   },
+  sliderContainer: {
+    width: "100%",
+    marginBottom: 20,
+  },
+  sliderLabel: {
+    fontSize: 16,
+    marginBottom: 5,
+    fontWeight: "bold",
+  },
   button: {
     paddingVertical: 12,
-    paddingHorizontal: 25,
     backgroundColor: "#6846bd",
     borderRadius: 5,
     shadowColor: "#6846bd",
@@ -218,6 +267,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
     fontWeight: "bold",
+    textAlign: "center",
   },
   modalContainer: {
     flex: 1,

@@ -10,6 +10,7 @@ import Apartment from "../Hostdata/addyourPlace/apparement";
 import FinalSubmit from "../Hostdata/addyourPlace/finalSubmit";
 import HostSignIn from "../Hostdata/hostUserData/hostsignin";
 import HostSignUp from "../Hostdata/hostUserData/hostsignup";
+import EditPlaceOptions from "../Hostdata/EditPlace/edityoutplace";
 
 const OwnerBar = createStackNavigator();
 
@@ -47,6 +48,7 @@ const OwnerStack = ({ setIsHost }) => {
       <OwnerBar.Screen name="FinalSubmit" component={FinalSubmit} />
       <OwnerBar.Screen name="HostSignUp" component={HostSignUp}/>
       <OwnerBar.Screen name="HostSignIn" component={HostSignIn}/>
+      <OwnerBar.Screen name="EditPlace" component={EditPlaceOptions}/>
     </OwnerBar.Navigator>
   );
 };
