@@ -20,6 +20,8 @@ const ApartmentData = () => {
   const API_URL = "https://zewixa-jz2h.onrender.com/api/create-apartment";
   const navigation = useNavigation();
   const { ownerData } = useRoute().params || {};
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const [formData, setFormData] = useState({
     photos: {
@@ -98,9 +100,19 @@ const ApartmentData = () => {
   };
 
   const handleSubmit = async () => {
+
+    if (isSubmitting) return; // Prevent double click
+    setIsSubmitting(true);
+    if (formData.bhkUnits.length === 0) {
+      Alert.alert("Add BHK Units", "Please add at least one BHK unit.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
     if (missing.length) {
       Alert.alert("Missing Images", `Please upload: ${missing.join(", ")}`);
+      setIsSubmitting(false);
       return;
     }
 
@@ -138,6 +150,9 @@ const ApartmentData = () => {
     } catch (err) {
       console.error("Submission Error:", err);
       Alert.alert("Error", "Failed to submit apartment data.");
+    }
+    finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -260,9 +275,16 @@ const ApartmentData = () => {
         </TouchableOpacity>
       ))}
 
-      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Submit Apartment</Text>
+      <TouchableOpacity
+        style={[styles.submitBtn, isSubmitting && { backgroundColor: "#aaa" }]}
+        onPress={handleSubmit}
+        disabled={isSubmitting}
+      >
+        <Text style={styles.submitText}>
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </Text>
       </TouchableOpacity>
+
     </ScrollView>
   );
 };

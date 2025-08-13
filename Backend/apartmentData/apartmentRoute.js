@@ -38,21 +38,37 @@ const streamUpload = (buffer, folder) => {
   });
 };
 
-// POST create apartment
+// POST /create-apartment
 router.post("/create-apartment", upload, async (req, res) => {
   try {
     const { location, wifiAvailable, isElectricityIncluded, bhkUnits, security, ownerData } = req.body;
 
-    const bhkData = JSON.parse(bhkUnits);
-    const securityData = JSON.parse(security);
-    const owner = JSON.parse(ownerData);
+    // Validate required fields
+    if (!location) return res.status(400).json({ message: "Location is required" });
+    if (!bhkUnits) return res.status(400).json({ message: "BHK units are required" });
 
-    // Upload images to Cloudinary
+    // Parse JSON safely
+    let bhkData, securityData, owner;
+    try {
+      bhkData = JSON.parse(bhkUnits);
+      securityData = JSON.parse(security);
+      owner = JSON.parse(ownerData);
+    } catch (err) {
+      return res.status(400).json({ message: "Invalid JSON in request body" });
+    }
+
+    // Upload apartment photos to Cloudinary
     const photoPaths = {};
     for (const key in req.files) {
       const file = req.files[key][0];
       const result = await streamUpload(file.buffer, `apartments/${key}`);
       photoPaths[key] = result.secure_url;
+    }
+
+    // If ownerPhoto is uploaded, overwrite profileImage
+    if (req.files.ownerPhoto) {
+      const ownerResult = await streamUpload(req.files.ownerPhoto[0].buffer, "apartments/ownerPhoto");
+      owner.profileImage = ownerResult.secure_url;
     }
 
     const newApartment = new Apartment({
@@ -61,7 +77,7 @@ router.post("/create-apartment", upload, async (req, res) => {
         email: owner.email,
         mobile1: owner.mobile1,
         mobile2: owner.mobile2,
-        profileImage: owner.profileImage, 
+        profileImage: owner.profileImage || "",
       },
       photos: photoPaths,
       location,
@@ -72,20 +88,27 @@ router.post("/create-apartment", upload, async (req, res) => {
     });
 
     await newApartment.save();
-    res.status(201).json({ message: "Apartment created successfully", apartment: newApartment });
+
+    res.status(201).json({
+      message: "Apartment created successfully",
+      apartment: newApartment,
+      photos: photoPaths,
+      ownerPhoto: owner.profileImage,
+    });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error", error });
+    console.error("Apartment creation error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// GET all apartments
+// GET /get-apartment-data
 router.get("/get-apartment-data", async (req, res) => {
   try {
     const apartments = await Apartment.find();
     res.status(200).json(apartments);
   } catch (error) {
-    console.error("FETCH ERROR:", error);
+    console.error("Fetch error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
