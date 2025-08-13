@@ -6,7 +6,7 @@ const { Readable } = require("stream");
 
 const router = express.Router();
 
-// Multer memory storage
+// 🟣 Multer memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage }).fields([
   { name: "building", maxCount: 1 },
@@ -18,7 +18,7 @@ const upload = multer({ storage }).fields([
   { name: "ownerPhoto", maxCount: 1 },
 ]);
 
-// Helper to upload buffer to Cloudinary
+// 🟣 Helper to upload buffer to Cloudinary
 const streamUpload = (buffer, folder) => {
   return new Promise((resolve, reject) => {
     const readable = new Readable();
@@ -26,19 +26,16 @@ const streamUpload = (buffer, folder) => {
     readable.push(buffer);
     readable.push(null);
 
-    const stream = cloudinary.uploader.upload_stream(
-      { folder },
-      (error, result) => {
-        if (result) resolve(result);
-        else reject(error);
-      }
-    );
+    const stream = cloudinary.uploader.upload_stream({ folder }, (error, result) => {
+      if (result) resolve(result);
+      else reject(error);
+    });
 
     readable.pipe(stream);
   });
 };
 
-// POST /create-apartment
+// 🟣 POST /create-apartment
 router.post("/create-apartment", upload, async (req, res) => {
   try {
     const { location, wifiAvailable, isElectricityIncluded, bhkUnits, security, ownerData } = req.body;
@@ -57,20 +54,22 @@ router.post("/create-apartment", upload, async (req, res) => {
       return res.status(400).json({ message: "Invalid JSON in request body" });
     }
 
-    // Upload apartment photos to Cloudinary
+    // Upload apartment photos (skip ownerPhoto)
     const photoPaths = {};
     for (const key in req.files) {
+      if (key === "ownerPhoto") continue; // skip owner photo
       const file = req.files[key][0];
       const result = await streamUpload(file.buffer, `apartments/${key}`);
       photoPaths[key] = result.secure_url;
     }
 
-    // If ownerPhoto is uploaded, overwrite profileImage
+    // Upload owner photo if provided
     if (req.files.ownerPhoto) {
       const ownerResult = await streamUpload(req.files.ownerPhoto[0].buffer, "apartments/ownerPhoto");
       owner.profileImage = ownerResult.secure_url;
     }
 
+    // Create new apartment document
     const newApartment = new Apartment({
       ownerData: {
         name: owner.name,
@@ -102,7 +101,7 @@ router.post("/create-apartment", upload, async (req, res) => {
   }
 });
 
-// GET /get-apartment-data
+// 🟣 GET /get-apartment-data
 router.get("/get-apartment-data", async (req, res) => {
   try {
     const apartments = await Apartment.find();

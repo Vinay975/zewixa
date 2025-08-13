@@ -42,6 +42,11 @@ const AboutOwner = () => {
             return;
         }
 
+        if (!profileImage) {
+            Alert.alert("Error", "Please select a profile photo.");
+            return;
+        }
+
 
         if (mobile1.length !== 10 || isNaN(mobile1)) {
             Alert.alert("Invalid Mobile Number", "Mobile Number 1 must be exactly 10 digits.");
