@@ -6,19 +6,20 @@ const apartmentSchema = new mongoose.Schema({
     email: String,
     mobile1: String,
     mobile2: String,
-    profileImage: String, // URL of uploaded image
+    profileImage: String, 
   },
 
   photos: {
-    building: String,
+    building: String,     
     livingRoom: String,
     kitchen: String,
     bedroom: String,
     bathroom: String,
     balcony: String,
+    ownerPhoto: String,
   },
 
-  location: String, // Simple location string from the form
+  location: String, 
 
   wifiAvailable: {
     type: String,
