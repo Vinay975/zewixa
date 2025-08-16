@@ -22,7 +22,7 @@ const upload = multer({ storage }).fields([
 const streamUpload = (buffer, folder) => {
   return new Promise((resolve, reject) => {
     const readable = new Readable();
-    readable._read = () => {};
+    readable._read = () => { };
     readable.push(buffer);
     readable.push(null);
 
@@ -39,6 +39,10 @@ const streamUpload = (buffer, folder) => {
 router.post("/create-apartment", upload, async (req, res) => {
   try {
     const { location, wifiAvailable, isElectricityIncluded, bhkUnits, security, ownerData } = req.body;
+
+    console.log("REQ.BODY:", req.body);
+    console.log("REQ.FILES:", Object.keys(req.files || {}));
+
 
     // Validate required fields
     if (!location) return res.status(400).json({ message: "Location is required" });
@@ -67,7 +71,9 @@ router.post("/create-apartment", upload, async (req, res) => {
     if (req.files.ownerPhoto) {
       const ownerResult = await streamUpload(req.files.ownerPhoto[0].buffer, "apartments/ownerPhoto");
       owner.profileImage = ownerResult.secure_url;
+      photoPaths.ownerPhoto = ownerResult.secure_url; // save in photos too
     }
+
 
     // Create new apartment document
     const newApartment = new Apartment({
@@ -96,8 +102,8 @@ router.post("/create-apartment", upload, async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Apartment creation error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Apartment creation error:", error.message, error.stack);
+    res.status(500).json({ message: "Server error", error: error.message, stack: error.stack });
   }
 });
 

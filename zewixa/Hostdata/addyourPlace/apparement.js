@@ -148,7 +148,7 @@ const ApartmentData = () => {
         navigation.navigate("FinalSubmit");
       }
     } catch (err) {
-      console.error("Submission Error:", err);
+      console.error("Submission Error:", err.response?.data || err.message);
       Alert.alert("Error", "Failed to submit apartment data.");
     }
     finally {
