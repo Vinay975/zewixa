@@ -15,7 +15,6 @@ const upload = multer({ storage }).fields([
   { name: "bedroom", maxCount: 1 },
   { name: "bathroom", maxCount: 1 },
   { name: "balcony", maxCount: 1 },
-  { name: "ownerPhoto", maxCount: 1 },
 ]);
 
 // 🟣 Helper to upload buffer to Cloudinary
@@ -26,63 +25,45 @@ const streamUpload = (buffer, folder) => {
     readable.push(buffer);
     readable.push(null);
 
-    const stream = cloudinary.uploader.upload_stream({ folder }, (error, result) => {
-      if (result) resolve(result);
-      else reject(error);
-    });
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: "auto" },
+      (error, result) => {
+        if (result) resolve(result);
+        else reject(error);
+      }
+    );
 
     readable.pipe(stream);
   });
 };
 
-// 🟣 POST /create-apartment
 router.post("/create-apartment", upload, async (req, res) => {
   try {
     const { location, wifiAvailable, isElectricityIncluded, bhkUnits, security, ownerData } = req.body;
 
-    console.log("REQ.BODY:", req.body);
-    console.log("REQ.FILES:", Object.keys(req.files || {}));
-
-
-    // Validate required fields
     if (!location) return res.status(400).json({ message: "Location is required" });
     if (!bhkUnits) return res.status(400).json({ message: "BHK units are required" });
 
-    // Parse JSON safely
     let bhkData, securityData, owner;
     try {
       bhkData = JSON.parse(bhkUnits);
       securityData = JSON.parse(security);
       owner = JSON.parse(ownerData);
     } catch (err) {
-      return res.status(400).json({ message: "Invalid JSON in request body" });
+      return res.status(400).json({ message: "Invalid JSON in request body", error: err.message });
     }
 
-    // Upload apartment photos (skip ownerPhoto)
     const photoPaths = {};
-    for (const key in req.files) {
-      if (key === "ownerPhoto") continue; // skip owner photo
+    for (const key in req.files || {}) {
+      if (!req.files[key] || !req.files[key][0]) continue;
       const file = req.files[key][0];
       const result = await streamUpload(file.buffer, `apartments/${key}`);
       photoPaths[key] = result.secure_url;
     }
 
-    // Upload owner photo if provided
-    if (req.files.ownerPhoto) {
-      const ownerResult = await streamUpload(req.files.ownerPhoto[0].buffer, "apartments/ownerPhoto");
-      owner.profileImage = ownerResult.secure_url;
-      photoPaths.ownerPhoto = ownerResult.secure_url; // save in photos too
-    }
-
-
-    // Create new apartment document
     const newApartment = new Apartment({
       ownerData: {
-        name: owner.name,
-        email: owner.email,
-        mobile1: owner.mobile1,
-        mobile2: owner.mobile2,
-        profileImage: owner.profileImage || "",
+        email: owner?.email || "",
       },
       photos: photoPaths,
       location,
@@ -98,16 +79,18 @@ router.post("/create-apartment", upload, async (req, res) => {
       message: "Apartment created successfully",
       apartment: newApartment,
       photos: photoPaths,
-      ownerPhoto: owner.profileImage,
     });
-
   } catch (error) {
-    console.error("Apartment creation error:", error.message, error.stack);
-    res.status(500).json({ message: "Server error", error: error.message, stack: error.stack });
+    console.error("Apartment creation error:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+      stack: error.stack,
+    });
   }
 });
 
-// 🟣 GET /get-apartment-data
+
 router.get("/get-apartment-data", async (req, res) => {
   try {
     const apartments = await Apartment.find();

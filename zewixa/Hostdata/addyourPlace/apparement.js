@@ -100,9 +100,9 @@ const ApartmentData = () => {
   };
 
   const handleSubmit = async () => {
-
-    if (isSubmitting) return; // Prevent double click
+    if (isSubmitting) return;
     setIsSubmitting(true);
+
     if (formData.bhkUnits.length === 0) {
       Alert.alert("Add BHK Units", "Please add at least one BHK unit.");
       setIsSubmitting(false);
@@ -116,29 +116,32 @@ const ApartmentData = () => {
       return;
     }
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("ownerData", JSON.stringify(ownerData));
-
-    if (ownerData?.profileImage) {
-      const uri = ownerData.profileImage;
-      const name = uri.split("/").pop();
-      const type = `image/${name.split(".").pop()}`;
-      formDataToSend.append("ownerPhoto", { uri, name, type });
-    }
-
-    formDataToSend.append("location", formData.location);
-    formDataToSend.append("wifiAvailable", formData.wifiAvailable);
-    formDataToSend.append("isElectricityIncluded", formData.isElectricityIncluded);
-    formDataToSend.append("security", JSON.stringify(formData.security));
-    formDataToSend.append("bhkUnits", JSON.stringify(formData.bhkUnits));
-
-    Object.entries(formData.photos).forEach(([key, uri]) => {
-      const name = uri.split("/").pop();
-      const type = `image/${name.split(".").pop()}`;
-      formDataToSend.append(key, { uri, name, type });
-    });
-
     try {
+      const formDataToSend = new FormData();
+
+      formDataToSend.append(
+        "ownerData",
+        JSON.stringify({
+          email: ownerData?.email || "",
+        })
+      )
+
+      formDataToSend.append("location", formData.location);
+      formDataToSend.append("wifiAvailable", formData.wifiAvailable);
+      formDataToSend.append("isElectricityIncluded", formData.isElectricityIncluded);
+      formDataToSend.append("security", JSON.stringify(formData.security));
+      formDataToSend.append("bhkUnits", JSON.stringify(formData.bhkUnits));
+
+
+      Object.keys(formData.photos).forEach((key) => {
+        formDataToSend.append(key, {
+          uri: formData.photos[key],
+          name: `${key}.jpg`,
+          type: "image/jpeg",
+        });
+      });
+
+
       const res = await axios.post(API_URL, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -146,15 +149,21 @@ const ApartmentData = () => {
       if (res.status === 201) {
         Alert.alert("Success", "Apartment data saved!");
         navigation.navigate("FinalSubmit");
+      } else {
+        const errorText = await response.text();
+        console.error("❌ Server Error Response:", errorText);
+        Alert.alert("Error", res.data?.message || "Unexpected response");
       }
     } catch (err) {
-      console.error("Submission Error:", err.response?.data || err.message);
+      console.error("Submission Error:", err.response?.data && err.message);
+      console.error("❌ Network/Code Error:", error);
+      Alert.alert("Error", `Something went wrong: ${error.message}`);
       Alert.alert("Error", "Failed to submit apartment data.");
-    }
-    finally {
+    } finally {
       setIsSubmitting(false);
     }
   };
+
 
   const getIcon = (type) =>
   ({

@@ -58,14 +58,10 @@ const AboutOwner = () => {
             return;
         }
         const ownerData = {
-            name,
-            mobile1,
-            mobile2,
             email,
-            profileImage,
         };
 
-        console.log("Navigating with Data:", ownerData); // Debugging log
+        // console.log("Navigating with Data:", ownerData); // Debugging log
 
         if (placeType === "Hostel") {
             navigation.navigate("AboutHostel", { ownerData });  // FIXED: Changed from "HostelDataOne" to "AboutHostel"

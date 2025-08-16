@@ -120,7 +120,7 @@ export default function ApartmentDetails({ route }) {
 
             {/* Call & Book Buttons */}
             <View style={styles.footer}>
-                <TouchableOpacity onPress={openDialer} style={styles.callBtn}>
+                <TouchableOpacity onPress={openDialer} style={styles.callBtn}>  
                     <Ionicons name="call" size={20} color="#fff" />
                     <Text style={styles.btnText}>Call Owner</Text>
                 </TouchableOpacity>
