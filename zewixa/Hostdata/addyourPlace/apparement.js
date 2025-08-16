@@ -22,7 +22,6 @@ const ApartmentData = () => {
   const { ownerData } = useRoute().params || {};
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-
   const [formData, setFormData] = useState({
     photos: {
       building: null,
@@ -119,19 +118,14 @@ const ApartmentData = () => {
     try {
       const formDataToSend = new FormData();
 
-      formDataToSend.append(
-        "ownerData",
-        JSON.stringify({
-          email: ownerData?.email || "",
-        })
-      )
+      // ✅ Corrected: Send owner's email directly instead of a stringified object
+      formDataToSend.append("ownerEmail", ownerData?.email || "");
 
       formDataToSend.append("location", formData.location);
       formDataToSend.append("wifiAvailable", formData.wifiAvailable);
       formDataToSend.append("isElectricityIncluded", formData.isElectricityIncluded);
       formDataToSend.append("security", JSON.stringify(formData.security));
       formDataToSend.append("bhkUnits", JSON.stringify(formData.bhkUnits));
-
 
       Object.keys(formData.photos).forEach((key) => {
         formDataToSend.append(key, {
@@ -141,7 +135,6 @@ const ApartmentData = () => {
         });
       });
 
-
       const res = await axios.post(API_URL, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -150,30 +143,35 @@ const ApartmentData = () => {
         Alert.alert("Success", "Apartment data saved!");
         navigation.navigate("FinalSubmit");
       } else {
-        const errorText = await response.text();
+        const errorText = await res.text();
         console.error("❌ Server Error Response:", errorText);
         Alert.alert("Error", res.data?.message || "Unexpected response");
       }
     } catch (err) {
-      console.error("Submission Error:", err.response?.data && err.message);
-      console.error("❌ Network/Code Error:", error);
-      Alert.alert("Error", `Something went wrong: ${error.message}`);
-      Alert.alert("Error", "Failed to submit apartment data.");
+      if (err.response) {
+        console.error("❌ API Error Response:", err.response.data);
+        Alert.alert("Server Error", JSON.stringify(err.response.data, null, 2));
+      } else if (err.request) {
+        console.error("❌ No Response:", err.request);
+        Alert.alert("Network Error", "No response from server.");
+      } else if (err.message) {
+        console.error("❌ Unexpected Error:", err.message);
+        Alert.alert("Error", err.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-
   const getIcon = (type) =>
-  ({
-    building: "business-outline",
-    livingRoom: "ios-tv-outline",
-    kitchen: "restaurant-outline",
-    bedroom: "bed-outline",
-    bathroom: "water-outline",
-    balcony: "sunny-outline",
-  }[type] || "image-outline");
+    ({
+      building: "business-outline",
+      livingRoom: "tv-outline",
+      kitchen: "restaurant-outline",
+      bedroom: "bed-outline",
+      bathroom: "water-outline",
+      balcony: "sunny-outline",
+    }[type] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>
@@ -197,7 +195,6 @@ const ApartmentData = () => {
           ))}
         </View>
       ))}
-
 
       <Text style={styles.sectionTitle}>Apartment Location</Text>
       <TextInput
@@ -293,7 +290,6 @@ const ApartmentData = () => {
           {isSubmitting ? "Submitting..." : "Submit"}
         </Text>
       </TouchableOpacity>
-
     </ScrollView>
   );
 };
@@ -329,7 +325,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     resizeMode: "cover",
   },
-
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
