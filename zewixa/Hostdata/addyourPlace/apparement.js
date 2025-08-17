@@ -98,48 +98,33 @@ const API_URL = "https://zewixa-jz2h.onrender.com/api/create-apartment";
     setFormData((prev) => ({ ...prev, bhkUnits: updatedUnits }));
   };
 
-  const handleSubmit = async () => {
-
+   async function handleSubmit() {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
+    const formData = new FormData();
+    formData.append("ownerEmail", ownerData?.email || "");
+    formData.append("location", location);
+    formData.append("security", JSON.stringify(security));
+    formData.append("bhkUnits", JSON.stringify([bhkUnit]));
+
+    if (photos.building) {
+      const uriParts = photos.building.split("/");
+      const fileName = uriParts[uriParts.length - 1];
+      formData.append("building", { uri: photos.building, name: fileName, type: "image/jpeg" });
+    }
+
     try {
-      const formDataToSend = new FormData();
-
-      formDataToSend.append("ownerEmail", ownerData?.email || "");
-      formDataToSend.append("location", formData.location);
-      formDataToSend.append("wifiAvailable", formData.wifiAvailable);
-      formDataToSend.append("isElectricityIncluded", formData.isElectricityIncluded);
-      formDataToSend.append("security", JSON.stringify(formData.security));
-      formDataToSend.append("bhkUnits", JSON.stringify(formData.bhkUnits));
-      Object.keys(formData.photos).forEach((key) => {
-        if (formData.photos[key]) {  // ✅ check first
-          formDataToSend.append(key, {
-            uri: formData.photos[key],
-            name: `${key}.jpg`,
-            type: "image/jpeg",
-          });
-        }
-      });
-
-
-      for (let pair of formDataToSend.entries()) {
-        console.log("📦 FormData:", pair[0], pair[1]);
-      }
-
-      const res = await axios.post(API_URL, formDataToSend, {
+      const res = await axios.post(API_URL, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      // 🟣 JUST PRINT RESPONSE DATA
-      console.log("📩 API Response Data:", res.data);
-
-    } catch (err) {
-      console.log("❌ Error:", err.response?.data || err.message);
+      Alert.alert("Success", "Apartment data submitted!");
+    } catch (error) {
+      Alert.alert("Error", error.message);
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
 
   const getIcon = (type) =>
