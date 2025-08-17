@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 const ApartmentData = () => {
-  const API_URL = "https://zewixa-jz2h.onrender.com/api/create-apartment";
+const API_URL = "https://zewixa-jz2h.onrender.com/api/create-apartment";
   const navigation = useNavigation();
   const { ownerData } = useRoute().params || {};
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,79 +99,58 @@ const ApartmentData = () => {
   };
 
   const handleSubmit = async () => {
+
     if (isSubmitting) return;
     setIsSubmitting(true);
-
-    if (formData.bhkUnits.length === 0) {
-      Alert.alert("Add BHK Units", "Please add at least one BHK unit.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
-    if (missing.length) {
-      Alert.alert("Missing Images", `Please upload: ${missing.join(", ")}`);
-      setIsSubmitting(false);
-      return;
-    }
 
     try {
       const formDataToSend = new FormData();
 
-      // ✅ Corrected: Send owner's email directly instead of a stringified object
       formDataToSend.append("ownerEmail", ownerData?.email || "");
-
       formDataToSend.append("location", formData.location);
       formDataToSend.append("wifiAvailable", formData.wifiAvailable);
       formDataToSend.append("isElectricityIncluded", formData.isElectricityIncluded);
       formDataToSend.append("security", JSON.stringify(formData.security));
       formDataToSend.append("bhkUnits", JSON.stringify(formData.bhkUnits));
-
       Object.keys(formData.photos).forEach((key) => {
-        formDataToSend.append(key, {
-          uri: formData.photos[key],
-          name: `${key}.jpg`,
-          type: "image/jpeg",
-        });
+        if (formData.photos[key]) {  // ✅ check first
+          formDataToSend.append(key, {
+            uri: formData.photos[key],
+            name: `${key}.jpg`,
+            type: "image/jpeg",
+          });
+        }
       });
+
+
+      for (let pair of formDataToSend.entries()) {
+        console.log("📦 FormData:", pair[0], pair[1]);
+      }
 
       const res = await axios.post(API_URL, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (res.status === 201) {
-        Alert.alert("Success", "Apartment data saved!");
-        navigation.navigate("FinalSubmit");
-      } else {
-        const errorText = await res.text();
-        console.error("❌ Server Error Response:", errorText);
-        Alert.alert("Error", res.data?.message || "Unexpected response");
-      }
+      // 🟣 JUST PRINT RESPONSE DATA
+      console.log("📩 API Response Data:", res.data);
+
     } catch (err) {
-      if (err.response) {
-        console.error("❌ API Error Response:", err.response.data);
-        Alert.alert("Server Error", JSON.stringify(err.response.data, null, 2));
-      } else if (err.request) {
-        console.error("❌ No Response:", err.request);
-        Alert.alert("Network Error", "No response from server.");
-      } else if (err.message) {
-        console.error("❌ Unexpected Error:", err.message);
-        Alert.alert("Error", err.message);
-      }
+      console.log("❌ Error:", err.response?.data || err.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+
   const getIcon = (type) =>
-    ({
-      building: "business-outline",
-      livingRoom: "tv-outline",
-      kitchen: "restaurant-outline",
-      bedroom: "bed-outline",
-      bathroom: "water-outline",
-      balcony: "sunny-outline",
-    }[type] || "image-outline");
+  ({
+    building: "business-outline",
+    livingRoom: "tv-outline",
+    kitchen: "restaurant-outline",
+    bedroom: "bed-outline",
+    bathroom: "water-outline",
+    balcony: "sunny-outline",
+  }[type] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>

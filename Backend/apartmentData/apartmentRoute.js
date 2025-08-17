@@ -1,15 +1,13 @@
 const express = require("express");
 const multer = require("multer");
-const Apartment = require("./apartmentModel");
-const cloudinary = require("../cloudinaryConfig");
-const { Readable } = require("stream");
-
 const router = express.Router();
 
-// 🟣 Multer memory storage
-
+// Multer: store uploaded images in memory (no saving yet)
 const storage = multer.memoryStorage();
-const upload = multer({ storage }).fields([
+const upload = multer({ storage });
+
+// Accept these fields from multipart/form-data
+const uploadFields = upload.fields([
   { name: "building", maxCount: 1 },
   { name: "livingRoom", maxCount: 1 },
   { name: "kitchen", maxCount: 1 },
@@ -18,106 +16,55 @@ const upload = multer({ storage }).fields([
   { name: "balcony", maxCount: 1 },
 ]);
 
-// 🟣 Helper to upload buffer to Cloudinary
-const streamUpload = (buffer, folder) => {
-  return new Promise((resolve, reject) => {
-    console.log("📂 Uploading to Cloudinary folder:", folder);
-
-    const readable = new Readable();
-    readable._read = () => { };
-    readable.push(buffer);
-    readable.push(null);
-
-    const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "auto" },
-      (error, result) => {
-        if (result) resolve(result);
-        else reject(error);
-      }
-    );
-    
-    readable.pipe(stream);
-  });
-};
-
-// 🟣 POST /create-apartment
-router.post("/create-apartment", upload, async (req, res) => {
+router.post("/create-apartment", uploadFields, (req, res) => {
   try {
-    console.log("📥 Incoming body:", req.body);
-    console.log("📸 Incoming files:", Object.keys(req.files || {}));
+    const form = req.body;
+    const files = req.files;
 
-    const { location, wifiAvailable, isElectricityIncluded, bhkUnits, security, ownerEmail } = req.body;
+    // Print raw body fields
+    console.log("\n================= 📩 Raw Form Data =================");
+    console.log("Owner Email:", form.ownerEmail);
+    console.log("Location:", form.location);
+    console.log("WiFi Available:", form.wifiAvailable);
+    console.log("Electricity Included:", form.isElectricityIncluded);
 
-    if (!location) return res.status(400).json({ message: "Location is required" });
-
-    let bhkData, securityData;
+    // Try parsing JSON fields
+    console.log("\n================= 🏢 BHK Units =================");
     try {
-      // ✅ Change Starts Here
-      // This ensures that if bhkUnits or security are missing or malformed,
-      // they default to an empty array or object instead of causing a parse error.
-      bhkData = bhkUnits ? JSON.parse(bhkUnits) : [];
-      securityData = security ? JSON.parse(security) : {};
-      // ✅ Change Ends Here
+      const bhkUnits = JSON.parse(form.bhkUnits);
+      console.log(bhkUnits);
     } catch (err) {
-      return res.status(400).json({ message: "Invalid JSON in request body", error: err.message });
+      console.log("❌ Error parsing BHK Units:", err.message);
     }
 
-    const photoPaths = {};
-    if (req.files) {
-      for (const [key, file] of Object.entries(req.files)) {
-        try {
-          const result = await streamUpload(file[0].buffer, `apartments/${key}`);
-          if (!result?.secure_url) {
-            throw new Error(`Cloudinary upload failed for ${key}`);
-          }
-          photoPaths[key] = result.secure_url;
-        } catch (cloudErr) {
-          console.error(`❌ Cloudinary upload failed for ${key}`, cloudErr);
-          return res.status(500).json({
-            message: "Image upload failed",
-            error: cloudErr.message,
-            fileKey: key,
-          });
-        }
-      }
+    console.log("\n================= 🛡️ Security Features =================");
+    try {
+      const security = JSON.parse(form.security);
+      console.log(security);
+    } catch (err) {
+      console.log("❌ Error parsing Security Features:", err.message);
     }
 
-    const newApartment = new Apartment({
-      ownerData: { email: ownerEmail || "" },
-      photos: photoPaths,
-      location,
-      wifiAvailable,
-      isElectricityIncluded,
-      bhkUnits: bhkData,
-      security: securityData,
-    });
+    // Print uploaded file info
+    console.log("\n================= 🖼 Uploaded Images =================");
+    if (!files || Object.keys(files).length === 0) {
+      console.log("No files received.");
+    } else {
+      Object.entries(files).forEach(([key, fileArr]) => {
+        console.log(`${key}:`, fileArr[0].originalname, `(${fileArr[0].size} bytes)`);
+      });
+    }
 
-    await newApartment.save();
+    console.log("\n✅ All data received successfully.\n");
 
-    res.status(201).json({
-      message: "Apartment created successfully",
-      apartment: newApartment,
-      photos: photoPaths,
-    });
-  } catch (error) {
-    console.error("❌ Apartment creation error:", error);
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-      stack: error.stack,
-    });
+    return res.status(200).json({ message: "Data received successfully ✅" });
+  } catch (err) {
+    console.error("❌ Server Error:", err.message);
+    return res.status(500).json({ error: "Something went wrong" });
   }
 });
-
-// 🟣 GET /get-apartment-data
-router.get("/get-apartment-data", async (req, res) => {
-  try {
-    const apartments = await Apartment.find();
-    res.status(200).json(apartments);
-  } catch (error) {
-    console.error("❌ Fetch error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
+router.get("/test", (req, res) => {
+  res.send("Apartment API is working 🚀");
 });
 
 module.exports = router;
