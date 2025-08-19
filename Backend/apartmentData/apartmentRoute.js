@@ -1,12 +1,14 @@
 const express = require("express");
 const multer = require("multer");
+const Apartment = require("../apartmentData/apartmentModel"); // ✅ adjust path if needed
+const cloudinary = require("../cloudinaryConfig");
+
 const router = express.Router();
 
-// Multer: store uploaded images in memory (no saving yet)
+// ================== Multer Config ==================
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Accept these fields from multipart/form-data
 const uploadFields = upload.fields([
   { name: "building", maxCount: 1 },
   { name: "livingRoom", maxCount: 1 },
@@ -16,55 +18,78 @@ const uploadFields = upload.fields([
   { name: "balcony", maxCount: 1 },
 ]);
 
-router.post("/create-apartment", uploadFields, (req, res) => {
+// ================== Create Apartment ==================
+router.post("/create-apartment", uploadFields, async (req, res) => {
   try {
     const form = req.body;
     const files = req.files;
 
-    // Print raw body fields
-    console.log("\n================= 📩 Raw Form Data =================");
-    console.log("Owner Email:", form.ownerEmail);
-    console.log("Location:", form.location);
-    console.log("WiFi Available:", form.wifiAvailable);
-    console.log("Electricity Included:", form.isElectricityIncluded);
+    console.log("\n📩 Incoming Form Data:", form);
 
-    // Try parsing JSON fields
-    console.log("\n================= 🏢 BHK Units =================");
+    // Parse JSON fields
+    let bhkUnits = [];
+    let security = {};
     try {
-      const bhkUnits = JSON.parse(form.bhkUnits);
-      console.log(bhkUnits);
+      bhkUnits = JSON.parse(form.bhkUnits || "[]");
     } catch (err) {
-      console.log("❌ Error parsing BHK Units:", err.message);
+      console.log("❌ Error parsing bhkUnits:", err.message);
+    }
+    try {
+      security = JSON.parse(form.security || "{}");
+    } catch (err) {
+      console.log("❌ Error parsing security:", err.message);
     }
 
-    console.log("\n================= 🛡️ Security Features =================");
-    try {
-      const security = JSON.parse(form.security);
-      console.log(security);
-    } catch (err) {
-      console.log("❌ Error parsing Security Features:", err.message);
-    }
-
-    // Print uploaded file info
-    console.log("\n================= 🖼 Uploaded Images =================");
-    if (!files || Object.keys(files).length === 0) {
-      console.log("No files received.");
-    } else {
-      Object.entries(files).forEach(([key, fileArr]) => {
-        console.log(`${key}:`, fileArr[0].originalname, `(${fileArr[0].size} bytes)`);
+    // Upload Images to Cloudinary
+    const photos = {};
+    for (const key in files) {
+      const file = files[key][0];
+      const uploadPromise = new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "apartments" },
+          (err, result) => {
+            if (err) reject(err);
+            else resolve(result.secure_url);
+          }
+        );
+        stream.end(file.buffer);
       });
+      photos[key] = await uploadPromise;
     }
 
-    console.log("\n✅ All data received successfully.\n");
+    // Create Apartment object
+    const apartment = new Apartment({
+      ownerData: { email: form.ownerEmail },
+      photos,
+      location: form.location,
+      wifiAvailable: form.wifiAvailable,
+      isElectricityIncluded: form.isElectricityIncluded,
+      bhkUnits,
+      security,
+    });
 
-    return res.status(200).json({ message: "Data received successfully ✅" });
+    // Save in MongoDB
+    await apartment.save();
+    console.log("✅ Apartment saved:", apartment._id);
+
+    res.status(200).json({
+      message: "Apartment created successfully ✅",
+      apartment,
+    });
   } catch (err) {
-    console.error("❌ Server Error:", err.message);
-    return res.status(500).json({ error: "Something went wrong" });
+    console.error("❌ Error saving apartment:", err);
+    res.status(500).json({ error: err.message });
   }
 });
-router.get("/test", (req, res) => {
-  res.send("Apartment API is working 🚀");
+
+// ================== Test API ==================
+router.get("/get/apartments", async (req, res) => {
+  try {
+    const apartments = await Apartment.find();
+    res.json(apartments);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch apartments" });
+  }
 });
 
 module.exports = router;
