@@ -58,7 +58,11 @@ const AboutOwner = () => {
             return;
         }
         const ownerData = {
-            email,
+            name: name.trim(),
+            mobile1: mobile1.trim(),
+            mobile2: mobile2.trim(),
+            email: email.trim(),
+            profileImage,
         };
 
         // console.log("Navigating with Data:", ownerData); // Debugging log
