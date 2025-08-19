@@ -6,7 +6,6 @@ const Apartment = require("../apartmentData/apartmentModel");
 
 const router = express.Router();
 
-// ================= Upload Setup =================
 const UPLOAD_DIR = path.join(__dirname, "..", "uploads", "forApartmentPhotos");
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
@@ -23,46 +22,48 @@ const upload = multer({
     : cb(new Error("Only image files allowed"), false)
 });
 
-// ================= Routes =================
 
-// POST /api/create-apartment
 router.post(
   "/create-apartment",
   upload.fields([
-    { name: "building",   maxCount: 1 },
+    { name: "building", maxCount: 1 },
     { name: "livingRoom", maxCount: 1 },
-    { name: "kitchen",    maxCount: 1 },
-    { name: "bedroom",    maxCount: 1 },
-    { name: "bathroom",   maxCount: 1 },
-    { name: "balcony",    maxCount: 1 },
-    { name: "ownerImage", maxCount: 1 }, // optional owner photo
+    { name: "kitchen", maxCount: 1 },
+    { name: "bedroom", maxCount: 1 },
+    { name: "bathroom", maxCount: 1 },
+    { name: "balcony", maxCount: 1 },
+    { name: "ownerImage", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
-      // 1) Parse JSON payloads
-      const ownerData     = JSON.parse(req.body.ownerData);
-      const apartmentData = JSON.parse(req.body.apartmentData);
-      const bhkUnits      = JSON.parse(req.body.bhkUnits);
-      const security      = JSON.parse(req.body.security);
 
-      // Map uploaded photos
+      const ownerData = JSON.parse(req.body.ownerData);
+      const apartmentData = JSON.parse(req.body.apartmentData);
+      const bhkUnits = JSON.parse(req.body.bhkUnits);
+      const security = JSON.parse(req.body.security);
+
+
       const photos = {};
-      for (const key of ["building","livingRoom","kitchen","bedroom","bathroom","balcony"]) {
+      for (const key of ["building", "livingRoom", "kitchen", "bedroom", "bathroom", "balcony"]) {
         if (req.files[key]) {
           photos[key] = `/uploads/forApartmentPhotos/${req.files[key][0].filename}`;
         }
       }
 
-      // Owner image
       if (req.files.ownerImage) {
         ownerData.ownerImage = `/uploads/forApartmentPhotos/${req.files.ownerImage[0].filename}`;
       }
+      console.log("OwnerData:", ownerData);
+      console.log("ApartmentData:", apartmentData);
+      console.log("BHK Units:", bhkUnits);
+      console.log("Security:", security);
+      console.log("Photos:", photos);
 
-      // 2) Construct & save
+
       const apartment = new Apartment({
-        owner:        ownerData,
+        owner: ownerData,
         apartmentName: apartmentData.apartmentName,
-        location:     apartmentData.location,
+        location: apartmentData.location,
         wifiAvailable: req.body.wifiAvailable === "true",
         electricityIncluded: req.body.electricityIncluded === "true",
         security,
@@ -75,12 +76,12 @@ router.post(
       res.status(201).send("Apartment created!");
     } catch (err) {
       console.error("❌ Error creating apartment:", err);
-      res.status(500).send("Failed to create apartment.");
+      res.status(500).json({ error: err.message });
+
     }
   }
 );
 
-// GET /api/apartments
 router.get("/apartments", async (req, res) => {
   try {
     const apartments = await Apartment.find();
