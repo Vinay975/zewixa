@@ -39,7 +39,7 @@ router.post(
 
       const ownerData = JSON.parse(req.body.ownerData);
       const apartmentData = JSON.parse(req.body.apartmentData);
-      const bhkUnits = JSON.parse(req.body.bhkUnits);
+      const bhkUnits = JSON.parse(req.body.bhkUnits); 
       const security = JSON.parse(req.body.security);
 
 

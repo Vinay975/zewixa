@@ -94,80 +94,105 @@ const ApartmentData = () => {
     setFormData((prev) => ({ ...prev, bhkUnits: updatedUnits }));
   };
 
-  // 🟣 Submit
-  async function handleSubmit() {
-    if (isSubmitting) return;
+  const handleSubmit = async () => {
+  try {
+    setIsSubmitting(true); // ✅ Start loading
 
-    // 1) Validate owner
-    if (!ownerData?.name || !ownerData?.email || !ownerData?.mobile1 || !ownerData?.profileImage) {
-      Alert.alert("Error", "Owner details are missing. Please go back and fill owner info.");
-      return;
-    }
+    const formDataToSend = new FormData();
 
-    // 2) Validate location
-    if (!formData.location.trim()) {
-      Alert.alert("Error", "Please enter apartment location.");
-      return;
-    }
+    // ✅ Owner Data
+    formDataToSend.append(
+      "ownerData",
+      JSON.stringify({
+        name: formData.ownerName,
+        email: formData.ownerEmail,
+        phoneOne: formData.ownerPhoneOne,
+        phoneTwo: formData.ownerPhoneTwo,
+      })
+    );
 
-    // 3) Validate BHK units
-    if (!formData.bhkUnits.length) {
-      Alert.alert("Error", "Please add at least one BHK unit.");
-      return;
-    }
-    for (let i = 0; i < formData.bhkUnits.length; i++) {
-      const unit = formData.bhkUnits[i];
-      if (!unit.apartmentType || !unit.monthlyRent || !unit.securityDeposit || !unit.maintenanceCharges) {
-        Alert.alert("Error", `BHK unit ${i + 1} is incomplete. Fill all fields.`);
-        return;
-      }
-    }
-
-    // 4) Validate photos
-    for (const key of ["building", "livingRoom", "kitchen", "bedroom", "bathroom", "balcony"]) {
-      if (!formData.photos[key]) {
-        Alert.alert("Error", `Please upload ${key} photo.`);
-        return;
-      }
-    }
-
-    // 5) Validate security (at least one feature must be true)
-    if (!Object.values(formData.security).some((val) => val)) {
-      Alert.alert("Error", "Please select at least one security feature.");
-      return;
-    }
-
-    // ✅ If all validations pass → submit
-    setIsSubmitting(true);
-
-    try {
-      const payload = {
-        owner: ownerData,
+    // ✅ Apartment Data
+    formDataToSend.append(
+      "apartmentData",
+      JSON.stringify({
+        apartmentName: formData.apartmentName,
         location: formData.location,
-        wifiAvailable: formData.wifiAvailable,
-        isElectricityIncluded: formData.isElectricityIncluded,
-        security: formData.security,
-        bhkUnits: formData.bhkUnits,
-        photos: formData.photos,
-      };
+      })
+    );
 
-      console.log("📤 Sending data:", payload);
+    // ✅ BHK Units
+    formDataToSend.append(
+      "bhkUnits",
+      JSON.stringify(
+        formData.bhkUnits.map((unit) => ({
+          type: unit.apartmentType, 
+          rent: unit.monthlyRent,
+          deposit: unit.securityDeposit,
+          maintenance: unit.maintenanceCharges,
+        }))
+      )
+    );
 
-      const res = await axios.post(API_URL, JSON.stringify(payload), {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    // ✅ Security
+    formDataToSend.append(
+      "security",
+      JSON.stringify({
+        cctv: formData.cctv,
+        securityGuards: formData.securityGuards,
+        gatedCommunity: formData.gatedCommunity,
+        fireSafety: formData.fireSafety,
+      })
+    );
 
-      Alert.alert("Success", res.data.message || "Apartment data submitted!");
-      navigation.navigate("FinalSubmit");
-    } catch (error) {
-      console.error("❌ Submit Error:", error.response?.data || error.message);
-      Alert.alert("Error", error.response?.data?.error || error.message);
-    } finally {
-      setIsSubmitting(false);
+    // ✅ Wifi & Electricity
+    formDataToSend.append("wifiAvailable", formData.wifiAvailable);
+    formDataToSend.append("electricityIncluded", formData.electricityIncluded);
+
+    // ✅ Photos
+    const photoFields = [
+      "building",
+      "livingRoom",
+      "kitchen",
+      "bedroom",
+      "bathroom",
+      "balcony",
+      "ownerImage",
+    ];
+
+    photoFields.forEach((field) => {
+      if (formData[field]) {
+        formDataToSend.append(field, {
+          uri: formData[field].uri,
+          type: formData[field].type || "image/jpeg",
+          name: formData[field].fileName || `${field}.jpg`,
+        });
+      }
+    });
+
+    // ✅ Submit request
+    const response = await fetch("http://<YOUR_SERVER_IP>:5000/api/create-apartment", {
+      method: "POST",
+      body: formDataToSend,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("❌ Submit Error:", errorData);
+      alert("Submit failed: " + JSON.stringify(errorData));
+      return;
     }
+
+    const data = await response.text();
+    console.log("✅ Apartment Created:", data);
+    alert("Apartment created successfully!");
+  } catch (error) {
+    console.error("❌ Submit Exception:", error);
+    alert("Something went wrong. Check console.");
+  } finally {
+    setIsSubmitting(false); 
   }
+};
+
 
   const getIcon = (type) =>
   ({
