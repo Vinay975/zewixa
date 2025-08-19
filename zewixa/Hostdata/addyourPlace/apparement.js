@@ -153,7 +153,11 @@ const ApartmentData = () => {
 
       console.log("📤 Sending data:", payload);
 
-      const res = await axios.post(API_URL, payload);
+      const res = await axios.post(API_URL, JSON.stringify(payload), {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       Alert.alert("Success", res.data.message || "Apartment data submitted!");
       navigation.navigate("FinalSubmit");
@@ -166,14 +170,14 @@ const ApartmentData = () => {
   }
 
   const getIcon = (type) =>
-    ({
-      building: "business-outline",
-      livingRoom: "tv-outline",
-      kitchen: "restaurant-outline",
-      bedroom: "bed-outline",
-      bathroom: "water-outline",
-      balcony: "sunny-outline",
-    }[type] || "image-outline");
+  ({
+    building: "business-outline",
+    livingRoom: "tv-outline",
+    kitchen: "restaurant-outline",
+    bedroom: "bed-outline",
+    bathroom: "water-outline",
+    balcony: "sunny-outline",
+  }[type] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>
