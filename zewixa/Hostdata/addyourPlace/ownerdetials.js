@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import HostelDataOne from "./hostel-1";
+
 
 const AboutOwner = () => {
     const navigation = useNavigation();
@@ -42,11 +42,6 @@ const AboutOwner = () => {
             return;
         }
 
-        if (!profileImage) {
-            Alert.alert("Error", "Please select a profile photo.");
-            return;
-        }
-
 
         if (mobile1.length !== 10 || isNaN(mobile1)) {
             Alert.alert("Invalid Mobile Number", "Mobile Number 1 must be exactly 10 digits.");
@@ -58,14 +53,14 @@ const AboutOwner = () => {
             return;
         }
         const ownerData = {
-            name: name.trim(),
-            mobile1: mobile1.trim(),
-            mobile2: mobile2.trim(),
-            email: email.trim(),
+            name,
+            mobile1,
+            mobile2,
+            email,
             profileImage,
         };
 
-        // console.log("Navigating with Data:", ownerData); // Debugging log
+        console.log("Navigating with Data:", ownerData); // Debugging log
 
         if (placeType === "Hostel") {
             navigation.navigate("AboutHostel", { ownerData });  // FIXED: Changed from "HostelDataOne" to "AboutHostel"

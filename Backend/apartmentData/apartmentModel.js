@@ -1,31 +1,14 @@
 const mongoose = require("mongoose");
 
 const apartmentSchema = new mongoose.Schema({
-  owner: {
+  ownerData: {
     name: String,
     email: String,
-    phoneOne: String,
-    phoneTwo: String,
-    ownerImage: String,
+    mobile1: String,
+    mobile2: String,
+    profileImage: String, // URL of uploaded image
   },
-  apartmentName: String,
-  location: String,
-  wifiAvailable: Boolean,
-  electricityIncluded: Boolean,
-  security: {
-    cctv: Boolean,
-    securityGuards: Boolean,
-    gatedCommunity: Boolean,
-    fireSafety: Boolean,
-  },
-  bhkUnits: [
-    {
-      type: String,
-      rent: String,
-      deposit: String,
-      maintenance: String,
-    },
-  ],
+
   photos: {
     building: String,
     livingRoom: String,
@@ -34,6 +17,41 @@ const apartmentSchema = new mongoose.Schema({
     bathroom: String,
     balcony: String,
   },
-});
+
+  location: String, // Simple location string from the form
+
+  wifiAvailable: {
+    type: String,
+    enum: ["yes", "no"],
+    default: "no",
+  },
+
+  isElectricityIncluded: {
+    type: String,
+    enum: ["yes", "no"],
+    default: "no",
+  },
+
+  bhkUnits: [
+    {
+      apartmentType: {
+        type: String,
+        enum: ["1BHK", "2BHK", "3BHK", "4BHK"],
+        required: true,
+      },
+      monthlyRent: String,
+      securityDeposit: String,
+      maintenanceCharges: String,
+    }
+  ],
+
+  security: {
+    cctv: Boolean,
+    securityGuards: Boolean,
+    gatedCommunity: Boolean,
+    fireSafety: Boolean,
+  },
+
+}, { timestamps: true });
 
 module.exports = mongoose.model("Apartment", apartmentSchema);

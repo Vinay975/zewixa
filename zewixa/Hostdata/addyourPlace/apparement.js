@@ -20,7 +20,6 @@ const ApartmentData = () => {
   const API_URL = "https://zewixa-jz2h.onrender.com/api/create-apartment";
   const navigation = useNavigation();
   const { ownerData } = useRoute().params || {};
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     photos: {
@@ -43,17 +42,33 @@ const ApartmentData = () => {
     },
   });
 
-  // 🟣 Pick Image
+  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ Added
+
+  // 📸 Pick Image
   const pickImage = async (photoType) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert("Permission required", "Allow gallery access.");
       return;
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
+    Alert.alert("Upload Photo", "Choose an option", [
+      { text: "Take Photo", onPress: () => handleImage("camera", photoType) },
+      { text: "Choose from Gallery", onPress: () => handleImage("gallery", photoType) },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
+  const handleImage = async (source, photoType) => {
+    const result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
+          });
 
     if (!result.canceled) {
       setFormData((prev) => ({
@@ -63,7 +78,7 @@ const ApartmentData = () => {
     }
   };
 
-  // 🟣 Toggle Security
+  // 🔒 Toggle Security
   const toggleSecurity = (field) => {
     setFormData((prev) => ({
       ...prev,
@@ -71,7 +86,7 @@ const ApartmentData = () => {
     }));
   };
 
-  // 🟣 Add BHK Unit
+  // ➕ Add BHK Unit
   const addBhkUnit = () => {
     setFormData((prev) => ({
       ...prev,
@@ -87,144 +102,109 @@ const ApartmentData = () => {
     }));
   };
 
-  // 🟣 Update BHK Unit
+  // ✏️ Update BHK Unit
   const updateBhkUnit = (index, field, value) => {
     const updatedUnits = [...formData.bhkUnits];
     updatedUnits[index][field] = value;
     setFormData((prev) => ({ ...prev, bhkUnits: updatedUnits }));
   };
 
+  // 🚀 Submit
   const handleSubmit = async () => {
-  try {
-    setIsSubmitting(true); // ✅ Start loading
-
-    const formDataToSend = new FormData();
-
-    // ✅ Owner Data
-    formDataToSend.append(
-      "ownerData",
-      JSON.stringify({
-        name: formData.ownerName,
-        email: formData.ownerEmail,
-        phoneOne: formData.ownerPhoneOne,
-        phoneTwo: formData.ownerPhoneTwo,
-      })
-    );
-
-    // ✅ Apartment Data
-    formDataToSend.append(
-      "apartmentData",
-      JSON.stringify({
-        apartmentName: formData.apartmentName,
-        location: formData.location,
-      })
-    );
-
-    // ✅ BHK Units
-    formDataToSend.append(
-      "bhkUnits",
-      JSON.stringify(
-        formData.bhkUnits.map((unit) => ({
-          type: unit.apartmentType, 
-          rent: unit.monthlyRent,
-          deposit: unit.securityDeposit,
-          maintenance: unit.maintenanceCharges,
-        }))
-      )
-    );
-
-    // ✅ Security
-    formDataToSend.append(
-      "security",
-      JSON.stringify({
-        cctv: formData.cctv,
-        securityGuards: formData.securityGuards,
-        gatedCommunity: formData.gatedCommunity,
-        fireSafety: formData.fireSafety,
-      })
-    );
-
-    // ✅ Wifi & Electricity
-    formDataToSend.append("wifiAvailable", formData.wifiAvailable);
-    formDataToSend.append("electricityIncluded", formData.electricityIncluded);
-
-    // ✅ Photos
-    const photoFields = [
-      "building",
-      "livingRoom",
-      "kitchen",
-      "bedroom",
-      "bathroom",
-      "balcony",
-      "ownerImage",
-    ];
-
-    photoFields.forEach((field) => {
-      if (formData[field]) {
-        formDataToSend.append(field, {
-          uri: formData[field].uri,
-          type: formData[field].type || "image/jpeg",
-          name: formData[field].fileName || `${field}.jpg`,
-        });
-      }
-    });
-
-    // ✅ Submit request
-    const response = await fetch("http://<YOUR_SERVER_IP>:5000/api/create-apartment", {
-      method: "POST",
-      body: formDataToSend,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("❌ Submit Error:", errorData);
-      alert("Submit failed: " + JSON.stringify(errorData));
+    const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
+    if (missing.length) {
+      Alert.alert("Missing Images", `Please upload: ${missing.join(", ")}`);
       return;
     }
 
-    const data = await response.text();
-    console.log("✅ Apartment Created:", data);
-    alert("Apartment created successfully!");
-  } catch (error) {
-    console.error("❌ Submit Exception:", error);
-    alert("Something went wrong. Check console.");
-  } finally {
-    setIsSubmitting(false); 
-  }
-};
+    setIsSubmitting(true); // ✅ Disable button while submitting
 
+    const formDataToSend = new FormData();
+    formDataToSend.append("ownerData", JSON.stringify(ownerData));
 
+    if (ownerData?.profileImage) {
+      const uri = ownerData.profileImage;
+      const name = uri.split("/").pop();
+      const type = `image/${name.split(".").pop()}`;
+      formDataToSend.append("ownerPhoto", { uri, name, type });
+    }
+
+    formDataToSend.append("location", formData.location);
+    formDataToSend.append("wifiAvailable", formData.wifiAvailable);
+    formDataToSend.append("isElectricityIncluded", formData.isElectricityIncluded);
+    formDataToSend.append("security", JSON.stringify(formData.security));
+    formDataToSend.append("bhkUnits", JSON.stringify(formData.bhkUnits));
+
+    Object.entries(formData.photos).forEach(([key, uri]) => {
+      const name = uri.split("/").pop();
+      const type = `image/${name.split(".").pop()}`;
+      formDataToSend.append(key, { uri, name, type });
+    });
+
+    try {
+      const res = await axios.post(API_URL, formDataToSend, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.status === 201) {
+        Alert.alert("Success", "Apartment data saved!");
+        navigation.navigate("FinalSubmit");
+      }
+    } catch (err) {
+      console.error("Submission Error:", err);
+      Alert.alert("Error", "Failed to submit apartment data.");
+    } finally {
+      setIsSubmitting(false); // ✅ Reset state
+    }
+  };
+
+  // 📌 Icons
   const getIcon = (type) =>
-  ({
-    building: "business-outline",
-    livingRoom: "tv-outline",
-    kitchen: "restaurant-outline",
-    bedroom: "bed-outline",
-    bathroom: "water-outline",
-    balcony: "sunny-outline",
-  }[type] || "image-outline");
+    ({
+      building: "business-outline",
+      livingRoom: "ios-tv-outline",
+      kitchen: "restaurant-outline",
+      bedroom: "bed-outline",
+      bathroom: "water-outline",
+      balcony: "sunny-outline",
+    }[type] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.sectionTitle}>Upload Apartment Photos</Text>
 
-      {Object.keys(formData.photos).reduce((rows, key, index, array) => {
-        if (index % 2 === 0) rows.push(array.slice(index, index + 2));
-        return rows;
-      }, []).map((row, rowIndex) => (
-        <View key={rowIndex} style={styles.photoRow}>
-          {row.map((photoType) => (
-            <TouchableOpacity key={photoType} style={styles.photoUpload} onPress={() => pickImage(photoType)}>
-              <Ionicons name={getIcon(photoType)} size={32} color="#6846bd" />
-              <Text style={styles.photoLabel}>{photoType.charAt(0).toUpperCase() + photoType.slice(1)}</Text>
-              {formData.photos[photoType] && (
-                <Image source={{ uri: formData.photos[photoType] }} style={styles.previewImage} />
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-      ))}
+      {/* Render photo uploads in rows of 2 */}
+      {Object.keys(formData.photos)
+        .reduce((rows, key, index, array) => {
+          if (index % 2 === 0) {
+            rows.push(array.slice(index, index + 2));
+          }
+          return rows;
+        }, [])
+        .map((row, rowIndex) => (
+          <View key={rowIndex} style={styles.photoRow}>
+            {row.map((photoType) => (
+              <TouchableOpacity
+                key={photoType}
+                style={styles.photoUpload}
+                onPress={() => pickImage(photoType)}
+              >
+                <Ionicons name={getIcon(photoType)} size={32} color="#6846bd" />
+                <Text style={styles.photoLabel}>
+                  {photoType.charAt(0).toUpperCase() + photoType.slice(1)}
+                </Text>
+                {formData.photos[photoType] && (
+                  <Image
+                    source={{ uri: formData.photos[photoType] }}
+                    style={styles.previewImage}
+                  />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
 
+      {/* Location */}
       <Text style={styles.sectionTitle}>Apartment Location</Text>
       <TextInput
         style={styles.input}
@@ -233,6 +213,7 @@ const ApartmentData = () => {
         onChangeText={(v) => setFormData((p) => ({ ...p, location: v }))}
       />
 
+      {/* BHK Units */}
       <Text style={styles.sectionTitle}>Add BHK Units</Text>
       {formData.bhkUnits.map((unit, index) => (
         <View key={index} style={styles.card}>
@@ -276,6 +257,7 @@ const ApartmentData = () => {
         <Text style={styles.addText}>Add Another BHK</Text>
       </TouchableOpacity>
 
+      {/* WiFi */}
       <Text style={styles.sectionTitle}>WiFi</Text>
       <Picker
         selectedValue={formData.wifiAvailable}
@@ -286,30 +268,40 @@ const ApartmentData = () => {
         <Picker.Item label="No" value="no" />
       </Picker>
 
+      {/* Electricity */}
       <Text style={styles.sectionTitle}>Electricity Included</Text>
       <Picker
         selectedValue={formData.isElectricityIncluded}
-        onValueChange={(v) => setFormData((p) => ({ ...p, isElectricityIncluded: v }))}
+        onValueChange={(v) =>
+          setFormData((p) => ({ ...p, isElectricityIncluded: v }))
+        }
         style={styles.picker}
       >
         <Picker.Item label="Yes" value="yes" />
         <Picker.Item label="No" value="no" />
       </Picker>
 
+      {/* Security */}
       <Text style={styles.sectionTitle}>Security Features</Text>
       {Object.keys(formData.security).map((key) => (
-        <TouchableOpacity key={key} style={styles.checkboxContainer} onPress={() => toggleSecurity(key)}>
+        <TouchableOpacity
+          key={key}
+          style={styles.checkboxContainer}
+          onPress={() => toggleSecurity(key)}
+        >
           <Ionicons
             name={formData.security[key] ? "checkbox-outline" : "square-outline"}
             size={24}
             color="#6846bd"
           />
           <Text style={styles.checkboxLabel}>
-            {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")}
+            {key.charAt(0).toUpperCase() +
+              key.slice(1).replace(/([A-Z])/g, " $1")}
           </Text>
         </TouchableOpacity>
       ))}
 
+      {/* Submit */}
       <TouchableOpacity
         style={[styles.submitBtn, isSubmitting && { backgroundColor: "#aaa" }]}
         onPress={handleSubmit}
@@ -325,8 +317,17 @@ const ApartmentData = () => {
 
 const styles = StyleSheet.create({
   container: { padding: 15, backgroundColor: "#fff" },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12, color: "#333" },
-  photoRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 15 },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 12,
+    color: "#333",
+  },
+  photoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
   photoUpload: {
     width: "48%",
     alignItems: "center",
@@ -336,7 +337,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#f2f2f2",
   },
-  photoLabel: { marginTop: 6, fontSize: 13, textAlign: "center", fontWeight: "500", color: "#444" },
+  photoLabel: {
+    marginTop: 6,
+    fontSize: 13,
+    textAlign: "center",
+    fontWeight: "500",
+    color: "#444",
+  },
   previewImage: {
     width: "100%",
     height: 100,
@@ -344,7 +351,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
     resizeMode: "cover",
   },
-  input: { borderWidth: 1, borderColor: "#ccc", padding: 8, marginBottom: 10, borderRadius: 5, fontSize: 14 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 8,
+    marginBottom: 10,
+    borderRadius: 5,
+    fontSize: 14,
+  },
   picker: { marginBottom: 12 },
   card: {
     borderWidth: 1,
@@ -354,10 +368,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "#f9f9f9",
   },
-  checkboxContainer: { flexDirection: "row", alignItems: "center", marginBottom: 8 },
-  checkboxLabel: { marginLeft: 8, fontSize: 14, color: "#444" },
-  addBtn: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
-  addText: { marginLeft: 6, color: "#6846bd", fontSize: 15, fontWeight: "500" },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#444",
+  },
+  addBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  addText: {
+    marginLeft: 6,
+    color: "#6846bd",
+    fontSize: 15,
+    fontWeight: "500",
+  },
   submitBtn: {
     backgroundColor: "#6846bd",
     padding: 14,
@@ -365,7 +396,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
-  submitText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  submitText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });
 
 export default ApartmentData;
