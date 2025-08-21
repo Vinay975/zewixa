@@ -36,11 +36,11 @@ const BottomTab = ({ setIsHost }) => {
           },
           tabBarActiveTintColor: "#6846bd",
           tabBarInactiveTintColor: "gray",
-          tabBarStyle: { height: 60 },
+          tabBarStyle: { height: 76 },
           tabBarLabelStyle: {
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: "bold",
-            marginTop: 5,
+            marginTop: 3,
           },
         })}
       >
