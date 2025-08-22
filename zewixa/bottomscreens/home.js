@@ -33,6 +33,22 @@ export default function HomePage({ route }) {
       .catch(console.error);
   }, []);
 
+  // Helper function to safely get image URL
+  const getPhoto = (item, defaultKey) => {
+    const photos = item.photos;
+    if (!photos) return 'https://via.placeholder.com/150'; // fallback image
+    if (photos[defaultKey]) {
+      return `https://zewixa-jz2h.onrender.com${photos[defaultKey].startsWith('/') ? '' : '/'}${photos[defaultKey]}`;
+    }
+    // fallback to the first available photo
+    const firstKey = Object.keys(photos).find(k => photos[k]);
+    if (firstKey) {
+      return `https://zewixa-jz2h.onrender.com${photos[firstKey].startsWith('/') ? '' : '/'}${photos[firstKey]}`;
+    }
+    return 'https://via.placeholder.com/150';
+  };
+
+
   const applyFilter = (h) => {
     const q = search.toLowerCase();
     if (q && !(
@@ -114,12 +130,11 @@ export default function HomePage({ route }) {
               >
                 <Image
                   source={{
-                    uri: showHostels
-                      ? `https://zewixa-jz2h.onrender.com${item.photos?.main}`
-                      : `https://zewixa-jz2h.onrender.com/${item.photos?.building}`
+                    uri: showHostels ? getPhoto(item, 'main') : getPhoto(item, 'building')
                   }}
                   style={styles.cardImage}
                 />
+
 
                 <View style={styles.cardInfo}>
                   {/* First row: Hostel name (left) + Gender (right) */}
