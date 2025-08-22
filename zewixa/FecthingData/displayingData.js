@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import {
   View,
   Text,
@@ -8,16 +7,19 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  Dimensions,
   Linking,
   Alert
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import * as Animatable from 'react-native-animatable';
 
 export default function HostelDetails({ route }) {
   const { hostel } = route.params;
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const navigation = useNavigation();
 
   const openImageModal = (uri) => {
     setSelectedImage(uri);
@@ -47,49 +49,49 @@ export default function HostelDetails({ route }) {
     }
   };
 
-
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Profile Section */}
-      <View style={styles.profileCard}>
+      <Animatable.View animation="fadeInDown" duration={800} style={styles.profileCard}>
         <Image
           source={{ uri: `https://zewixa-jz2h.onrender.com${hostel.owner.ownerImage}` }}
-
           style={styles.ownerImage}
         />
         <View style={styles.ownerInfo}>
-          <Text style={styles.ownerName}>Name : {hostel.owner?.name || 'Owner Name'}</Text>
-          <Text style={styles.ownerPhone}>Mobile :  {hostel.owner?.phoneOne || 'Not Available'}</Text>
+          <Text style={styles.ownerName}>{hostel.owner?.name || 'Owner Name'}</Text>
+          <Text style={styles.ownerPhone}><Ionicons name="call-outline" size={16} /> {hostel.owner?.phoneOne || 'Not Available'}</Text>
           {hostel.owner?.phoneTwo && (
-            <Text style={styles.ownerPhone}>Mobile :  {hostel.owner.phoneTwo}</Text>
+            <Text style={styles.ownerPhone}><Ionicons name="call-outline" size={16} /> {hostel.owner.phoneTwo}</Text>
           )}
-          <Text style={styles.ownerLocation}>Location :  {hostel.location || 'Location not available'}</Text>
-          <Text style={styles.ownerEmail}>Email : {hostel.owner?.email || 'Email not available'}</Text>
+          <Text style={styles.ownerLocation}><Ionicons name="location-outline" size={16} /> {hostel.location || 'Location not available'}</Text>
+          <Text style={styles.ownerEmail}><Ionicons name="mail-outline" size={16} /> {hostel.owner?.email || 'Email not available'}</Text>
         </View>
-      </View>
+      </Animatable.View>
 
       {/* Hostel Information Section */}
-      {/* Hostel Information */}
-      <View style={styles.infoCard}>
-        <Text style={styles.sectionTitle}>Hostel Information</Text>
+      <Animatable.View animation="fadeInUp" duration={800} style={styles.infoCard}>
+        <Text style={styles.sectionTitle}>🏠 Hostel Information</Text>
 
         {[
           {
             label: 'WiFi',
             value: hostel.wifi ? 'Available' : 'Not Available',
+            icon: <MaterialIcons name="wifi" size={20} color="#6846bd" />,
           },
           {
             label: 'AC Type',
             value: hostel.acType || 'Not available',
+            icon: <Ionicons name="snow-outline" size={20} color="#6846bd" />,
           },
           {
             label: 'Floors',
             value: hostel.floors || 'Not specified',
+            icon: <FontAwesome5 name="building" size={18} color="#6846bd" />,
           },
           {
             label: 'Rooms',
             value: hostel.rooms || 'Not specified',
+            icon: <Ionicons name="bed-outline" size={20} color="#6846bd" />,
           },
         ].map((row, idx) => (
           <View style={styles.infoRow} key={idx}>
@@ -100,20 +102,50 @@ export default function HostelDetails({ route }) {
             <Text style={styles.infoValue}>{row.value}</Text>
           </View>
         ))}
-      </View>
-
-
+      </Animatable.View>
 
       {/* Rent Details Section */}
-      <View style={styles.rentCard}>
-        <Text style={styles.sectionTitle}> Rent Details</Text>
-        {hostel.rent?.OneSharing && <Text style={styles.rentText}>Single Sharing : ₹{hostel.rent.OneSharing}</Text>}
-        {hostel.rent?.TwoSharing && <Text style={styles.rentText}>Double Sharing : ₹{hostel.rent.TwoSharing}</Text>}
-        {hostel.rent?.ThreeSharing && <Text style={styles.rentText}>Triple Sharing : ₹{hostel.rent.ThreeSharing}</Text>}
-        {hostel.rent?.FourSharing && <Text style={styles.rentText}>Four Sharing : ₹{hostel.rent.FourSharing}</Text>}
-        {hostel.rent?.FiveSharing && <Text style={styles.rentText}>Five Sharing : ₹{hostel.rent.FiveSharing}</Text>}
-        {hostel.rent?.Advance && <Text style={styles.rentText}>Advance to pay : ₹{hostel.rent.Advance}</Text>}
-      </View>
+      <Animatable.View animation="fadeInUp" duration={900} style={styles.rentCard}>
+        <Text style={styles.sectionTitle}>💰 Rent Details</Text>
+        <View style={styles.rentGrid}>
+          {hostel.rent?.OneSharing && (
+            <View style={styles.rentItem}>
+              <Ionicons name="person-outline" size={22} color="#6846bd" />
+              <Text style={styles.rentText}>Single: ₹{hostel.rent.OneSharing}</Text>
+            </View>
+          )}
+          {hostel.rent?.TwoSharing && (
+            <View style={styles.rentItem}>
+              <Ionicons name="people-outline" size={22} color="#6846bd" />
+              <Text style={styles.rentText}>Double: ₹{hostel.rent.TwoSharing}</Text>
+            </View>
+          )}
+          {hostel.rent?.ThreeSharing && (
+            <View style={styles.rentItem}>
+              <FontAwesome5 name="users" size={20} color="#6846bd" />
+              <Text style={styles.rentText}>Triple: ₹{hostel.rent.ThreeSharing}</Text>
+            </View>
+          )}
+          {hostel.rent?.FourSharing && (
+            <View style={styles.rentItem}>
+              <FontAwesome5 name="users-cog" size={20} color="#6846bd" />
+              <Text style={styles.rentText}>Four: ₹{hostel.rent.FourSharing}</Text>
+            </View>
+          )}
+          {hostel.rent?.FiveSharing && (
+            <View style={styles.rentItem}>
+              <FontAwesome5 name="user-friends" size={20} color="#6846bd" />
+              <Text style={styles.rentText}>Five: ₹{hostel.rent.FiveSharing}</Text>
+            </View>
+          )}
+          {hostel.rent?.Advance && (
+            <View style={styles.rentItem}>
+              <MaterialIcons name="payments" size={22} color="#6846bd" />
+              <Text style={styles.rentText}>Advance: ₹{hostel.rent.Advance}</Text>
+            </View>
+          )}
+        </View>
+      </Animatable.View>
 
       {/* Mess Menu */}
       {hostel.photos?.messMenu && (
@@ -150,14 +182,19 @@ export default function HostelDetails({ route }) {
       </View>
 
       {/* Contact and Book Buttons */}
-      <View style={styles.contactSection}>
+      <Animatable.View animation="fadeInUp" duration={1000} style={styles.contactSection}>
         <TouchableOpacity style={styles.actionBtn} onPress={handleContact}>
+          <Ionicons name="call" size={20} color="#fff" />
           <Text style={styles.btnText}>Contact</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn} onPress={handleBookNow}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={() => navigation.navigate("HostelBooking")}
+        >
+          <Ionicons name="calendar-outline" size={20} color="#fff" />
           <Text style={styles.btnText}>Book Now</Text>
         </TouchableOpacity>
-      </View>
+      </Animatable.View>
 
       {/* Image Modal */}
       <Modal
@@ -170,10 +207,7 @@ export default function HostelDetails({ route }) {
           <TouchableOpacity style={styles.modalClose} onPress={closeImageModal}>
             <Ionicons name="close-circle" size={40} color="white" />
           </TouchableOpacity>
-          <Image
-            source={{ uri: selectedImage }}
-            style={styles.modalImage}
-          />
+          <Image source={{ uri: selectedImage }} style={styles.modalImage} />
         </View>
       </Modal>
     </ScrollView>
@@ -181,167 +215,72 @@ export default function HostelDetails({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    backgroundColor: '#fdfdfd',
-  },
+  container: { padding: 16, backgroundColor: '#fdfdfd' },
+
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 20,
+    padding: 18,
     borderRadius: 16,
     marginBottom: 16,
     elevation: 3,
-    height: 170,
   },
   ownerImage: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     marginRight: 16,
-    borderWidth: 2,
-    elevation: 3,
-    borderColor: 'white',
   },
-  ownerInfo: {
-    flex: 1,
-  },
-  ownerName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 4,
-  },
-  ownerPhone: {
-    fontSize: 15,
-    color: '#555',
-    marginBottom: 2,
-  },
-  ownerLocation: {
-    fontSize: 15,
-    color: '#555',
-    marginBottom: 2,
-  },
-  ownerEmail: {
-    fontSize: 15,
-    color: '#555',
-  },
-  infoCard: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 16,
-    elevation: 3,
-  },
+  ownerInfo: { flex: 1 },
+  ownerName: { fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  ownerPhone: { fontSize: 14, marginBottom: 2, color: '#555' },
+  ownerLocation: { fontSize: 14, marginBottom: 2, color: '#555' },
+  ownerEmail: { fontSize: 14, color: '#555' },
 
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    // color: '#6846bd',
-    marginBottom: 12,
-  },
-
+  infoCard: { backgroundColor: '#fff', padding: 16, borderRadius: 10, marginBottom: 16, elevation: 3 },
+  sectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12, color: '#333' },
   infoRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10,
-    paddingHorizontal:20,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
+  infoLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  infoLabel: { fontSize: 15, fontWeight: '600' },
+  infoValue: { fontSize: 15, color: '#444' },
 
-  infoLeft: {
+  rentCard: { backgroundColor: '#fff', padding: 16, borderRadius: 10, marginBottom: 16, elevation: 3 },
+  rentGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  rentItem: {
+    width: '48%',
+    backgroundColor: '#f9f7ff',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  rentText: { fontSize: 14, marginTop: 4, fontWeight: '600', color: '#333' },
+
+  photoItem: { width: '100%', height: 220, borderRadius: 10, marginBottom: 8 },
+  photoLabel: { fontSize: 14, textAlign: 'center', marginTop: 4, color: '#444' },
+  galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, marginBottom: 16 },
+  imageWrapper: { width: '48%', marginBottom: 12 },
+  gridPhoto: { width: '100%', height: 150, borderRadius: 10 },
+
+  contactSection: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 20, marginBottom: 30 },
+  actionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-
-  infoLabel: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-  },
-
-  infoValue: {
-    fontSize: 16,
-    color: '#555',
-  },
-
-  rentCard: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 16,
-    elevation: 3,
-  },
-  rentText: {
-    fontSize: 16,
-    color: '#444',
-    marginBottom: 6,
-  },
-  photoItem: {
-    width: '100%',
-    height: 220,
-    borderRadius: 10,
-    marginBottom: 8,
-  },
-  photoLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: 4,
-    color: '#444',
-  },
-  galleryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 16,
-  },
-  imageWrapper: {
-    width: '48%',
-    marginBottom: 12,
-  },
-  gridPhoto: {
-    width: '100%',
-    height: 150,
-    borderRadius: 10,
-  },
-  contactSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 30,
-    marginBottom: 30,
-  },
-  actionBtn: {
     backgroundColor: '#6846bd',
     paddingVertical: 12,
-    paddingHorizontal: 28,
+    paddingHorizontal: 20,
     borderRadius: 30,
-    elevation: 2,
   },
-  btnText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  },
-  modalClose: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-  },
-  modalImage: {
-    width: '90%',
-    height: '80%',
-    resizeMode: 'contain',
-  },
+  btnText: { color: '#fff', fontSize: 16, marginLeft: 8, fontWeight: '600' },
+
+  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.9)' },
+  modalClose: { position: 'absolute', top: 20, right: 20 },
+  modalImage: { width: '90%', height: '80%', resizeMode: 'contain' },
 });
