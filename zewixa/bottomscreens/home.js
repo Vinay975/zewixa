@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { Alert } from "react-native";
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import FilterModal from '../FecthingData/filterModel';
 import { WatchlistContext } from '../FecthingData/watchingDetails';
@@ -20,7 +20,6 @@ export default function HomePage({ route }) {
   const [filter, setFilter] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const { watchlist, toggleWatch } = useContext(WatchlistContext);
-  // const { hostel } = route.params;
   const { customerInfo } = useContext(AuthContext);
   const navigation = useNavigation();
 
@@ -54,11 +53,8 @@ export default function HomePage({ route }) {
 
   const displayedItems = showHostels ? hostels : apartments;
 
-
   return (
     <View style={styles.screen}>
-
-
 
       {/* Search Header */}
       <View style={styles.header}>
@@ -73,6 +69,7 @@ export default function HomePage({ route }) {
           <Ionicons name="filter-outline" size={24} color="#6846bd" />
         </TouchableOpacity>
       </View>
+
       {/* Toggle Buttons */}
       <View style={styles.toggleContainer}>
         <TouchableOpacity
@@ -89,93 +86,99 @@ export default function HomePage({ route }) {
         </TouchableOpacity>
       </View>
 
-      {/* List */}
+      {/* Cards Grid */}
       <ScrollView contentContainerStyle={styles.list}>
-        {displayedItems.filter(applyFilter).map(item => {
-          const liked = watchlist.some(w => w._id === item._id);
-          const isHostel = showHostels;
+        <View style={styles.grid}>
+          {displayedItems.filter(applyFilter).map(item => {
+            const liked = watchlist.some(w => w._id === item._id);
+            const isHostel = showHostels;
 
-          return (
-            <TouchableOpacity
-              key={item._id}
-              style={styles.card}
-              onPress={() => {
-                if (!customerInfo) {
-                  Alert.alert("Login Required", "Please login to view details.");
-                  navigation.navigate("SignIn");
-                } else {
-                  navigation.navigate(
-                    isHostel ? "HostelDetails" : "ApartmentDetails",
-                    isHostel ? { hostel: item } : { apartment: item }
-                  );
-                }
-              }}
-            >
-              <Image
-                source={{
-                  uri: showHostels
-                    ? `https://zewixa-jz2h.onrender.com${item.photos?.main}`
-                    : `https://zewixa-jz2h.onrender.com/${item.photos?.building}`
-                }}
-                style={styles.cardImage}
-              />
+            const price = item.rent?.singleSharing || item.rent?.["1BHK"] || "N/A";
+            const rating = item.rating || 4.2; // fallback if no rating in API
 
-
-              <View style={styles.cardInfo}>
-                {isHostel ? (
-                  <>
-                    <View style={styles.row}>
-                      <MaterialIcons name="home" size={16} color="#6846bd" />
-                      <Text style={styles.text}>{item.hostelName}</Text>
-                    </View>
-                    <View style={styles.row}>
-                      <Ionicons name="location-outline" size={16} color="#6846bd" />
-                      <Text style={styles.text}>{item.location}</Text>
-                    </View>
-                    <View style={styles.row}>
-                      <Ionicons
-                        name={item.gender === 'Male' ? 'male-outline' : 'female-outline'}
-                        size={16}
-                        color="#6846bd"
-                      />
-                      <Text style={styles.text}>{item.gender}</Text>
-                    </View>
-                  </>
-                ) : (
-                  <>
-                    <View style={styles.row}>
-                      <MaterialIcons name="person" size={16} color="#6846bd" />
-                      <Text style={styles.text}>Owner: {item.ownerData?.name || 'N/A'}</Text>
-
-                    </View>
-                    <View style={styles.row}>
-                      <Ionicons name="location-outline" size={16} color="#6846bd" />
-                      <Text style={styles.text}>{item.location || 'N/A'}</Text>
-                    </View>
-                  </>
-                )}
-              </View>
+            return (
               <TouchableOpacity
+                key={item._id}
+                style={styles.card}
                 onPress={() => {
                   if (!customerInfo) {
-                    Alert.alert("Login Required", "Login to save to watchlist.");
+                    Alert.alert("Login Required", "Please login to view details.");
                     navigation.navigate("SignIn");
                   } else {
-                    toggleWatch(item);
+                    navigation.navigate(
+                      isHostel ? "HostelDetails" : "ApartmentDetails",
+                      isHostel ? { hostel: item } : { apartment: item }
+                    );
                   }
                 }}
-                style={styles.heartBtn}
               >
-                <Ionicons
-                  name={liked ? 'heart' : 'heart-outline'}
-                  size={24}
-                  color={liked ? 'tomato' : '#ccc'}
+                <Image
+                  source={{
+                    uri: showHostels
+                      ? `https://zewixa-jz2h.onrender.com${item.photos?.main}`
+                      : `https://zewixa-jz2h.onrender.com/${item.photos?.building}`
+                  }}
+                  style={styles.cardImage}
                 />
-              </TouchableOpacity>
 
-            </TouchableOpacity>
-          );
-        })}
+                <View style={styles.cardInfo}>
+                  {/* First row: Hostel name (left) + Gender (right) */}
+                  {isHostel ? (
+                    <View style={styles.rowBetween}>
+                      <Text style={styles.title}>{item.hostelName}</Text>
+                      <View style={styles.row}>
+                        <Ionicons
+                          name={item.gender === 'Male' ? 'male-outline' : 'female-outline'}
+                          size={14}
+                          color={item.gender === 'Male' ? '#3b82f6' : '#ec4899'}
+                        />
+                        <Text style={[
+                          styles.genderText,
+                          { color: item.gender === 'Male' ? '#3b82f6' : '#ec4899' }
+                        ]}>
+                          {item.gender}
+                        </Text>
+                      </View>
+                    </View>
+                  ) : (
+                    <Text style={styles.title}>{item.ownerData?.name || "Apartment"}</Text>
+                  )}
+
+                  {/* Location (common for both) */}
+                  <Text style={styles.location}>{item.location || "N/A"}</Text>
+
+                  {/* Price & Rating Row */}
+                  <View style={styles.rowBetween}>
+                    <Text style={styles.price}>₹{price}</Text>
+                    <View style={styles.row}>
+                      <Ionicons name="star" size={16} color="#f5a623" />
+                      <Text style={styles.rating}>{rating}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Heart button */}
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!customerInfo) {
+                      Alert.alert("Login Required", "Login to save to watchlist.");
+                      navigation.navigate("SignIn");
+                    } else {
+                      toggleWatch(item);
+                    }
+                  }}
+                  style={styles.heartBtn}
+                >
+                  <Ionicons
+                    name={liked ? 'heart' : 'heart-outline'}
+                    size={22}
+                    color={liked ? 'tomato' : '#ccc'}
+                  />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </ScrollView>
 
       <FilterModal
@@ -189,33 +192,8 @@ export default function HomePage({ route }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#f2f2f2' },
-  toggleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 8
-  },
-  toggleButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 40,
-    borderRadius: 20,
-    marginHorizontal: 25,
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    padding: 2,
-    elevation: 2,
-    shadowColor: '#000',
-  },
-  activeToggle: {
-    backgroundColor: '#6846bd'
-  },
-  toggleText: {
-    fontSize: 18,
-    color: '#6846bd'
-  },
-  activeToggleText: {
-    color: '#fff',
-    fontWeight: 'bold'
-  },
+
+  /* Header Search */
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -231,23 +209,110 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     fontSize: 16
   },
-  list: { padding: 12 },
-  card: {
+
+  /* Toggle Buttons */
+  toggleContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8
+  },
+  toggleButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 40,
+    borderRadius: 18,
+    marginHorizontal: 25,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 12,
-    padding: 8,
     elevation: 2,
+    shadowColor: '#000',
+  },
+  activeToggle: {
+    backgroundColor: '#6846bd'
+  },
+  toggleText: {
+    fontSize: 18,
+    color: '#6846bd'
+  },
+  activeToggleText: {
+    color: '#fff',
+    fontWeight: 'bold'
+  },
+
+  /* Grid List */
+  list: { padding: 12 },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+
+  /* Card */
+  card: {
+    width: '48%',  // two per row
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: 'hidden',
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4
+    shadowRadius: 3,
+    position: 'relative',
+    minHeight: 220,   // 🔥 increased height
   },
-  cardImage: { width: 80, height: 80, borderRadius: 8 },
-  cardInfo: { flex: 1, marginLeft: 8 },
-  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  text: { marginLeft: 4, fontSize: 14, color: '#333' },
-  heartBtn: { padding: 4 }
+  cardImage: {
+    width: '100%',
+    height: 140,   // 🔥 bigger image
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  cardInfo: {
+    padding: 8,
+  },
+
+  /* Text Styles */
+  title: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  location: {
+    fontSize: 12,
+    color: '#666',
+    marginVertical: 2,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#6846bd',
+  },
+  rating: {
+    marginLeft: 4,
+    fontSize: 12,
+    color: '#333',
+  },
+  genderText: {
+    marginLeft: 4,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  /* Layout Helpers */
+  row: { flexDirection: 'row', alignItems: 'center' },
+  rowBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+
+  /* Heart Button */
+  heartBtn: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderRadius: 20,
+    padding: 4,
+  },
 });
