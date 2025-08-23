@@ -6,7 +6,7 @@ const apartmentSchema = new mongoose.Schema({
     email: String,
     mobile1: String,
     mobile2: String,
-    profileImage: String, // URL of uploaded image
+    profileImage: String,
   },
 
   photos: {
