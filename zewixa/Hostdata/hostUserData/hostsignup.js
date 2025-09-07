@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { API_CONFIG } from '../../config/api';
 
 const HostSignUp = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -27,7 +28,7 @@ const HostSignUp = ({ navigation }) => {
     }
 
     try {
-      const res = await fetch("https://zewixa-jz2h.onrender.com/host/signup", {
+      const res = await fetch(`${API_CONFIG.BASE_URL}/host/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),

@@ -15,9 +15,10 @@ import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import { API_CONFIG } from '../../config/api';
 
 const ApartmentData = () => {
-  const API_URL = "https://zewixa-jz2h.onrender.com/api/create-apartment";
+  const API_URL = `${API_CONFIG.BASE_URL}/api/create-apartment`;
   const navigation = useNavigation();
   const { ownerData } = useRoute().params || {};
 

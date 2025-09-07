@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from './userAuth';
+import { API_CONFIG } from '../config/api';
 
 const SignIn = ({ navigation }) => {
   const [emailOrUsername, setEmailOrUsername] = useState('');
@@ -24,7 +25,7 @@ const SignIn = ({ navigation }) => {
     }
 
     try {
-      const res = await fetch('https://zewixa-jz2h.onrender.com/signin', {
+      const res = await fetch(`${API_CONFIG.BASE_URL}/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

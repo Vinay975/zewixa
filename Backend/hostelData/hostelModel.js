@@ -3,83 +3,88 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const Hostel = require("./hostelSchema");
-
+const cloudinary = require("../cloudinaryConfig");
 const router = express.Router();
+const { uploadImageWithCache } = require("../image/imageUploader");
 
-// Where to save uploaded files
-const UPLOAD_DIR = path.join(__dirname, "..", "uploads", "forHostelPhotos");
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+// Using Cloudinary for image storage
 
-// Multer storage config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename:    (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
-});
+// Use memory storage for Cloudinary
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => file.mimetype.startsWith("image/") 
-    ? cb(null, true) 
-    : cb(new Error("Only image files allowed"), false)
+  fileFilter: (req, file, cb) =>
+    file.mimetype.startsWith("image/")
+      ? cb(null, true)
+      : cb(new Error("Only image files allowed"), false),
 });
 
 // POST /api/create-hostel
 router.post(
   "/create-hostel",
   upload.fields([
-    { name: "main",         maxCount: 1 },
-    { name: "messRoom",     maxCount: 1 },
-    { name: "topView",      maxCount: 1 },
-    { name: "washroom",     maxCount: 1 },
+    { name: "main", maxCount: 1 },
+    { name: "messRoom", maxCount: 1 },
+    { name: "topView", maxCount: 1 },
+    { name: "washroom", maxCount: 1 },
     { name: "roomInterior", maxCount: 1 },
-    { name: "commonArea",   maxCount: 1 },
-    { name: "balconyView",  maxCount: 1 },
-    { name: "laundryArea",  maxCount: 1 },
-    { name: "messMenu",     maxCount: 1 },  // new
-    { name: "ownerImage",   maxCount: 1 },  // new
+    { name: "commonArea", maxCount: 1 },
+    { name: "balconyView", maxCount: 1 },
+    { name: "laundryArea", maxCount: 1 },
+    { name: "messMenu", maxCount: 1 }, // new
+    { name: "ownerImage", maxCount: 1 }, // new
   ]),
   async (req, res) => {
     try {
       // 1) Parse JSON payloads
-      const ownerData  = JSON.parse(req.body.ownerData);
+      const ownerData = JSON.parse(req.body.ownerData);
       const hostelData = JSON.parse(req.body.hostelData);
-      const rent       = JSON.parse(req.body.rent);
+      const rent = JSON.parse(req.body.rent);
 
-    ownerData.phoneOne = ownerData.mobile1;
-    ownerData.phoneTwo = ownerData.mobile2;
-    delete ownerData.mobile1;
-    delete ownerData.mobile2;
-      // 2) Build photos subdocument
+      // Map mobile fields to phone fields
+      ownerData.phoneOne = ownerData.mobile1;
+      ownerData.phoneTwo = ownerData.mobile2;
+      delete ownerData.mobile1;
+      delete ownerData.mobile2;
+
+      // Upload photos to Cloudinary
       const photos = {};
       for (const key of [
-        "main","messRoom","topView","washroom",
-        "roomInterior","commonArea","balconyView",
-        "laundryArea","messMenu"
+        "main",
+        "messRoom",
+        "topView",
+        "washroom",
+        "roomInterior",
+        "commonArea",
+        "balconyView",
+        "laundryArea",
+        "messMenu",
       ]) {
         if (req.files[key]) {
-          photos[key] = `/uploads/forHostelPhotos/${req.files[key][0].filename}`;
+          const file = req.files[key][0];
+          photos[key] = await uploadImageWithCache(file, "hostels");
         }
       }
 
-      // 3) Attach ownerImage
+      // Upload owner image
       if (req.files.ownerImage) {
-        ownerData.ownerImage = `/uploads/forHostelPhotos/${req.files.ownerImage[0].filename}`;
-
+        const file = req.files.ownerImage[0];
+        ownerData.ownerImage = await uploadImageWithCache(file, "owners");
       }
-
       // 4) Construct & save
       const hostel = new Hostel({
-        owner:      ownerData,
+        owner: ownerData,
         hostelName: hostelData.hostelName,
-        location:   hostelData.location,
-        gender:     hostelData.gender,
-        acType:     hostelData.acType,
-        floors:     hostelData.floors,
-        rooms:      hostelData.rooms,
-        wifi:       req.body.wifi === "true",
+        location: hostelData.location,
+        gender: hostelData.gender,
+        acType: hostelData.acType,
+        floors: hostelData.floors,
+        rooms: hostelData.rooms,
+        wifi: req.body.wifi === "true",
         rent,
-        photos
+        photos,
       });
 
       await hostel.save();

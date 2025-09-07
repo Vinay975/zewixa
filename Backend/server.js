@@ -13,28 +13,24 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-//photos
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-
 // MongoDB connection
-mongoose.connect("mongodb+srv://Zewixa:Vinay123@hosteldata.wvwi4no.mongodb.net/hostelDB")
+mongoose
+  .connect(
+    "mongodb+srv://Zewixa:Vinay123@hosteldata.wvwi4no.mongodb.net/hostelDB"
+  )
   .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.error("MongoDB Connection Error:", err));
+  .catch((err) => console.error("MongoDB Connection Error:", err));
 
 // ROUTES
 const hostelRoutes = require("./hostelData/hostelModel");
 const userRoutes = require("./userData/userRoute");
-const apartmentRoute = require("./apartmentData/apartmentRoute")
-const hostUserRoute = require('./hostDataForLogin/hostdataRoute')
+const apartmentRoute = require("./apartmentData/apartmentRoute");
+const hostUserRoute = require("./hostDataForLogin/hostdataRoute");
 
 app.use("/api", hostelRoutes);
-app.use("/api",apartmentRoute)
-app.use('/', userRoutes);
-app.use('/host',hostUserRoute)
-
-
-
+app.use("/api", apartmentRoute);
+app.use("/", userRoutes);
+app.use("/host", hostUserRoute);
 
 app.get("/", (req, res) => {
   res.send("API is running!");
