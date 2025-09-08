@@ -1,7 +1,7 @@
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { createStackNavigator } from "@react-navigation/stack";
-import HostBottomBar from "../bottomTabForHost";
+import HostBottomBar from "../bottomtabs/hostbottomtab";
 import AboutPlace from "../Hostdata/addyourPlace/aboutpace";
 import AboutOwner from "../Hostdata/addyourPlace/ownerdetials";
 import HostelDataOne from "../Hostdata/addyourPlace/hostel-1";

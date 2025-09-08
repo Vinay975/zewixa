@@ -3,18 +3,16 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-import Home from "./bottomscreens/home";
-// import Scanner from "./bottomscreens/scanner";
-import WatchList from "./bottomscreens/watchlist";
-import AddHub from "./bottomscreens/addhub";
-import Profile from "./bottomscreens/profile";
-import { WatchlistProvider } from "./FecthingData/watchingDetails";
+import HomePage from "../bottomscreens/home";
+import WatchList from "../bottomscreens/watchlist";
+import Profile from "../bottomscreens/profile";
+import { WatchlistProvider } from "../FecthingData/watchingDetails";
 
 
 
 const Tab = createBottomTabNavigator();
 
-const BottomTab = ({ setIsHost }) => {
+const UserBottomTab = ({ setIsHost }) => {
   return (
     <WatchlistProvider>
       <Tab.Navigator
@@ -46,7 +44,7 @@ const BottomTab = ({ setIsHost }) => {
       >
         <Tab.Screen
           name="Home"
-          component={Home}
+          component={HomePage}
           options={{
             headerTitle: "Habita",
             headerTitleStyle: {
@@ -72,4 +70,4 @@ const BottomTab = ({ setIsHost }) => {
   );
 };
 
-export default BottomTab;
+export default UserBottomTab;

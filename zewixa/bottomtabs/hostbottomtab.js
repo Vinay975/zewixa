@@ -2,10 +2,10 @@ import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import Host from "./Hostdata/bottomscreen/host";
-import Message from "./Hostdata/bottomscreen/message";
-import Payment from "./Hostdata/bottomscreen/payment";
-import HostProfile from "./Hostdata/bottomscreen/hostprofile";
+import Host from "../Hostdata/bottomscreen/host";
+import Message from "../Hostdata/bottomscreen/message";
+import Payment from "../Hostdata/bottomscreen/payment";
+import HostProfile from "../Hostdata/bottomscreen/hostprofile";
 
 const Tab = createBottomTabNavigator();
 const activeColor = "#6846bd";

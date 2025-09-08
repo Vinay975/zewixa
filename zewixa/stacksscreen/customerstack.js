@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useState } from 'react';
 import { createStackNavigator } from "@react-navigation/stack";
-import BottomTab from "../bottomTab";
+import UserBottomTab from '../bottomtabs/userbottomtap';
 // import Settings from "../customerScreens/profileScreens/setting";
 // import FetchingHostelData from "../FecthingData/hosteldata";
 import HostelDetails from "../FecthingData/displayingData";
@@ -31,7 +31,7 @@ const CustomerStack = ({ setIsHost }) => {
   return (
     <CustomerBar.Navigator screenOptions={{ headerShown: false }}>
       <CustomerBar.Screen name="BottomTab">
-        {() => <BottomTab setIsHost={setIsHost} />}
+        {() => <UserBottomTab setIsHost={setIsHost} />}
       </CustomerBar.Screen>
 
       {/* 👇 Show the header only for Settings */}
