@@ -8,6 +8,7 @@ import HostelDetails from "../FecthingData/displayingData";
 import ApartmentDetails from '../FecthingData/apartmentDetails';
 
 import HostelBooking from '../Booking/HostelBooking';
+import ApartmentBooking from '../Booking/ApartmentBooking';
 
 import PersonInfo from '../UserAccountData/personInfo';
 import Security from '../UserAccountData/security';
@@ -101,6 +102,11 @@ const CustomerStack = ({ setIsHost }) => {
        <CustomerBar.Screen
         name="HostelBooking"
         component={HostelBooking}
+        options={{ headerShown: true }}
+      />
+      <CustomerBar.Screen
+        name="ApartmentBooking"
+        component={ApartmentBooking}
         options={{ headerShown: true }}
       />
     </CustomerBar.Navigator>

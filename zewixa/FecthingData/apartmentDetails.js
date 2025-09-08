@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -25,6 +26,8 @@ export default function ApartmentDetails({ route }) {
   const { apartment } = route.params;
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const Navigator = useNavigation()
+
 
   const openImageModal = (uri) => {
     setSelectedImage(uri);
@@ -49,7 +52,8 @@ export default function ApartmentDetails({ route }) {
   };
 
   const handleBook = () => {
-    Alert.alert("Booking", "Booking functionality to be implemented.");
+    // Alert.alert("Booking", "Booking functionality to be implemented.");
+    Navigator.navigate("ApartmentBooking")
   };
 
   //   const getPhoto = (key) => {

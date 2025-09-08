@@ -48,7 +48,7 @@ const BottomTab = ({ setIsHost }) => {
           name="Home"
           component={Home}
           options={{
-            headerTitle: "Zewixa",
+            headerTitle: "Habita",
             headerTitleStyle: {
               fontSize: 25,
               fontWeight: "bold",
@@ -60,10 +60,10 @@ const BottomTab = ({ setIsHost }) => {
         />
         <Tab.Screen name="WatchList" component={WatchList} />
         {/* <Tab.Screen name="Scanner" component={Scanner} /> */}
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Booking"
           component={AddHub}
-        />
+        /> */}
         <Tab.Screen name="Profile">
           {(props) => <Profile {...props} setIsHost={setIsHost} />}
         </Tab.Screen>
