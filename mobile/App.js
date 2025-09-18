@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import CustomerStack from "./stacksscreen/customerstack";
-import OwnerStack from "./stacksscreen/ownerstack";
-import { AuthProvider } from "./userDetails/userAuth";
+import CustomerStack from "./src/stacksscreen/customerstack";
+import OwnerStack from "./src/stacksscreen/ownerstack";
+import { AuthProvider } from "./src/userDetails/userAuth";
 
-const App = () => {
+export default function App() {
   const [isHost, setIsHost] = useState(true);
 
   return (
@@ -18,6 +18,4 @@ const App = () => {
       </NavigationContainer>
     </AuthProvider>
   );
-};
-
-export default App;
+}
