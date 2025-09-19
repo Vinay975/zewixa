@@ -5,7 +5,6 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Animated,
   ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -14,18 +13,12 @@ import { AuthContext } from "../../userDetails/userAuth";
 
 const HostProfile = ({ navigation, setIsHost }) => {
   const [isVisitor, setIsVisitor] = useState(false);
-  const animatedValue = new Animated.Value(isVisitor ? 1 : 0);
   const [hostImage, setHostImage] = useState("please select image");
 
   const { hostInfo, signOutHost } = useContext(AuthContext);
 
   const handleToggleSwitch = () => {
-    Animated.timing(animatedValue, {
-      toValue: isVisitor ? 0 : 1,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-
+    // just toggle without animation
     setIsVisitor(!isVisitor);
     setIsHost(!isVisitor);
   };
@@ -44,14 +37,6 @@ const HostProfile = ({ navigation, setIsHost }) => {
       setHostImage(result.assets[0].uri);
     }
   };
-
-  const switchBackgroundColor = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#6846bd", "#34a853"],
-  });
-
-  const switchIcon = isVisitor ? "account" : "home-city";
-  const switchText = isVisitor ? "Visitor Mode" : "Switch to User Mode";
 
   return (
     <View style={styles.container}>
@@ -85,7 +70,7 @@ const HostProfile = ({ navigation, setIsHost }) => {
           <View style={styles.profileDetails}>
             <Text style={styles.name}>Welcome {hostInfo?.username || "Guest"}</Text>
             <Text style={styles.email}>
-              {hostInfo?.email ? `${hostInfo.email}` : isVisitor ? "Visitor" : "Host"}
+              {hostInfo?.email ? hostInfo.email : isVisitor ? "Visitor" : "Host"}
             </Text>
           </View>
         </View>
@@ -106,12 +91,12 @@ const HostProfile = ({ navigation, setIsHost }) => {
       {/* Fixed Switch Button */}
       <View style={styles.fixedSwitch}>
         <TouchableOpacity onPress={handleToggleSwitch}>
-          <Animated.View
-            style={[styles.switchButton, { backgroundColor: switchBackgroundColor }]}
-          >
-            <Icon name={switchIcon} size={24} color="white" />
-            <Text style={styles.switchText}>{switchText}</Text>
-          </Animated.View>
+          <View style={styles.switchButton}>
+            <Icon name="home-city" size={24} color="white" />
+            <Text style={styles.switchText}>
+              {isVisitor ? "Switch to Host Mode" : "Switch to User Mode"}
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -183,6 +168,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 25,
     elevation: 3,
+    backgroundColor:"#6846bd",
   },
   switchText: {
     color: "#ffffff",

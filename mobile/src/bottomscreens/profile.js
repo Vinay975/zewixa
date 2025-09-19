@@ -108,7 +108,7 @@ const Profile = ({ navigation, setIsHost }) => {
       >
         <Ionicons name="home-outline" size={30} color="#6846bd" />
         <View style={{ marginLeft: 12 }}>
-          <Text style={styles.placeTitle}>Go to Host Mode</Text>
+          <Text style={styles.placeTitle}>Switch Host Mode</Text>
           <Text style={styles.placeSubtitle}>List your hostel or apartment and manage your properties</Text>
         </View>
       </TouchableOpacity>
