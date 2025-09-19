@@ -2,14 +2,12 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { View, Text, StyleSheet } from "react-native";
 
 import Home from "./bottomscreens/home";
-
 import WatchList from "./bottomscreens/watchlist";
 import Profile from "./bottomscreens/profile";
 import { WatchlistProvider } from "./FecthingData/watchingDetails";
-
-
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +16,7 @@ const BottomTab = ({ setIsHost }) => {
     <WatchlistProvider>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
+          tabBarIcon: ({ focused, color }) => {
             let iconName;
             if (route.name === "Home") {
               iconName = focused ? "home" : "home-outline";
@@ -43,16 +41,18 @@ const BottomTab = ({ setIsHost }) => {
           name="Home"
           component={Home}
           options={{
-            headerTitle: "Zewixa",
-            headerTitleStyle: {
-              fontSize: 25,
-              fontWeight: "bold",
-              color: "#6846bd",
-              marginLeft: 20,
-            },
+            headerTitle: () => (
+              <View style={styles.brandContainer}>
+                {/* Spot goes slightly up */}
+                <Text style={styles.brandSpot}>Spot</Text>
+                {/* Accomm goes slightly down */}
+                <Text style={styles.brandAccomm}>Accomm</Text>
+              </View>
+            ),
             headerStyle: { backgroundColor: "#f0f0f0", height: 80 },
           }}
         />
+
         <Tab.Screen name="WatchList" component={WatchList} />
         <Tab.Screen name="Profile">
           {(props) => <Profile {...props} setIsHost={setIsHost} />}
@@ -62,4 +62,35 @@ const BottomTab = ({ setIsHost }) => {
   );
 };
 
-export default BottomTab; 
+export default BottomTab;
+
+const styles = StyleSheet.create({
+  brandContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+  },
+  brandSpot: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#6846bd",
+    textShadowColor: "#9BBD46",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    marginRight: 4,
+    // lift Spot slightly upward
+    transform: [{ translateY: -3 }],
+  },
+  brandAccomm: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#9BBD46",
+    textShadowColor: "#6846bd",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    opacity: 1,
+    // push Accomm slightly downward
+    transform: [{ translateY: 3 }],
+  },
+});

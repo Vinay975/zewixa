@@ -1,8 +1,11 @@
 import React from "react";
+import { View, Text, Alert, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
 import Host from "./Hostdata/bottomscreen/host";
 import Message from "./Hostdata/bottomscreen/message";
 import Payment from "./Hostdata/bottomscreen/payment";
@@ -16,15 +19,13 @@ const HostBottomBar = ({ setIsHost }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarStyle: { backgroundColor: "#fff", height: 60 },
+        tabBarStyle: { backgroundColor: "#fff", height: 88 },
         tabBarActiveTintColor: activeColor,
         tabBarInactiveTintColor: inactiveColor,
-        // headerShown: false,
-        // screenOptions={{ headerShown: false }}
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: "bold",
-          marginTop: 5,
+          marginTop: 3,
         },
         headerBackground: () => (
           <LinearGradient
@@ -33,26 +34,54 @@ const HostBottomBar = ({ setIsHost }) => {
           />
         ),
         headerTintColor: "#fff",
-        tabBarIcon: ({ color, size, focused }) => {
+
+       
+        tabBarIcon: ({ color, focused }) => {
           let iconName;
           let IconComponent = Ionicons;
+          let iconSize = 30;
 
           if (route.name === "Host") {
             iconName = focused ? "add-circle" : "add-circle-outline";
           } else if (route.name === "Message") {
-            iconName = focused ? "chatbubbles" : "chatbubbles-outline";
+            iconName = focused ? "book-account" : "book-account-outline";
+            IconComponent = MaterialCommunityIcons;
           } else if (route.name === "Payment") {
-            iconName = "credit-card";
-            IconComponent = FontAwesome5;
+            iconName = "money-check-dollar";
+            IconComponent = FontAwesome6;
+            iconSize = 27;
           } else if (route.name === "Profile") {
-            iconName = focused ? "person" : "person-outline";
+            iconName = focused ? "person-circle" : "person-circle-outline";
           }
 
-          return <IconComponent name={iconName} size={30} color={color} />;
+          return <IconComponent name={iconName} size={iconSize} color={color} />;
         },
       })}
     >
-      <Tab.Screen name="Host" component={Host} />
+      <Tab.Screen
+        name="Host"
+        component={Host}
+        options={{
+          headerTitle: () => (
+            <View style={styles.brandContainer}>
+              <Text style={styles.brandSpot}>Spot</Text>
+              <Text style={styles.brandAccomm}>Accom</Text>
+            </View>
+          ),
+          headerRight: () => (
+            <Ionicons
+              name="notifications-outline"
+              size={26}
+              color="#fff"
+              style={{ marginRight: 16 }}
+              onPress={() =>
+                Alert.alert("Notifications", "No new notifications")
+              }
+            />
+          ),
+        }}
+      />
+
       <Tab.Screen name="Message" component={Message} />
       <Tab.Screen name="Payment" component={Payment} />
       <Tab.Screen name="Profile">
@@ -63,3 +92,31 @@ const HostBottomBar = ({ setIsHost }) => {
 };
 
 export default HostBottomBar;
+
+const styles = StyleSheet.create({
+  brandContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+  },
+  brandSpot: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#ffffff", 
+    textShadowColor: "#9BBD46",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    marginRight: 4,
+    transform: [{ translateY: -3 }],
+  },
+  brandAccomm: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#9BBD46", 
+    textShadowColor: "#ffffff",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    transform: [{ translateY: 3 }],
+  },
+});
