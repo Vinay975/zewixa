@@ -50,6 +50,17 @@ const BottomTab = ({ setIsHost }) => {
               </View>
             ),
             headerStyle: { backgroundColor: "#f0f0f0", height: 80 },
+             headerRight: () => (
+            <Ionicons
+              name="notifications-outline"
+              size={26}
+              color="#6846bd"
+              style={{ marginRight: 16 }}
+              onPress={() =>
+                Alert.alert("Notifications", "No new notifications")
+              }
+            />
+          ),
           }}
         />
 

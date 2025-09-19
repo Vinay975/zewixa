@@ -16,6 +16,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as Animatable from "react-native-animatable";
 import { API_CONFIG } from "../config/api";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -23,6 +24,7 @@ export default function ApartmentDetails({ route }) {
   const { apartment } = route.params;
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const navigation = useNavigation();
 
   const openImageModal = (uri) => {
     setSelectedImage(uri);
@@ -47,7 +49,7 @@ export default function ApartmentDetails({ route }) {
   };
 
   const handleBook = () => {
-    Alert.alert("Booking", "Booking functionality to be implemented.");
+     navigation.navigate("ApartmentBooking", { apartment });
   };
 
   //   const getPhoto = (key) => {
