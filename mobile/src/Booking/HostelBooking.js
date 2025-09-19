@@ -12,8 +12,8 @@ import {
   ActionSheetIOS,
   Platform,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const HostelBooking = () => {
@@ -54,28 +54,28 @@ const HostelBooking = () => {
     }
   };
 
-  const pickImage = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert("Permission required", "Camera permission is needed!");
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({ quality: 0.5 });
-    if (!result.canceled) {
-      setDetails({ ...details, photo: result.assets[0].uri });
-    }
+  const pickImage = () => {
+    launchCamera(
+      { mediaType: 'photo', quality: 0.5 },
+      (response) => {
+        if (response.didCancel || response.errorCode) return;
+        if (response.assets && response.assets[0]?.uri) {
+          setDetails({ ...details, photo: response.assets[0].uri });
+        }
+      },
+    );
   };
 
-  const pickGallery = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert("Permission required", "Gallery permission is needed!");
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({ quality: 0.5 });
-    if (!result.canceled) {
-      setDetails({ ...details, photo: result.assets[0].uri });
-    }
+  const pickGallery = () => {
+    launchImageLibrary(
+      { mediaType: 'photo', quality: 0.5 },
+      (response) => {
+        if (response.didCancel || response.errorCode) return;
+        if (response.assets && response.assets[0]?.uri) {
+          setDetails({ ...details, photo: response.assets[0].uri });
+        }
+      },
+    );
   };
 
   const handleSubmit = () => {

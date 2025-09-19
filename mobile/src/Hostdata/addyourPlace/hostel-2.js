@@ -11,9 +11,9 @@ import {
   Animated,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker";
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Picker } from "@react-native-picker/picker";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from "axios";
 import { API_CONFIG } from '../../config/api';
 
@@ -58,31 +58,27 @@ const HostelDataTwo = () => {
   }, [pulse]);
 
   // Image picker common logic
-  const pickImage = async (photoType) => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission required", "Allow gallery access.");
-      return;
-    }
-    Alert.alert("Upload Photo", "Choose an option", [
-      { text: "Take Photo", onPress: () => handleImage("camera", photoType) },
-      { text: "Choose from Gallery", onPress: () => handleImage("gallery", photoType) },
-      { text: "Cancel", style: "cancel" },
+   const pickImage = (photoType) => {
+    Alert.alert('Upload Photo', 'Choose an option', [
+      { text: 'Take Photo', onPress: () => handleImage('camera', photoType) },
+      { text: 'Choose from Gallery', onPress: () => handleImage('gallery', photoType) },
+      { text: 'Cancel', style: 'cancel' },
     ]);
   };
 
-  const handleImage = async (source, photoType) => {
+   const handleImage = async (source, photoType) => {
+    const options = { mediaType: 'photo', quality: 1 };
     const result =
-      source === "camera"
-        ? await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 1 })
-        : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 1 });
+      source === 'camera'
+        ? await launchCamera(options)
+        : await launchImageLibrary(options);
 
-    if (!result.canceled) {
-      setFormData((prev) => ({
-        ...prev,
-        photos: { ...prev.photos, [photoType]: result.assets[0].uri },
-      }));
-    }
+    if (result.didCancel || !result.assets?.length) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      photos: { ...prev.photos, [photoType]: result.assets[0].uri },
+    }));
   };
 
   // Rent input handler

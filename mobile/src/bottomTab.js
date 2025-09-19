@@ -4,9 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import Home from "./bottomscreens/home";
-// import Scanner from "./bottomscreens/scanner";
+
 import WatchList from "./bottomscreens/watchlist";
-import AddHub from "./bottomscreens/addhub";
 import Profile from "./bottomscreens/profile";
 import { WatchlistProvider } from "./FecthingData/watchingDetails";
 
@@ -25,10 +24,6 @@ const BottomTab = ({ setIsHost }) => {
               iconName = focused ? "home" : "home-outline";
             } else if (route.name === "WatchList") {
               iconName = focused ? "heart-circle" : "heart-circle-outline";
-            } else if (route.name === "Scanner") {
-              iconName = focused ? "qr-code" : "qr-code";
-            } else if (route.name === "Booking") {
-              iconName = focused ? "bookmarks" : "bookmarks-outline";
             } else if (route.name === "Profile") {
               iconName = focused ? "person-circle" : "person-circle-outline";
             }
@@ -59,11 +54,6 @@ const BottomTab = ({ setIsHost }) => {
           }}
         />
         <Tab.Screen name="WatchList" component={WatchList} />
-        {/* <Tab.Screen name="Scanner" component={Scanner} /> */}
-        <Tab.Screen
-          name="Booking"
-          component={AddHub}
-        />
         <Tab.Screen name="Profile">
           {(props) => <Profile {...props} setIsHost={setIsHost} />}
         </Tab.Screen>
@@ -72,4 +62,4 @@ const BottomTab = ({ setIsHost }) => {
   );
 };
 
-export default BottomTab;
+export default BottomTab; 

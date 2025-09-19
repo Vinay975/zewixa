@@ -11,9 +11,9 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { Picker } from "@react-native-picker/picker";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import axios from "axios";
 import { API_CONFIG } from '../../config/api';
 
@@ -46,35 +46,31 @@ const ApartmentData = () => {
   const [isSubmitting, setIsSubmitting] = useState(false); // ✅ Added
 
   // 📸 Pick Image
-  const pickImage = async (photoType) => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission required", "Allow gallery access.");
-      return;
-    }
+  const pickImage = (photoType) => {
     Alert.alert("Upload Photo", "Choose an option", [
-      { text: "Take Photo", onPress: () => handleImage("camera", photoType) },
-      { text: "Choose from Gallery", onPress: () => handleImage("gallery", photoType) },
+      {
+        text: "Take Photo",
+        onPress: () => handleImage("camera", photoType),
+      },
+      {
+        text: "Choose from Gallery",
+        onPress: () => handleImage("gallery", photoType),
+      },
       { text: "Cancel", style: "cancel" },
     ]);
   };
 
   const handleImage = async (source, photoType) => {
-    const result =
+    const options = { mediaType: "photo", quality: 1 };
+    const response =
       source === "camera"
-        ? await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            quality: 1,
-          })
-        : await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            quality: 1,
-          });
+        ? await launchCamera(options)
+        : await launchImageLibrary(options);
 
-    if (!result.canceled) {
+    if (response?.assets && response.assets.length > 0) {
       setFormData((prev) => ({
         ...prev,
-        photos: { ...prev.photos, [photoType]: result.assets[0].uri },
+        photos: { ...prev.photos, [photoType]: response.assets[0].uri },
       }));
     }
   };
@@ -161,14 +157,14 @@ const ApartmentData = () => {
 
   // 📌 Icons
   const getIcon = (type) =>
-    ({
-      building: "business-outline",
-      livingRoom: "ios-tv-outline",
-      kitchen: "restaurant-outline",
-      bedroom: "bed-outline",
-      bathroom: "water-outline",
-      balcony: "sunny-outline",
-    }[type] || "image-outline");
+  ({
+    building: "business-outline",
+    livingRoom: "ios-tv-outline",
+    kitchen: "restaurant-outline",
+    bedroom: "bed-outline",
+    bathroom: "water-outline",
+    balcony: "sunny-outline",
+  }[type] || "image-outline");
 
   return (
     <ScrollView style={styles.container}>

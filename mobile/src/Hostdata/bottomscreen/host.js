@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { AuthContext } from "../../userDetails/userAuth";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Host = () => {
   const { hostInfo } = useContext(AuthContext);

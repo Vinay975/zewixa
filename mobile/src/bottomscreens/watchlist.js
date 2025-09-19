@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { WatchlistContext } from "../FecthingData/watchingDetails";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from "@react-navigation/native";
 import { API_CONFIG } from "../config/api";
 

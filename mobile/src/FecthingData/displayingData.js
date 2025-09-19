@@ -11,7 +11,9 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import * as Animatable from "react-native-animatable";
 
 export default function HostelDetails({ route }) {
