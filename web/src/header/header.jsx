@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "../styles/header.css";
-import logo from "../assets/logo.svg";
+import logo from "../assets/logo.png";
 import { FaHome, FaInfoCircle, FaSignInAlt, FaUserCircle } from "react-icons/fa";
 
 function Header() {
@@ -10,7 +10,7 @@ function Header() {
       <div className="container header-container">
         {/* Left: Logo + Brand */}
         <div className="brand">
-          <img src={logo} alt="Logo" className="logo-img" />
+          {/* <img src={logo} alt="Logo" className="logo-img" /> */}
           <span className="brandSpot">Spot</span>
           <span className="brandAccomm">Accom</span>
         </div>

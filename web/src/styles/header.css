@@ -18,7 +18,7 @@
 }
 
 .logo-img {
-  height: 40px;
+  height: 100px;
   margin-right: 8px;
    background: none;
 }
@@ -26,8 +26,7 @@
 .brandSpot {
   font-size: 26px;
   font-weight: 800;
-  color: #6846bd; /* purple */
-  text-shadow: 1px 1px 2px #9BBD46; /* green shadow */
+  color: #6846bd;
   margin-right: 4px;
   transform: translateY(-3px);
 }
@@ -35,8 +34,7 @@
 .brandAccomm {
   font-size: 26px;
   font-weight: 800;
-  color: #9BBD46; /* green */
-  text-shadow: 1px 1px 2px #6846bd; /* purple shadow */
+  color: #9BBD46;
   transform: translateY(3px);
 }
 
@@ -49,7 +47,7 @@
 
 .nav-links li a {
   text-decoration: none;
-  color: #6846bd; /* purple default */
+  color: rgba(135, 126, 126, 0.493);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -60,7 +58,7 @@
 
 .nav-links li a.active,
 .nav-links li a:hover {
-  color: #9BBD46; /* green on hover/active */
+  color:black
 }
 
 /* Right icons */
