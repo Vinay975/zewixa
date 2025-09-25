@@ -90,7 +90,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
     marginRight: 4,
-    // lift Spot slightly upward
     transform: [{ translateY: -3 }],
   },
   brandAccomm: {
@@ -101,7 +100,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
     opacity: 1,
-    // push Accomm slightly downward
     transform: [{ translateY: 3 }],
   },
 });
