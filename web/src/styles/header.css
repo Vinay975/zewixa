@@ -1,0 +1,77 @@
+/* Header container */
+.header {
+  background-color: #ffffff; /* White background */
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* subtle shadow */
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Left brand section */
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 40px;
+  margin-right: 8px;
+   background: none;
+}
+
+.brandSpot {
+  font-size: 26px;
+  font-weight: 800;
+  color: #6846bd; /* purple */
+  text-shadow: 1px 1px 2px #9BBD46; /* green shadow */
+  margin-right: 4px;
+  transform: translateY(-3px);
+}
+
+.brandAccomm {
+  font-size: 26px;
+  font-weight: 800;
+  color: #9BBD46; /* green */
+  text-shadow: 1px 1px 2px #6846bd; /* purple shadow */
+  transform: translateY(3px);
+}
+
+/* Middle nav links */
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #6846bd; /* purple default */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.nav-links li a.active,
+.nav-links li a:hover {
+  color: #9BBD46; /* green on hover/active */
+}
+
+/* Right icons */
+.right-icons a {
+  color: #6846bd; /* purple */
+  font-size: 22px;
+  margin-left: 15px;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.right-icons a:hover {
+  color: #9BBD46; /* green hover */
+}
