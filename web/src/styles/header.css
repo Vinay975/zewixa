@@ -1,76 +1,137 @@
-/* Header container */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap');
+
+/* ---------- HEADER ---------- */
 .header {
-  background-color: #ffffff; /* White background */
-  padding: 10px 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* subtle shadow */
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+  top: 0;
+  z-index: 1000;
+}
+
+.container {
+  max-width: 1300px;
+  margin: auto;
+  padding: 0 30px;
 }
 
 .header-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 80px;
 }
 
-/* Left brand section */
+/* ---------- LEFT LOGO ---------- */
 .brand {
   display: flex;
   align-items: center;
 }
 
 .logo-img {
-  height: 100px;
-  margin-right: 8px;
-   background: none;
+  height: 60px;
+  width: auto;
 }
 
-.brandSpot {
-  font-size: 26px;
-  font-weight: 800;
-  color: #6846bd;
-  margin-right: 4px;
-  transform: translateY(-3px);
-}
-
-.brandAccomm {
-  font-size: 26px;
-  font-weight: 800;
-  color: #9BBD46;
-  transform: translateY(3px);
-}
-
-/* Middle nav links */
-.nav-links {
+/* ---------- MIDDLE NAV ---------- */
+nav {
   display: flex;
+  justify-content: center;
+}
+
+.nav-links {
   list-style: none;
-  gap: 20px;
+  display: flex;
+  gap: 90px !important;
 }
 
 .nav-links li a {
   text-decoration: none;
-  color: rgba(135, 126, 126, 0.493);
+  color: #0000009e;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: "Nunito Sans", sans-serif;
+  position: relative;
+  padding-bottom: 6px;
+  transition: color 0.3s ease;
+}
+
+.nav-links li a:hover {
+  color: #000000;
+}
+
+.nav-links li a.active {
+  color: #000000;
   font-weight: 600;
+}
+
+
+/* Underline animation */
+.nav-links li a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background-color: #000000;
+  transition: width 0.3s ease;
+}
+
+.nav-links li a:hover::after,
+.nav-links li a.active::after {
+  width: 100%;
+  color: #000000;
+}
+
+/* ---------- RIGHT PROFILE ---------- */
+.right-icons {
   display: flex;
   align-items: center;
-  gap: 5px;
-  transition: color 0.2s;
-  cursor: pointer;
+  justify-content: flex-end;
 }
 
-.nav-links li a.active,
-.nav-links li a:hover {
-  color:black
+.profile-icon {
+  color: #000000;
+  background-color: #00000017;
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 50%;
+  /* border: 2px solid; */
+  transition: all 0.3s ease;
 }
 
-/* Right icons */
-.right-icons a {
-  color: #6846bd; /* purple */
-  font-size: 22px;
-  margin-left: 15px;
-  transition: color 0.2s;
-  cursor: pointer;
+.profile-icon:hover {
+  background-color: #6846bd;
+  border-color: #6846bd;
+  color: #ffffff;
 }
 
-.right-icons a:hover {
-  color: #9BBD46; /* green hover */
-  
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .header-container {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 12px 0;
+  }
+
+  nav {
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .nav-links {
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .logo-img {
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-links li a {
+    font-size: 14px;
+  }
 }

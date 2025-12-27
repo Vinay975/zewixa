@@ -26,9 +26,7 @@ body, html, #root, .app {
   transition: color 0.3s;
 }
 
-.nav-links a:hover, .nav-links a.active {
-  color: #9BBD46;
-}
+
 
 .nav-links {
   list-style: none;
@@ -42,9 +40,7 @@ body, html, #root, .app {
   transition: color 0.3s;
 }
 
-.nav-links a:hover, .nav-links a.active {
-  color: #9BBD46;
-}
+
 .footer {
   background-color: #222;
   color: white;
