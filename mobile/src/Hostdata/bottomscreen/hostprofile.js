@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import * as ImagePicker from "expo-image-picker";
+import { launchImageLibrary } from "react-native-image-picker";
 import { AuthContext } from "../../userDetails/userAuth";
 
 const HostProfile = ({ navigation, setIsHost }) => {
@@ -23,19 +23,23 @@ const HostProfile = ({ navigation, setIsHost }) => {
     setIsHost(!isVisitor);
   };
 
-  const pickImage = async () => {
-    const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!granted) return;
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setHostImage(result.assets[0].uri);
-    }
+  const pickImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: "photo",
+        quality: 1,
+      },
+      (response) => {
+        if (response.didCancel) {
+          console.log("User cancelled image picker");
+        } else if (response.errorCode) {
+          console.log("ImagePicker Error: ", response.errorMessage);
+          Alert.alert("Error", response.errorMessage);
+        } else if (response.assets && response.assets.length > 0) {
+          setHostImage(response.assets[0].uri);
+        }
+      }
+    );
   };
 
   return (
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 25,
     elevation: 3,
-    backgroundColor:"#6846bd",
+    backgroundColor: "#6846bd",
   },
   switchText: {
     color: "#ffffff",

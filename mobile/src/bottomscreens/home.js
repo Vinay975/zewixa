@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  StatusBar,
 } from "react-native";
 import axios from "axios";
 import { Alert } from "react-native";
@@ -82,7 +83,9 @@ export default function HomePage({ route }) {
   const displayedItems = showHostels ? hostels : apartments;
 
   return (
-    <View style={styles.screen}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+      <View style={styles.screen}>
       {/* Search Header */}
       <View style={styles.header}>
         <Ionicons name="location-outline" size={24} color="#6846bd" />
@@ -242,7 +245,8 @@ export default function HomePage({ route }) {
           setModalVisible(false);
         }}
       />
-    </View>
+      </View>
+    </>
   );
 }
 

@@ -1,0 +1,1 @@
+if user asks you to use or find then look for the skills in .github/skills/<skill-name>/SKILL.md

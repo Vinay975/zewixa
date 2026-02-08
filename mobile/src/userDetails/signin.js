@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  StatusBar,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from './userAuth';
@@ -61,7 +62,9 @@ const SignIn = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+      <View style={styles.container}>
       <Text style={styles.header}>Sign In</Text>
 
       <View style={styles.inputWrapper}>
@@ -102,6 +105,7 @@ const SignIn = ({ navigation }) => {
         <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
       </TouchableOpacity>
     </View>
+    </>
   );
 };
 

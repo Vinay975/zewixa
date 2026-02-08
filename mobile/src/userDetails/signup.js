@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  StatusBar,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { API_CONFIG } from '../config/api';
@@ -59,7 +60,9 @@ const SignUp = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+      <View style={styles.container}>
       <Text style={styles.header}>Sign Up</Text>
 
       <View style={styles.inputWrapper}>
@@ -120,6 +123,7 @@ const SignUp = ({ navigation }) => {
         <Text style={styles.linkText}>Already have an account? Sign In</Text>
       </TouchableOpacity>
     </View>
+    </>
   );
 };
 

@@ -7,6 +7,7 @@ import {
   Alert,
   Image,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AuthContext } from "../userDetails/userAuth"; // adjust path as needed
@@ -42,7 +43,9 @@ const Profile = ({ navigation, setIsHost }) => {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+      <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={styles.profileHeader}>
         <View style={styles.imageContainer}>
@@ -169,6 +172,7 @@ const Profile = ({ navigation, setIsHost }) => {
         />
       </View>
     </ScrollView>
+    </>
   );
 };
 

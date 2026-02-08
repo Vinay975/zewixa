@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import DateTimePicker from "@react-native-community/datetimepicker";
+// import DateTimePicker from "@react-native-community/datetimepicker";
 
 const HostelBooking = () => {
   const [category, setCategory] = useState(""); // "already" | "new"
@@ -55,27 +55,29 @@ const HostelBooking = () => {
   };
 
   const pickImage = () => {
-    launchCamera(
-      { mediaType: 'photo', quality: 0.5 },
-      (response) => {
-        if (response.didCancel || response.errorCode) return;
-        if (response.assets && response.assets[0]?.uri) {
-          setDetails({ ...details, photo: response.assets[0].uri });
-        }
-      },
-    );
+    launchCamera({ mediaType: 'photo', quality: 0.5 }, (res) => {
+      if (res.didCancel) return;
+      if (res.errorCode) {
+        Alert.alert("Camera Error", res.errorMessage || "Error");
+        return;
+      }
+      if (!res.assets || res.assets.length === 0) return;
+
+      setDetails(prev => ({ ...prev, photo: res.assets[0].uri }));
+    });
   };
 
   const pickGallery = () => {
-    launchImageLibrary(
-      { mediaType: 'photo', quality: 0.5 },
-      (response) => {
-        if (response.didCancel || response.errorCode) return;
-        if (response.assets && response.assets[0]?.uri) {
-          setDetails({ ...details, photo: response.assets[0].uri });
-        }
-      },
-    );
+    launchImageLibrary({ mediaType: 'photo', quality: 0.5 }, (res) => {
+      if (res.didCancel) return;
+      if (res.errorCode) {
+        Alert.alert("Gallery Error", res.errorMessage || "Error");
+        return;
+      }
+      if (!res.assets || res.assets.length === 0) return;
+
+      setDetails(prev => ({ ...prev, photo: res.assets[0].uri }));
+    });
   };
 
   const handleSubmit = () => {
@@ -193,15 +195,15 @@ const HostelBooking = () => {
         )}
 
         {/* Date Picker */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.dateBtn}
           onPress={() => setShowDatePicker(true)}
         >
           <Ionicons name="calendar" size={20} color="#6846bd" />
           <Text style={styles.dateText}>{date.toDateString()}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
-        {showDatePicker && (
+        {/* {showDatePicker && (
           <DateTimePicker
             value={date}
             mode="date"
@@ -211,7 +213,7 @@ const HostelBooking = () => {
               if (selectedDate) setDate(selectedDate);
             }}
           />
-        )}
+        )} */}
 
         <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
           <Text style={styles.submitText}>

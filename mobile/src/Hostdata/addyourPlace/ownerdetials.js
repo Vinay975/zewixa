@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker";
+import { launchImageLibrary } from "react-native-image-picker";
 
 
 const AboutOwner = () => {
@@ -17,23 +17,25 @@ const AboutOwner = () => {
     const [profileImage, setProfileImage] = useState(null);
 
     // Function to pick an image from the gallery
-    const pickImage = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-            Alert.alert("Permission Denied", "You need to allow access to the gallery.");
-            return;
-        }
 
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            // allowsEditing: true,
+    const pickImage = () => {
+    launchImageLibrary(
+        {
+            mediaType: "photo",
             quality: 1,
-        });
-
-        if (!result.canceled && result.assets.length > 0) {
-            setProfileImage(result.assets[0].uri);
+        },
+        (response) => {
+            if (response.didCancel) {
+                console.log("User cancelled image picker");
+            } else if (response.errorCode) {
+                console.log("ImagePicker Error: ", response.errorMessage);
+                Alert.alert("Error", response.errorMessage);
+            } else if (response.assets && response.assets.length > 0) {
+                setProfileImage(response.assets[0].uri);
+            }
         }
-    };
+    );
+};
 
     // Validation function
     const handleNextNavigation = () => {

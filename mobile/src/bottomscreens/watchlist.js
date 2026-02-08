@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  StatusBar,
 } from "react-native";
 import { WatchlistContext } from "../FecthingData/watchingDetails";
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -19,14 +20,19 @@ export default function WatchList() {
 
   if (!watchlist.length) {
     return (
-      <View style={styles.empty}>
-        <Text>No liked places yet.</Text>
-      </View>
+      <>
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+        <View style={styles.empty}>
+          <Text>No liked places yet.</Text>
+        </View>
+      </>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.list}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+      <ScrollView contentContainerStyle={styles.list}>
       {watchlist.map((item) => {
         const isHostel = !!item.hostelName;
         const name = isHostel ? item.hostelName : item.apartmentName;
@@ -115,6 +121,7 @@ export default function WatchList() {
         );
       })}
     </ScrollView>
+    </>
   );
 }
 
