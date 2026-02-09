@@ -84,7 +84,7 @@ export default function HomePage({ route }) {
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+       <StatusBar hidden />
       <View style={styles.screen}>
       {/* Search Header */}
       <View style={styles.header}>
@@ -257,8 +257,10 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 8,
-    margin: 12,
+    padding: 10,
+    marginHorizontal: 12,
+    marginTop: 8,
+    marginBottom: 8,
     backgroundColor: "#fff",
     borderRadius: 8,
     borderWidth: 1,

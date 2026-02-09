@@ -44,76 +44,64 @@ const Profile = ({ navigation, setIsHost }) => {
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+      <StatusBar hidden />
       <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={styles.profileHeader}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={require("../assets/profile.jpeg")}
-            style={styles.profileImage}
-          />
-        </View>
-
-        <View style={styles.infoContainer}>
-          {/* Top right login/logout container */}
-          <View style={styles.topRightContainer}>
-            {!isLoggedIn ? (
-              <TouchableOpacity
-                onPress={() => navigation.navigate("SignIn")}
-                style={styles.signInButton}
-                activeOpacity={0.7}
-              >
-                <Ionicons
-                  name="log-in-outline"
-                  size={26}
-                  color="#6846bd"
-                  style={{ marginRight: 6 }}
-                />
-                <Text style={styles.signInText}>Sign In</Text>
-              </TouchableOpacity>
+        <View style={styles.profileContent}>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={require("../assets/profile.jpeg")}
+              style={styles.profileImage}
+            />
+          </View>
+          <View style={styles.userInfo}>
+            {isLoggedIn ? (
+              <>
+                <Text style={styles.userName}>{user.username}</Text>
+                <Text style={styles.userEmail}>{user.email}</Text>
+              </>
             ) : (
-              <TouchableOpacity
-                onPress={handleLogout}
-                style={styles.logoutButton}
-                activeOpacity={0.7}
-              >
-                <Ionicons
-                  name="log-out-outline"
-                  size={28}
-                  color="#6846bd"
-                  style={{ fontWeight: "bold" }}
-                />
-              </TouchableOpacity>
+              <>
+                <Text style={styles.userName}>Guest User</Text>
+                <Text style={styles.userEmail}>Sign in to continue</Text>
+              </>
             )}
           </View>
-          {/* User info displayed below top-right */}
-          {isLoggedIn ? (
-            <>
-              <Text style={styles.helloText}>Hello, Mr.</Text>
-              <Text style={styles.userName}>{user.username}</Text>
-              <Text style={styles.userEmail}>{user.email}</Text>
-            </>
-          ) : (
-            <>
-              <Text style={styles.helloText}>Hello,</Text>
-              <Text style={styles.userName}>Guest</Text>
-            </>
-          )}
         </View>
+        {!isLoggedIn ? (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("SignIn")}
+            style={styles.signInButton}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.signInText}>Sign In</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={styles.logoutButton}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="log-out-outline" size={22} color="#FF4757" />
+          </TouchableOpacity>
+        )}
       </View>
 
-      {/* Add Your Place Section */}
+      {/* Your Place Section */}
       <TouchableOpacity
-        style={styles.placeContainer}
+        style={styles.placeCard}
         onPress={() => setIsHost(false)}
         activeOpacity={0.8}
       >
-        <Ionicons name="home-outline" size={30} color="#6846bd" />
-        <View style={{ marginLeft: 12 }}>
-          <Text style={styles.placeTitle}>Switch Host Mode</Text>
-          <Text style={styles.placeSubtitle}>List your hostel or apartment and manage your properties</Text>
+        <View style={styles.placeIconContainer}>
+          <Ionicons name="business" size={28} color="#6846bd" />
         </View>
+        <View style={styles.placeContent}>
+          <Text style={styles.placeTitle}>Your Place</Text>
+          <Text style={styles.placeSubtitle}>List and manage your properties</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={22} color="#9CA3AF" />
       </TouchableOpacity>
 
 
@@ -181,125 +169,130 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EFEFEF",
+    backgroundColor: "#F9FAFB",
   },
   profileHeader: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
     padding: 20,
-    alignItems: "flex-start", // align top
-    margin: 10,
-    borderRadius: 10,
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 12,
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    elevation: 2,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
-  imageContainer: {
-    marginRight: 15,
+  profileContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  avatarContainer: {
+    marginRight: 16,
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 2,
+    borderColor: "#E5E7EB",
   },
-  infoContainer: {
+  userInfo: {
     flex: 1,
-    position: "relative",
   },
-  topRightContainer: {
-    position: "absolute",
-    right: 10,
-    top: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    zIndex: 10,
-  },
-
-  signInButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#6846bd",
-  },
-
-  signInText: {
-    color: "#6846bd",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-
-  logoutButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#6846bd",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
   userName: {
     fontSize: 20,
-    fontWeight: "bold",
-    // color: "#6846bd",
-    color: "#777",
-    // marginTop: 26, 
+    fontWeight: "700",
+    color: "#1F2937",
+    marginBottom: 4,
   },
   userEmail: {
-    fontSize: 16,
-    color: "#777",
-    marginTop: 4,
+    fontSize: 14,
+    color: "#6B7280",
   },
-  helloText: {
-    fontSize: 18,
-    color: "#777",
+  signInButton: {
+    backgroundColor: "#6846bd",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
   },
-  placecontainer: {
-    width: "95%",
-    height: 100,
-    backgroundColor: "#fff",
-    padding: 20,
+  signInText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  logoutButton: {
+    padding: 8,
+  },
+  placeCard: {
+    backgroundColor: "#FFFFFF",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: "row",
     alignItems: "center",
-    margin: 10,
-    borderRadius: 10,
+    elevation: 2,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-    alignSelf: "center",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+  placeIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#F3F0FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  placeContent: {
+    flex: 1,
+  },
+  placeTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1F2937",
+    marginBottom: 2,
+  },
+  placeSubtitle: {
+    fontSize: 13,
+    color: "#6B7280",
   },
   sectionHeader: {
-    marginHorizontal: 10,
-    marginTop: 15,
+    marginHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 8,
   },
   sectionHeaderText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1F2937",
   },
   optionsContainer: {
-    backgroundColor: "#fff",
-    margin: 10,
-    borderRadius: 10,
-    paddingVertical: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
+    backgroundColor: "#FFFFFF",
+    marginHorizontal: 16,
+    borderRadius: 12,
+    overflow: "hidden",
     elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
   optionRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderBottomColor: "#eee",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomColor: "#F3F4F6",
     borderBottomWidth: 1,
   },
   rowContent: {
@@ -307,32 +300,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   optionIcon: {
-    marginRight: 15,
+    marginRight: 12,
   },
   optionText: {
-    fontSize: 18,
-    color: "#333",
+    fontSize: 15,
+    color: "#374151",
+    fontWeight: "500",
   },
-  placeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    margin: 10,
-    elevation: 3,
-  },
-
-  placeTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-
-  placeSubtitle: {
-    fontSize: 14,
-    color: '#777',
-    marginTop: 4,
-  },
-
 });

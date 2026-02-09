@@ -1,10 +1,7 @@
 import React from "react";
-import { View, Text, Alert, StyleSheet } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { View, Text, StyleSheet, Platform } from "react-native";
 
 import Host from "./Hostdata/bottomscreen/host";
 import Message from "./Hostdata/bottomscreen/message";
@@ -12,111 +9,130 @@ import Payment from "./Hostdata/bottomscreen/payment";
 import HostProfile from "./Hostdata/bottomscreen/hostprofile";
 
 const Tab = createBottomTabNavigator();
-const activeColor = "#6846bd";
-const inactiveColor = "gray";
 
-const HostBottomBar = ({ setIsHost }) => {
+/* ---------- COMMON HEADER (WhatsApp Style) ---------- */
+const commonHeaderOptions = {
+  headerStyle: {
+    backgroundColor: "#ffffff",
+    height: 100,
+    elevation: 0,
+    shadowColor: "transparent",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    borderBottomWidth: 0,
+  },
+  headerShadowVisible: false,
+};
+
+const HostBottomTab = ({ setIsHost }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarStyle: { backgroundColor: "#fff", height: 88 },
-        tabBarActiveTintColor: activeColor,
-        tabBarInactiveTintColor: inactiveColor,
-        tabBarLabelStyle: {
-          fontSize: 13,
-          fontWeight: "bold",
-          marginTop: 3,
-        },
-        headerBackground: () => (
-          <LinearGradient
-            colors={["#6846bd", "#4b0082"]}
-            style={{ flex: 1 }}
-          />
-        ),
-        headerTintColor: "#fff",
+        headerShown: true,
 
-       
-        tabBarIcon: ({ color, focused }) => {
+        tabBarIcon: ({ focused, color }) => {
           let iconName;
-          let IconComponent = Ionicons;
-          let iconSize = 30;
 
           if (route.name === "Host") {
-            iconName = focused ? "add-circle" : "add-circle-outline";
+            iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Message") {
-            iconName = focused ? "book-account" : "book-account-outline";
-            IconComponent = MaterialCommunityIcons;
+            iconName = focused
+              ? "chatbubbles"
+              : "chatbubbles-outline";
           } else if (route.name === "Payment") {
-            iconName = "money-check-dollar";
-            IconComponent = FontAwesome6;
-            iconSize = 27;
-          } else if (route.name === "Profile") {
-            iconName = focused ? "person-circle" : "person-circle-outline";
+            iconName = focused ? "wallet" : "wallet-outline";
+          } else {
+            iconName = focused ? "person" : "person-outline";
           }
 
-          return <IconComponent name={iconName} size={iconSize} color={color} />;
+          return (
+            <View
+              style={[
+                styles.iconContainer,
+                focused && styles.iconContainerFocused,
+              ]}
+            >
+              <Ionicons name={iconName} size={26} color={color} />
+            </View>
+          );
+        },
+
+        tabBarActiveTintColor: "#6846bd",
+        tabBarInactiveTintColor: "#9CA3AF",
+
+        tabBarStyle: {
+          height: 80,
+          paddingBottom: Platform.OS === "ios" ? 20 : 10,
+
+          backgroundColor: "#ffffff",
+          borderTopWidth: 1,
+          borderTopColor: "#E5E7EB",
+          elevation: 8,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+        },
+
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "600",
+          marginTop: -2,
         },
       })}
     >
+      {/* ---------- HOST HOME ---------- */}
       <Tab.Screen
         name="Host"
         component={Host}
         options={{
+          ...commonHeaderOptions,
           headerTitle: () => (
-            <View style={styles.brandContainer}>
-              <Text style={styles.brandSpot}>Spot</Text>
-              <Text style={styles.brandAccomm}>Accom</Text>
-            </View>
-          ),
-          headerRight: () => (
-            <Ionicons
-              name="notifications-outline"
-              size={26}
-              color="#fff"
-              style={{ marginRight: 16 }}
-              onPress={() =>
-                Alert.alert("Notifications", "No new notifications")
-              }
-            />
+            <Text style={styles.brandText}>Habita</Text>
           ),
         }}
       />
 
-      <Tab.Screen name="Message" component={Message} />
-      <Tab.Screen name="Payment" component={Payment} />
+      {/* ---------- MESSAGE ---------- */}
+      <Tab.Screen
+        name="Message"
+        component={Message}
+      />
+
+      {/* ---------- PAYMENT ---------- */}
+      <Tab.Screen
+        name="Payment"
+        component={Payment}
+      />
+
+      {/* ---------- PROFILE ---------- */}
       <Tab.Screen name="Profile">
-        {(props) => <HostProfile {...props} setIsHost={setIsHost} />}
+        {(props) => (
+          <HostProfile {...props} setIsHost={setIsHost} />
+        )}
       </Tab.Screen>
     </Tab.Navigator>
   );
 };
 
-export default HostBottomBar;
+export default HostBottomTab;
 
+/* ---------- STYLES ---------- */
 const styles = StyleSheet.create({
-  brandContainer: {
-    flexDirection: "row",
+  brandText: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#6846bd",
+    letterSpacing: 0.5,
+  },
+  iconContainer: {
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    justifyContent: "center",
+    width: 40,
+    height: 40,
   },
-  brandSpot: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: "#ffffff", 
-    textShadowColor: "#9BBD46",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-    marginRight: 4,
-    transform: [{ translateY: -3 }],
-  },
-  brandAccomm: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: "#9BBD46", 
-    textShadowColor: "#ffffff",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-    transform: [{ translateY: 3 }],
+  iconContainerFocused: {
+    transform: [{ scale: 1.1 }],
   },
 });

@@ -8,10 +8,11 @@ import {
   StyleSheet,
   Modal,
   Linking,
+  StatusBar,
 } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { AuthContext } from "../../userDetails/userAuth";
 import { useNavigation } from "@react-navigation/native";
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Host = () => {
   const { hostInfo } = useContext(AuthContext);
@@ -19,23 +20,6 @@ const Host = () => {
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const [modalVisible, setModalVisible] = useState(false);
- 
-
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.95,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
-  };
 
   const handleStartHosting = () => {
     if (hostInfo) {
@@ -64,35 +48,49 @@ const Host = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Become a Host</Text>
-      <Text style={styles.subtitle}>
-        List your hostel or apartment and connect with tenants easily.
-      </Text>
+      <StatusBar hidden />
+      {/* ✅ CUSTOM HEADER */}
+      <View style={styles.header}>
+        <Ionicons name="business" size={46} color="#6846bd" />
+        <Text style={styles.brandText}>Habita</Text>
+        <Text style={styles.tagline}>Your Property, Your Income</Text>
+      </View>
 
-      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      {/* CONTENT */}
+      <View style={styles.content}>
+        <Text style={styles.title}>Become a Host</Text>
+        <Text style={styles.subtitle}>
+          List your hostel or apartment and connect with tenants easily.
+        </Text>
+
+        {/* CTA */}
+        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+          <TouchableOpacity
+            style={styles.button}
+            activeOpacity={0.9}
+            onPress={handleStartHosting}
+          >
+            <Ionicons name="add-circle" size={24} color="#fff" />
+            <Text style={styles.buttonText}>List Your Property</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* VIDEO */}
         <TouchableOpacity
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          onPress={handleStartHosting}
-          style={styles.button}
+          style={styles.videoButton}
+          onPress={() => setModalVisible(true)}
         >
-          <Text style={styles.buttonText}>Host Your Property</Text>
+          <Ionicons name="play-circle" size={24} color="#6846bd" />
+          <Text style={styles.videoText}>Watch Tutorial</Text>
         </TouchableOpacity>
-      </Animated.View>
+      </View>
 
-      <TouchableOpacity
-        style={styles.videoButton}
-        onPress={() => setModalVisible(true)}
-      >
-        <Ionicons name="play-circle" size={28} color="#6846bd" />
-        <Text style={styles.videoText}>How to Fill Form?</Text>
-      </TouchableOpacity>
-
-      {/* 📽️ Modal for video language options */}
-      <Modal transparent visible={modalVisible} animationType="slide">
+      {/* MODAL */}
+      <Modal transparent visible={modalVisible} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Watch Tutorial In</Text>
+            <Text style={styles.modalTitle}>Choose Language</Text>
+
             {["Telugu", "Hindi", "English"].map((lang) => (
               <TouchableOpacity
                 key={lang}
@@ -102,16 +100,13 @@ const Host = () => {
                 <Text style={styles.langText}>{lang}</Text>
               </TouchableOpacity>
             ))}
+
             <TouchableOpacity
-              onPress={() => setModalVisible(false)}
               style={styles.closeBtn}
+              onPress={() => setModalVisible(false)}
             >
-              <Text style={{ color: "#6846bd", fontWeight: "bold" }}>
-                Cancel
-              </Text>
+              <Text style={styles.closeBtnText}>Cancel</Text>
             </TouchableOpacity>
-
-
           </View>
         </View>
       </Modal>
@@ -120,89 +115,125 @@ const Host = () => {
 };
 
 export default Host;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#F9FAFB",
+  },
+
+  header: {
+    backgroundColor: "#FFFFFF",
+    paddingTop: 12,
+    paddingBottom: 24,
+    alignItems: "center",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    elevation: 4,
+  },
+
+  brandText: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#6846bd",
+    marginTop: 8,
+  },
+
+  tagline: {
+    fontSize: 15,
+    color: "#6B7280",
+  },
+
+  content: {
+    flex: 1,
     padding: 24,
-    backgroundColor: "#f9f9f9",
   },
+
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#333",
+    fontSize: 26,
+    fontWeight: "700",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 10,
   },
+
   subtitle: {
-    fontSize: 16,
-    color: "#666",
+    fontSize: 15,
+    color: "#6B7280",
     textAlign: "center",
-    marginBottom: 30,
-    paddingHorizontal: 10,
+    marginBottom: 40,
   },
+
+  button: {
+    flexDirection: "row",
+    backgroundColor: "#6846bd",
+    padding: 16,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+  },
+
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
   videoButton: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    marginTop: 25,
+    alignItems: "center",
+    marginTop: 20,
+    gap: 6,
   },
+
   videoText: {
-    marginLeft: 8,
-    fontSize: 16,
     color: "#6846bd",
+    fontSize: 16,
     fontWeight: "600",
   },
-  button: {
-    backgroundColor: "#6846bd",
-    paddingVertical: 16,
-    paddingHorizontal: 25,
-    borderRadius: 12,
-    alignItems: "center",
-    elevation: 5,
-    shadowColor: "#6846bd",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-    letterSpacing: 1,
-  },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
   },
+
   modalContainer: {
     backgroundColor: "#fff",
     width: "80%",
-    padding: 24,
-    borderRadius: 12,
+    borderRadius: 16,
+    padding: 20,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+
+  langOption: {
+    padding: 14,
+    backgroundColor: "#F3F4F6",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+
+  langText: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  closeBtn: {
+    marginTop: 10,
+    padding: 12,
     alignItems: "center",
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
-  },
-  langOption: {
-    padding: 10,
-    width: "100%",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  langText: {
-    fontSize: 16,
-    textAlign: "center",
-    color: "#444",
-  },
-  closeBtn: {
-    marginTop: 15,
+
+  closeBtnText: {
+    color: "#6846bd",
+    fontWeight: "700",
   },
 });

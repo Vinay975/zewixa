@@ -2,7 +2,8 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { View, Text, StyleSheet, Alert } from "react-native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { View, Text, StyleSheet, Alert, Platform } from "react-native";
 
 import Home from "./bottomscreens/home";
 import WatchList from "./bottomscreens/watchlist";
@@ -11,42 +12,92 @@ import { WatchlistProvider } from "./FecthingData/watchingDetails";
 
 const Tab = createBottomTabNavigator();
 
+/* ---------- COMMON HEADER (WhatsApp Style) ---------- */
+const commonHeaderOptions = {
+  headerStyle: {
+    backgroundColor: "#ffffff02",
+    height: 80,
+    elevation: 0, // Android
+    shadowColor: "transparent", // iOS
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    borderBottomWidth: 0,
+  },
+  headerShadowVisible: false,
+};
+
 const BottomTab = ({ setIsHost }) => {
   return (
     <WatchlistProvider>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color }) => {
-            let iconName;
-            if (route.name === "Home") {
-              iconName = focused ? "home" : "home-outline";
-            } else if (route.name === "WatchList") {
-              iconName = focused ? "heart-circle" : "heart-circle-outline";
-            } else if (route.name === "Profile") {
-              iconName = focused ? "person-circle" : "person-circle-outline";
-            }
-            return <Ionicons name={iconName} size={30} color={color} />;
-          },
+          headerShown: true,
+
+          tabBarIcon: ({ focused, color }) => (
+            <View
+              style={[
+                styles.iconContainer,
+                focused && styles.iconContainerFocused,
+              ]}
+            >
+              {route.name === "Home" ? (
+                <MaterialCommunityIcons
+                  name={focused ? "home-city" : "home-city-outline"}
+                  size={26}
+                  color={color}
+                />
+              ) : route.name === "WatchList" ? (
+                <Ionicons
+                  name={focused ? "bookmark" : "bookmark-outline"}
+                  size={26}
+                  color={color}
+                />
+              ) : (
+                <Ionicons
+                  name={focused ? "person-circle" : "person-circle-outline"}
+                  size={26}
+                  color={color}
+                />
+              )}
+            </View>
+          ),
+
           tabBarActiveTintColor: "#6846bd",
-          tabBarInactiveTintColor: "gray",
-          tabBarStyle: { height: 76 },
+          tabBarInactiveTintColor: "#9CA3AF",
+
+          tabBarStyle: {
+            height: 80,
+            paddingBottom: Platform.OS === "ios" ? 20 : 10,
+
+            backgroundColor: "#ffffff",
+            borderTopWidth: 1,
+            borderTopColor: "#E5E7EB",
+            elevation: 8,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+          },
+
           tabBarLabelStyle: {
-            fontSize: 13,
-            fontWeight: "bold",
-            marginTop: 3,
+            fontSize: 11,
+            fontWeight: "600",
+            marginTop: -2,
           },
         })}
       >
+        {/* ---------- HOME ---------- */}
         <Tab.Screen
           name="Home"
           component={Home}
           options={{
+            ...commonHeaderOptions,
             headerTitle: () => (
               <View style={styles.brandContainer}>
                 <Text style={styles.brandText}>Habita</Text>
               </View>
             ),
-            headerStyle: { backgroundColor: "#ffffff", height: 80 },
             headerRight: () => (
               <Ionicons
                 name="notifications-outline"
@@ -61,8 +112,15 @@ const BottomTab = ({ setIsHost }) => {
           }}
         />
 
-        <Tab.Screen name="WatchList" component={WatchList} />
-        <Tab.Screen name="Profile">
+        {/* ---------- WATCHLIST ---------- */}
+        <Tab.Screen
+          name="WatchList"
+          component={WatchList}
+          options={commonHeaderOptions}
+        />
+
+        {/* ---------- PROFILE ---------- */}
+        <Tab.Screen name="Profile" options={commonHeaderOptions}>
           {(props) => <Profile {...props} setIsHost={setIsHost} />}
         </Tab.Screen>
       </Tab.Navigator>
@@ -72,9 +130,9 @@ const BottomTab = ({ setIsHost }) => {
 
 export default BottomTab;
 
+/* ---------- STYLES ---------- */
 const styles = StyleSheet.create({
   brandContainer: {
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -83,5 +141,14 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#6846bd",
     letterSpacing: 0.5,
+  },
+  iconContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 40,
+    height: 40,
+  },
+  iconContainerFocused: {
+    transform: [{ scale: 1.1 }],
   },
 });

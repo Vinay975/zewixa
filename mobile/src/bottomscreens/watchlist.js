@@ -23,7 +23,16 @@ export default function WatchList() {
       <>
         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
         <View style={styles.empty}>
-          <Text>No liked places yet.</Text>
+          <Ionicons name="bookmark-outline" size={80} color="#E5E7EB" />
+          <Text style={styles.emptyTitle}>No Saved Properties</Text>
+          <Text style={styles.emptySubtitle}>Your bookmarked properties will appear here</Text>
+          <TouchableOpacity 
+            style={styles.exploreButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('Home')}
+          >
+            <Text style={styles.exploreButtonText}>Explore Properties</Text>
+          </TouchableOpacity>
         </View>
       </>
     );
@@ -32,6 +41,10 @@ export default function WatchList() {
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Saved Properties</Text>
+        <Text style={styles.headerSubtitle}>{watchlist.length} {watchlist.length === 1 ? 'property' : 'properties'}</Text>
+      </View>
       <ScrollView contentContainerStyle={styles.list}>
       {watchlist.map((item) => {
         const isHostel = !!item.hostelName;
@@ -45,6 +58,7 @@ export default function WatchList() {
           <TouchableOpacity
             key={item._id}
             style={styles.card}
+            activeOpacity={0.7}
             onPress={() =>
               navigation.navigate(
                 isHostel ? "HostelDetails" : "ApartmentDetails",
@@ -61,34 +75,40 @@ export default function WatchList() {
                   {isHostel ? "Hostel" : "Apartment"}
                 </Text>
               </View>
+              <TouchableOpacity
+                onPress={() => toggleWatch(item)}
+                style={styles.heartBtn}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="heart" size={22} color="#FF4757" />
+              </TouchableOpacity>
             </View>
 
             <View style={styles.info}>
+              <Text style={styles.propertyName} numberOfLines={1}>
+                {name}
+              </Text>
               {isHostel ? (
                 <>
                   <View style={styles.row}>
-                    <MaterialIcons name="home" size={16} color="#6846bd" />
-                    <Text style={styles.text}>{name}</Text>
-                  </View>
-                  <View style={styles.row}>
                     <Ionicons
-                      name="location-outline"
-                      size={16}
-                      color="#6846bd"
+                      name="location"
+                      size={14}
+                      color="#9CA3AF"
                     />
-                    <Text style={styles.text}>{location}</Text>
+                    <Text style={styles.text} numberOfLines={1}>{location}</Text>
                   </View>
                   <View style={styles.row}>
                     <Ionicons
                       name={
                         gender === "Male"
-                          ? "male-outline"
+                          ? "male"
                           : gender === "Female"
-                          ? "female-outline"
-                          : "person-outline"
+                          ? "female"
+                          : "person"
                       }
-                      size={16}
-                      color="#6846bd"
+                      size={14}
+                      color="#9CA3AF"
                     />
                     <Text style={styles.text}>{gender}</Text>
                   </View>
@@ -96,27 +116,20 @@ export default function WatchList() {
               ) : (
                 <>
                   <View style={styles.row}>
-                    <MaterialIcons name="home" size={16} color="#6846bd" />
-                    <Text style={styles.text}> {owner}</Text>
+                    <Ionicons
+                      name="location"
+                      size={14}
+                      color="#9CA3AF"
+                    />
+                    <Text style={styles.text} numberOfLines={1}>{location}</Text>
                   </View>
                   <View style={styles.row}>
-                    <Ionicons
-                      name="location-outline"
-                      size={16}
-                      color="#6846bd"
-                    />
-                    <Text style={styles.text}>{location}</Text>
+                    <Ionicons name="person" size={14} color="#9CA3AF" />
+                    <Text style={styles.text}>{owner}</Text>
                   </View>
                 </>
               )}
             </View>
-
-            <TouchableOpacity
-              onPress={() => toggleWatch(item)}
-              style={styles.heartBtn}
-            >
-              <Ionicons name="heart" size={24} color="tomato" />
-            </TouchableOpacity>
           </TouchableOpacity>
         );
       })}
@@ -130,61 +143,125 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 40,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1F2937",
+    marginTop: 16,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: "#9CA3AF",
+    marginTop: 8,
+    textAlign: "center",
+  },
+  exploreButton: {
+    backgroundColor: "#6846bd",
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 8,
+    marginTop: 24,
+    elevation: 2,
+    shadowColor: "#6846bd",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  exploreButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
+    backgroundColor: "#FFFFFF",
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#1F2937",
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: "#9CA3AF",
+    marginTop: 4,
   },
   list: {
-    padding: 12,
+    padding: 16,
+    paddingTop: 8,
   },
   card: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginBottom: 12,
-    padding: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: "hidden",
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
   imageContainer: {
     position: "relative",
+    width: "100%",
+    height: 200,
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: "100%",
+    height: "100%",
   },
   typeBadge: {
     position: "absolute",
-    top: 4,
-    left: 4,
-    backgroundColor: "#6846bd",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    zIndex: 1,
+    top: 12,
+    left: 12,
+    backgroundColor: "rgba(104, 70, 189, 0.9)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
   },
   typeBadgeText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  heartBtn: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   info: {
-    flex: 1,
-    marginLeft: 8,
+    padding: 16,
+  },
+  propertyName: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1F2937",
+    marginBottom: 8,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 6,
   },
   text: {
-    marginLeft: 4,
+    marginLeft: 6,
     fontSize: 14,
-    color: "#333",
-  },
-  heartBtn: {
-    padding: 4,
+    color: "#6B7280",
+    flex: 1,
   },
 });
