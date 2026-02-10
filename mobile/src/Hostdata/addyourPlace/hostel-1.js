@@ -6,37 +6,28 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Modal,
-  FlatList,
-  Dimensions,
+  ScrollView,
+  StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Slider from "@react-native-community/slider";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-
-
-const { width } = Dimensions.get("window");
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const HostelDataOne = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { ownerData } = route.params || {};
 
-  const ownerName = ownerData?.name ? `Hello Mr. ${ownerData.name}` : "Hello, Owner!";
-
   const [hostelName, setHostelName] = useState("");
   const [location, setLocation] = useState("");
   const [floors, setFloors] = useState("");
   const [rooms, setRooms] = useState("");
-
   const [gender, setGender] = useState("");
   const [acType, setAcType] = useState("");
-
   const [totalCapacity, setTotalCapacity] = useState(50);
   const [currentPeople, setCurrentPeople] = useState(20);
-
-  const [genderModalVisible, setGenderModalVisible] = useState(false);
-  const [acModalVisible, setAcModalVisible] = useState(false);
 
   const genderOptions = ["Boys", "Girls", "Co-Ed"];
   const acOptions = ["AC", "Non-AC", "Both"];
@@ -73,227 +64,283 @@ const HostelDataOne = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Greeting */}
-      <View style={styles.greetingContainer}>
-        <Text style={styles.greetingText}>{ownerName}</Text>
-        <Text style={styles.subGreeting}>
-          Let’s set up your hostel details to welcome your guests.
-        </Text>
-      </View>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <StatusBar backgroundColor="#F8F9FA" barStyle="dark-content" />
+      
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Hostel Details</Text>
+          <Text style={styles.subtitle}>Step 1 of 2</Text>
+        </View>
 
-      {/* Basic Inputs */}
-      <TextInput
-        style={styles.input}
-        placeholder="Hostel Name"
-        value={hostelName}
-        onChangeText={setHostelName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Location"
-        value={location}
-        onChangeText={setLocation}
-      />
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>BASIC INFORMATION</Text>
+          
+          <View style={styles.inputCard}>
+            <Ionicons name="business" size={18} color="#6846bd" />
+            <TextInput
+              style={styles.input}
+              placeholder="Hostel Name"
+              placeholderTextColor="#9CA3AF"
+              value={hostelName}
+              onChangeText={setHostelName}
+            />
+          </View>
 
-      <TouchableOpacity style={styles.input} onPress={() => setGenderModalVisible(true)}>
-        <Text style={{ color: gender ? "#000" : "#aaa" }}>
-          {gender || "Select Gender Type"}
-        </Text>
-      </TouchableOpacity>
+          <View style={styles.inputCard}>
+            <Ionicons name="location" size={18} color="#6846bd" />
+            <TextInput
+              style={styles.input}
+              placeholder="Location"
+              placeholderTextColor="#9CA3AF"
+              value={location}
+              onChangeText={setLocation}
+            />
+          </View>
 
-      <TouchableOpacity style={styles.input} onPress={() => setAcModalVisible(true)}>
-        <Text style={{ color: acType ? "#000" : "#aaa" }}>
-          {acType || "Select AC Type"}
-        </Text>
-      </TouchableOpacity>
+          <View style={styles.row}>
+            <View style={[styles.inputCard, { flex: 1, marginRight: 8 }]}>
+              <Ionicons name="layers" size={18} color="#6846bd" />
+              <TextInput
+                style={styles.input}
+                placeholder="Floors"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={floors}
+                onChangeText={setFloors}
+              />
+            </View>
+            <View style={[styles.inputCard, { flex: 1 }]}>
+              <Ionicons name="grid" size={18} color="#6846bd" />
+              <TextInput
+                style={styles.input}
+                placeholder="Rooms"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={rooms}
+                onChangeText={setRooms}
+              />
+            </View>
+          </View>
+        </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Number of Floors"
-        keyboardType="numeric"
-        value={floors}
-        onChangeText={setFloors}
-      />
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>GENDER TYPE</Text>
+          <View style={styles.chipRow}>
+            {genderOptions.map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[styles.chip, gender === option && styles.chipActive]}
+                onPress={() => setGender(option)}
+              >
+                <Text style={[styles.chipText, gender === option && styles.chipTextActive]}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Number of Rooms"
-        keyboardType="numeric"
-        value={rooms}
-        onChangeText={setRooms}
-      />
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>AC TYPE</Text>
+          <View style={styles.chipRow}>
+            {acOptions.map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[styles.chip, acType === option && styles.chipActive]}
+                onPress={() => setAcType(option)}
+              >
+                <Text style={[styles.chipText, acType === option && styles.chipTextActive]}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-      {/* Sliders */}
-      <View style={styles.sliderContainer}>
-        <Text style={styles.sliderLabel}>Total Capacity: {totalCapacity}</Text>
-        <Slider
-          style={{ width: "90%" }}
-          minimumValue={10}
-          maximumValue={500}
-          step={1}
-          value={totalCapacity}
-          minimumTrackTintColor="#6846bd"
-          maximumTrackTintColor="#ccc"
-          onValueChange={setTotalCapacity}
-        />
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>CAPACITY</Text>
+          
+          <View style={styles.sliderCard}>
+            <View style={styles.sliderHeader}>
+              <Text style={styles.sliderTitle}>Total Capacity</Text>
+              <Text style={styles.sliderValue}>{totalCapacity}</Text>
+            </View>
+            <Slider
+              style={styles.slider}
+              minimumValue={10}
+              maximumValue={500}
+              step={1}
+              value={totalCapacity}
+              minimumTrackTintColor="#6846bd"
+              maximumTrackTintColor="#E5E7EB"
+              thumbTintColor="#6846bd"
+              onValueChange={setTotalCapacity}
+            />
+          </View>
 
-      <View style={styles.sliderContainer}>
-        <Text style={styles.sliderLabel}>Current People: {currentPeople}</Text>
-        <Slider
-          style={{ width: "90%" }}
-          minimumValue={0}
-          maximumValue={totalCapacity}
-          step={1}
-          value={currentPeople}
-          minimumTrackTintColor="#ff9800"
-          maximumTrackTintColor="#ccc"
-          onValueChange={setCurrentPeople}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleNext}>
-        <Text style={styles.buttonText}>Next</Text>
-      </TouchableOpacity>
-
-      {/* Gender Modal */}
-      <Modal transparent visible={genderModalVisible} animationType="fade">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Gender Type</Text>
-            <FlatList
-              data={genderOptions}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.modalOption}
-                  onPress={() => {
-                    setGender(item);
-                    setGenderModalVisible(false);
-                  }}
-                >
-                  <Text style={styles.modalOptionText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item, index) => index.toString()}
+          <View style={styles.sliderCard}>
+            <View style={styles.sliderHeader}>
+              <Text style={styles.sliderTitle}>Current Occupancy</Text>
+              <Text style={[styles.sliderValue, { color: "#F59E0B" }]}>{currentPeople}</Text>
+            </View>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={totalCapacity}
+              step={1}
+              value={currentPeople}
+              minimumTrackTintColor="#F59E0B"
+              maximumTrackTintColor="#E5E7EB"
+              thumbTintColor="#F59E0B"
+              onValueChange={setCurrentPeople}
             />
           </View>
         </View>
-      </Modal>
 
-      {/* AC Modal */}
-      <Modal transparent visible={acModalVisible} animationType="fade">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select AC Type</Text>
-            <FlatList
-              data={acOptions}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.modalOption}
-                  onPress={() => {
-                    setAcType(item);
-                    setAcModalVisible(false);
-                  }}
-                >
-                  <Text style={styles.modalOptionText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item, index) => index.toString()}
-            />
-          </View>
-        </View>
-      </Modal>
-    </View>
+        <TouchableOpacity style={styles.submitButton} onPress={handleNext}>
+          <Text style={styles.submitButtonText}>Continue</Text>
+          <Ionicons name="arrow-forward" size={18} color="#fff" />
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
-
-export default HostelDataOne;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
-    padding: 20,
+    backgroundColor: "#F8F9FA",
   },
-  greetingContainer: {
-    backgroundColor: "#6846bd",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: "center",
+  scrollView: {
+    flex: 1,
   },
-  greetingText: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#fff",
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
   },
-  subGreeting: {
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#2D3436",
+    marginBottom: 4,
+  },
+  subtitle: {
     fontSize: 14,
-    color: "#ddd",
-    marginTop: 5,
-    textAlign: "center",
+    color: "#9CA3AF",
+    fontWeight: "500",
+  },
+  section: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#636E72",
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  inputCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 12,
+    gap: 12,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   input: {
-    width: "100%",
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-  },
-  sliderContainer: {
-    width: "100%",
-    marginBottom: 20,
-  },
-  sliderLabel: {
-    fontSize: 16,
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
-  button: {
-    paddingVertical: 12,
-    backgroundColor: "#6846bd",
-    borderRadius: 5,
-    shadowColor: "#6846bd",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 5,
-    marginTop: 10,
-  },
-  buttonText: {
-    fontSize: 18,
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    fontSize: 15,
+    color: "#2D3436",
+    fontWeight: "500",
   },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    width: width * 0.8,
+  row: {
+    flexDirection: "row",
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
+  chipRow: {
+    flexDirection: "row",
+    gap: 10,
   },
-  modalOption: {
+  chip: {
+    flex: 1,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "#E5E7EB",
   },
-  modalOptionText: {
+  chipActive: {
+    backgroundColor: "#6846bd",
+    borderColor: "#6846bd",
+  },
+  chipText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#636E72",
+  },
+  chipTextActive: {
+    color: "#fff",
+  },
+  sliderCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+  },
+  sliderHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  sliderTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#2D3436",
+  },
+  sliderValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#6846bd",
+  },
+  slider: {
+    width: "100%",
+    height: 40,
+  },
+  submitButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#6846bd",
+    marginHorizontal: 20,
+    // marginVertical: 24,
+    marginBottom:50,
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
+    elevation: 3,
+    shadowColor: "#6846bd",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  submitButtonText: {
     fontSize: 16,
-    textAlign: "center",
+    fontWeight: "700",
+    color: "#fff",
   },
 });
+
+export default HostelDataOne;

@@ -1,4 +1,3 @@
-// 🟣 Imports
 import React, { useState } from "react";
 import {
   View,
@@ -9,6 +8,9 @@ import {
   ScrollView,
   Image,
   Alert,
+  StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
@@ -43,29 +45,19 @@ const ApartmentData = () => {
     },
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ Added
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 📸 Pick Image
   const pickImage = (photoType) => {
     Alert.alert("Upload Photo", "Choose an option", [
-      {
-        text: "Take Photo",
-        onPress: () => handleImage("camera", photoType),
-      },
-      {
-        text: "Choose from Gallery",
-        onPress: () => handleImage("gallery", photoType),
-      },
+      { text: "Take Photo", onPress: () => handleImage("camera", photoType) },
+      { text: "Choose from Gallery", onPress: () => handleImage("gallery", photoType) },
       { text: "Cancel", style: "cancel" },
     ]);
   };
 
   const handleImage = async (source, photoType) => {
     const options = { mediaType: "photo", quality: 1 };
-    const response =
-      source === "camera"
-        ? await launchCamera(options)
-        : await launchImageLibrary(options);
+    const response = source === "camera" ? await launchCamera(options) : await launchImageLibrary(options);
 
     if (response?.assets && response.assets.length > 0) {
       setFormData((prev) => ({
@@ -75,7 +67,6 @@ const ApartmentData = () => {
     }
   };
 
-  // 🔒 Toggle Security
   const toggleSecurity = (field) => {
     setFormData((prev) => ({
       ...prev,
@@ -83,30 +74,22 @@ const ApartmentData = () => {
     }));
   };
 
-  // ➕ Add BHK Unit
   const addBhkUnit = () => {
     setFormData((prev) => ({
       ...prev,
       bhkUnits: [
         ...prev.bhkUnits,
-        {
-          apartmentType: "1BHK",
-          monthlyRent: "",
-          securityDeposit: "",
-          maintenanceCharges: "",
-        },
+        { apartmentType: "1BHK", monthlyRent: "", securityDeposit: "", maintenanceCharges: "" },
       ],
     }));
   };
 
-  // ✏️ Update BHK Unit
   const updateBhkUnit = (index, field, value) => {
     const updatedUnits = [...formData.bhkUnits];
     updatedUnits[index][field] = value;
     setFormData((prev) => ({ ...prev, bhkUnits: updatedUnits }));
   };
 
-  // 🚀 Submit
   const handleSubmit = async () => {
     const missing = Object.keys(formData.photos).filter((k) => !formData.photos[k]);
     if (missing.length) {
@@ -114,7 +97,7 @@ const ApartmentData = () => {
       return;
     }
 
-    setIsSubmitting(true); // ✅ Disable button while submitting
+    setIsSubmitting(true);
 
     const formDataToSend = new FormData();
     formDataToSend.append("ownerData", JSON.stringify(ownerData));
@@ -151,252 +134,435 @@ const ApartmentData = () => {
       console.error("Submission Error:", err);
       Alert.alert("Error", "Failed to submit apartment data.");
     } finally {
-      setIsSubmitting(false); // ✅ Reset state
+      setIsSubmitting(false);
     }
   };
 
-  // 📌 Icons
-  const getIcon = (type) =>
-  ({
-    building: "business-outline",
-    livingRoom: "ios-tv-outline",
-    kitchen: "restaurant-outline",
-    bedroom: "bed-outline",
-    bathroom: "water-outline",
-    balcony: "sunny-outline",
-  }[type] || "image-outline");
+  const photoTypes = [
+    { key: "building", label: "Building", icon: "business" },
+    { key: "livingRoom", label: "Living Room", icon: "tv" },
+    { key: "kitchen", label: "Kitchen", icon: "restaurant" },
+    { key: "bedroom", label: "Bedroom", icon: "bed" },
+    { key: "bathroom", label: "Bathroom", icon: "water" },
+    { key: "balcony", label: "Balcony", icon: "sunny" },
+  ];
+
+  const securityOptions = [
+    { key: "cctv", label: "CCTV", icon: "videocam" },
+    { key: "securityGuards", label: "Security Guards", icon: "shield-checkmark" },
+    { key: "gatedCommunity", label: "Gated Community", icon: "lock-closed" },
+    { key: "fireSafety", label: "Fire Safety", icon: "flame" },
+  ];
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.sectionTitle}>Upload Apartment Photos</Text>
-
-      {/* Render photo uploads in rows of 2 */}
-      {Object.keys(formData.photos)
-        .reduce((rows, key, index, array) => {
-          if (index % 2 === 0) {
-            rows.push(array.slice(index, index + 2));
-          }
-          return rows;
-        }, [])
-        .map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.photoRow}>
-            {row.map((photoType) => (
-              <TouchableOpacity
-                key={photoType}
-                style={styles.photoUpload}
-                onPress={() => pickImage(photoType)}
-              >
-                <Ionicons name={getIcon(photoType)} size={32} color="#6846bd" />
-                <Text style={styles.photoLabel}>
-                  {photoType.charAt(0).toUpperCase() + photoType.slice(1)}
-                </Text>
-                {formData.photos[photoType] && (
-                  <Image
-                    source={{ uri: formData.photos[photoType] }}
-                    style={styles.previewImage}
-                  />
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      
+      
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+    
+        {/* Photos */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Property Photos</Text>
+          <View style={styles.photoGrid}>
+            {photoTypes.map((photo) => (
+              <TouchableOpacity key={photo.key} style={styles.photoBox} onPress={() => pickImage(photo.key)}>
+                {formData.photos[photo.key] ? (
+                  <>
+                    <Image source={{ uri: formData.photos[photo.key] }} style={styles.photoImage} />
+                    <View style={styles.photoOverlay}>
+                      <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                    </View>
+                  </>
+                ) : (
+                  <View style={styles.photoEmpty}>
+                    <Ionicons name={photo.icon} size={28} color="#9CA3AF" />
+                    <Text style={styles.photoText}>{photo.label}</Text>
+                  </View>
                 )}
               </TouchableOpacity>
             ))}
           </View>
-        ))}
-
-      {/* Location */}
-      <Text style={styles.sectionTitle}>Apartment Location</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Location"
-        value={formData.location}
-        onChangeText={(v) => setFormData((p) => ({ ...p, location: v }))}
-      />
-
-      {/* BHK Units */}
-      <Text style={styles.sectionTitle}>Add BHK Units</Text>
-      {formData.bhkUnits.map((unit, index) => (
-        <View key={index} style={styles.card}>
-          <Picker
-            selectedValue={unit.apartmentType}
-            onValueChange={(v) => updateBhkUnit(index, "apartmentType", v)}
-            style={styles.picker}
-          >
-            <Picker.Item label="1 BHK" value="1BHK" />
-            <Picker.Item label="2 BHK" value="2BHK" />
-            <Picker.Item label="3 BHK" value="3BHK" />
-            <Picker.Item label="4 BHK" value="4BHK" />
-          </Picker>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Monthly Rent"
-            keyboardType="numeric"
-            value={unit.monthlyRent}
-            onChangeText={(v) => updateBhkUnit(index, "monthlyRent", v)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Security Deposit"
-            keyboardType="numeric"
-            value={unit.securityDeposit}
-            onChangeText={(v) => updateBhkUnit(index, "securityDeposit", v)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Maintenance Charges"
-            keyboardType="numeric"
-            value={unit.maintenanceCharges}
-            onChangeText={(v) => updateBhkUnit(index, "maintenanceCharges", v)}
-          />
         </View>
-      ))}
 
-      <TouchableOpacity style={styles.addBtn} onPress={addBhkUnit}>
-        <Ionicons name="add-circle-outline" size={20} color="#6846bd" />
-        <Text style={styles.addText}>Add Another BHK</Text>
-      </TouchableOpacity>
+        {/* Location */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Location</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="location" size={20} color="#6846bd" style={styles.inputIcon} />
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter apartment address"
+              placeholderTextColor="#9CA3AF"
+              value={formData.location}
+              onChangeText={(v) => setFormData((p) => ({ ...p, location: v }))}
+            />
+          </View>
+        </View>
 
-      {/* WiFi */}
-      <Text style={styles.sectionTitle}>WiFi</Text>
-      <Picker
-        selectedValue={formData.wifiAvailable}
-        onValueChange={(v) => setFormData((p) => ({ ...p, wifiAvailable: v }))}
-        style={styles.picker}
-      >
-        <Picker.Item label="Yes" value="yes" />
-        <Picker.Item label="No" value="no" />
-      </Picker>
+        {/* BHK Units */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>BHK Units</Text>
+          {formData.bhkUnits.map((unit, index) => (
+            <View key={index} style={styles.unitBox}>
+              <View style={styles.unitHeader}>
+                <Ionicons name="home" size={18} color="#6846bd" />
+                <Text style={styles.unitTitle}>Unit {index + 1}</Text>
+              </View>
+              
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={unit.apartmentType}
+                  onValueChange={(v) => updateBhkUnit(index, "apartmentType", v)}
+                  style={styles.picker}
+                >
+                  <Picker.Item label="1 BHK" value="1BHK" />
+                  <Picker.Item label="2 BHK" value="2BHK" />
+                  <Picker.Item label="3 BHK" value="3BHK" />
+                  <Picker.Item label="4 BHK" value="4BHK" />
+                </Picker>
+              </View>
 
-      {/* Electricity */}
-      <Text style={styles.sectionTitle}>Electricity Included</Text>
-      <Picker
-        selectedValue={formData.isElectricityIncluded}
-        onValueChange={(v) =>
-          setFormData((p) => ({ ...p, isElectricityIncluded: v }))
-        }
-        style={styles.picker}
-      >
-        <Picker.Item label="Yes" value="yes" />
-        <Picker.Item label="No" value="no" />
-      </Picker>
+              <TextInput
+                style={styles.unitInput}
+                placeholder="Monthly Rent (₹)"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={unit.monthlyRent}
+                onChangeText={(v) => updateBhkUnit(index, "monthlyRent", v)}
+              />
+              <TextInput
+                style={styles.unitInput}
+                placeholder="Security Deposit (₹)"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={unit.securityDeposit}
+                onChangeText={(v) => updateBhkUnit(index, "securityDeposit", v)}
+              />
+              <TextInput
+                style={styles.unitInput}
+                placeholder="Maintenance Charges (₹)"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={unit.maintenanceCharges}
+                onChangeText={(v) => updateBhkUnit(index, "maintenanceCharges", v)}
+              />
+            </View>
+          ))}
 
-      {/* Security */}
-      <Text style={styles.sectionTitle}>Security Features</Text>
-      {Object.keys(formData.security).map((key) => (
+          <TouchableOpacity style={styles.addButton} onPress={addBhkUnit}>
+            <Ionicons name="add-circle" size={22} color="#6846bd" />
+            <Text style={styles.addButtonText}>Add BHK Unit</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Amenities */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Amenities</Text>
+          
+          <View style={styles.amenityRow}>
+            <View style={styles.amenityLeft}>
+              <Ionicons name="wifi" size={20} color="#6846bd" />
+              <Text style={styles.amenityLabel}>WiFi Available</Text>
+            </View>
+            <View style={styles.switchRow}>
+              <TouchableOpacity
+                style={[styles.switchBtn, formData.wifiAvailable === "yes" && styles.switchBtnActive]}
+                onPress={() => setFormData((p) => ({ ...p, wifiAvailable: "yes" }))}
+              >
+                <Text style={[styles.switchText, formData.wifiAvailable === "yes" && styles.switchTextActive]}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.switchBtn, formData.wifiAvailable === "no" && styles.switchBtnActive]}
+                onPress={() => setFormData((p) => ({ ...p, wifiAvailable: "no" }))}
+              >
+                <Text style={[styles.switchText, formData.wifiAvailable === "no" && styles.switchTextActive]}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.amenityRow}>
+            <View style={styles.amenityLeft}>
+              <Ionicons name="flash" size={20} color="#6846bd" />
+              <Text style={styles.amenityLabel}>Electricity Included</Text>
+            </View>
+            <View style={styles.switchRow}>
+              <TouchableOpacity
+                style={[styles.switchBtn, formData.isElectricityIncluded === "yes" && styles.switchBtnActive]}
+                onPress={() => setFormData((p) => ({ ...p, isElectricityIncluded: "yes" }))}
+              >
+                <Text style={[styles.switchText, formData.isElectricityIncluded === "yes" && styles.switchTextActive]}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.switchBtn, formData.isElectricityIncluded === "no" && styles.switchBtnActive]}
+                onPress={() => setFormData((p) => ({ ...p, isElectricityIncluded: "no" }))}
+              >
+                <Text style={[styles.switchText, formData.isElectricityIncluded === "no" && styles.switchTextActive]}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* Security */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Security Features</Text>
+          {securityOptions.map((option) => (
+            <TouchableOpacity
+              key={option.key}
+              style={styles.checkRow}
+              onPress={() => toggleSecurity(option.key)}
+            >
+              <Ionicons
+                name={formData.security[option.key] ? "checkbox" : "square-outline"}
+                size={24}
+                color={formData.security[option.key] ? "#6846bd" : "#9CA3AF"}
+              />
+              <Ionicons name={option.icon} size={18} color="#636E72" style={styles.checkIcon} />
+              <Text style={styles.checkLabel}>{option.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <TouchableOpacity
-          key={key}
-          style={styles.checkboxContainer}
-          onPress={() => toggleSecurity(key)}
+          style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+          onPress={handleSubmit}
+          disabled={isSubmitting}
         >
-          <Ionicons
-            name={formData.security[key] ? "checkbox-outline" : "square-outline"}
-            size={24}
-            color="#6846bd"
-          />
-          <Text style={styles.checkboxLabel}>
-            {key.charAt(0).toUpperCase() +
-              key.slice(1).replace(/([A-Z])/g, " $1")}
-          </Text>
+          <Text style={styles.submitButtonText}>{isSubmitting ? "Submitting..." : "Submit Apartment"}</Text>
+          {!isSubmitting && <Ionicons name="arrow-forward" size={20} color="#fff" />}
         </TouchableOpacity>
-      ))}
-
-      {/* Submit */}
-      <TouchableOpacity
-        style={[styles.submitBtn, isSubmitting && { backgroundColor: "#aaa" }]}
-        onPress={handleSubmit}
-        disabled={isSubmitting}
-      >
-        <Text style={styles.submitText}>
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 15, backgroundColor: "#fff" },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginVertical: 12,
-    color: "#333",
+  container: {
+    flex: 1,
+    backgroundColor: "#F8F9FA",
   },
-  photoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 15,
+  scrollView: {
+    flex: 1,
   },
-  photoUpload: {
-    width: "48%",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: "#f2f2f2",
+  titleSection: {
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 8,
   },
-  photoLabel: {
-    marginTop: 6,
-    fontSize: 13,
-    textAlign: "center",
-    fontWeight: "500",
-    color: "#444",
+  mainTitle: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#2D3436",
+    marginBottom: 4,
   },
-  previewImage: {
-    width: "100%",
-    height: 100,
-    borderRadius: 8,
-    marginTop: 8,
-    resizeMode: "cover",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 8,
-    marginBottom: 10,
-    borderRadius: 5,
-    fontSize: 14,
-  },
-  picker: { marginBottom: 12 },
-  card: {
-    borderWidth: 1,
-    borderColor: "#aaa",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: "#f9f9f9",
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  checkboxLabel: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#444",
-  },
-  addBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  addText: {
-    marginLeft: 6,
-    color: "#6846bd",
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  submitBtn: {
-    backgroundColor: "#6846bd",
-    padding: 14,
-    marginVertical: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  submitText: {
-    color: "#fff",
+  mainSubtitle: {
     fontSize: 16,
+    color: "#636E72",
+    fontWeight: "500",
+  },
+  card: {
+    backgroundColor: "#fff",
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 16,
+    padding: 20,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#2D3436",
+    marginBottom: 16,
+  },
+  photoGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  photoBox: {
+    width: "31%",
+    aspectRatio: 1,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#F8F9FA",
+  },
+  photoImage: {
+    width: "100%",
+    height: "100%",
+  },
+  photoEmpty: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  photoText: {
+    fontSize: 11,
+    color: "#636E72",
     fontWeight: "600",
+    marginTop: 6,
+    textAlign: "center",
+  },
+  photoOverlay: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8F9FA",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 15,
+    color: "#2D3436",
+    fontWeight: "500",
+  },
+  unitBox: {
+    backgroundColor: "#F8F9FA",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  unitHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  unitTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#2D3436",
+    marginLeft: 8,
+  },
+  pickerWrapper: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    marginBottom: 12,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+  },
+  unitInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: "#2D3436",
+    fontWeight: "500",
+    marginBottom: 12,
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E8E3F3",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  addButtonText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#6846bd",
+    marginLeft: 8,
+  },
+  amenityRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F8F9FA",
+  },
+  amenityLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  amenityLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#2D3436",
+    marginLeft: 12,
+  },
+  switchRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  switchBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#F8F9FA",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  switchBtnActive: {
+    backgroundColor: "#6846bd",
+    borderColor: "#6846bd",
+  },
+  switchText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#636E72",
+  },
+  switchTextActive: {
+    color: "#fff",
+  },
+  checkRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  checkIcon: {
+    marginLeft: 12,
+    marginRight: 8,
+  },
+  checkLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#2D3436",
+  },
+  submitButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#6846bd",
+    marginHorizontal: 100,
+    marginVertical: 30,
+     marginBottom: 50,
+    paddingVertical: 18,
+    borderRadius: 16,
+    gap: 10,
+    elevation: 4,
+    shadowColor: "#6846bd",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+  },
+  submitButtonDisabled: {
+    backgroundColor: "#9CA3AF",
+  },
+  submitButtonText: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#fff",
+    letterSpacing: 0.5,
   },
 });
 
