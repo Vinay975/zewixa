@@ -7,6 +7,9 @@ import Host from "./Hostdata/bottomscreen/host";
 import Message from "./Hostdata/bottomscreen/message";
 import Payment from "./Hostdata/bottomscreen/payment";
 import HostProfile from "./Hostdata/bottomscreen/hostprofile";
+import HostDashBoard from "./Hostdata/afterLoginscreens/hostsdashboard";
+import PaymentDashboard from "./Hostdata/afterLoginscreens/paymentdashborad"
+import { AuthContext } from "./userDetails/userAuth";
 
 const Tab = createBottomTabNavigator();
 
@@ -26,6 +29,7 @@ const commonHeaderOptions = {
 };
 
 const HostBottomTab = ({ setIsHost }) => {
+  const { hostInfo } = React.useContext(AuthContext);
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -85,7 +89,7 @@ const HostBottomTab = ({ setIsHost }) => {
       {/* ---------- HOST HOME ---------- */}
       <Tab.Screen
         name="Host"
-        component={Host}
+        component={hostInfo ? HostDashBoard : Host}
         options={{
           ...commonHeaderOptions,
           headerTitle: () => (
@@ -103,7 +107,7 @@ const HostBottomTab = ({ setIsHost }) => {
       {/* ---------- PAYMENT ---------- */}
       <Tab.Screen
         name="Payment"
-        component={Payment}
+        component={hostInfo ? PaymentDashboard : Payment}
       />
 
       {/* ---------- PROFILE ---------- */}
