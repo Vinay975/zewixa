@@ -49,47 +49,91 @@ const Host = () => {
   return (
     <View style={styles.container}>
       <StatusBar hidden />
-      {/* ✅ CUSTOM HEADER */}
-      <View style={styles.header}>
-        <Ionicons name="business" size={46} color="#6846bd" />
-        <Text style={styles.brandText}>Habita</Text>
-        <Text style={styles.tagline}>Your Property, Your Income</Text>
-      </View>
 
       {/* CONTENT */}
       <View style={styles.content}>
-        <Text style={styles.title}>Become a Host</Text>
-        <Text style={styles.subtitle}>
-          List your hostel or apartment and connect with tenants easily.
-        </Text>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <View style={styles.iconContainer}>
+            <Ionicons name="home" size={48} color="#6846bd" />
+          </View>
+          <Text style={styles.title}>Become a Host</Text>
+          <Text style={styles.subtitle}>
+            List your property and start earning today
+          </Text>
+        </View>
 
-        {/* CTA */}
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.9}
-            onPress={handleStartHosting}
-          >
-            <Ionicons name="add-circle" size={24} color="#fff" />
-            <Text style={styles.buttonText}>List Your Property</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        {/* Benefits Cards */}
+        <View style={styles.benefitsContainer}>
+          <View style={styles.benefitCard}>
+            <View style={styles.benefitIcon}>
+              <Ionicons name="cash-outline" size={28} color="#6846bd" />
+            </View>
+            <Text style={styles.benefitTitle}>Earn Income</Text>
+          </View>
+          
+          <View style={styles.benefitCard}>
+            <View style={styles.benefitIcon}>
+              <Ionicons name="people-outline" size={28} color="#6846bd" />
+            </View>
+            <Text style={styles.benefitTitle}>Find Tenants</Text>
+          </View>
+          
+          <View style={styles.benefitCard}>
+            <View style={styles.benefitIcon}>
+              <Ionicons name="shield-checkmark-outline" size={28} color="#6846bd" />
+            </View>
+            <Text style={styles.benefitTitle}>Secure Platform</Text>
+          </View>
+        </View>
 
-        {/* VIDEO */}
+        {/* CTA Button */}
+        <TouchableOpacity
+          style={styles.button}
+          activeOpacity={0.9}
+          onPress={handleStartHosting}
+        >
+          <Ionicons name="add-circle" size={24} color="#fff" />
+          <Text style={styles.buttonText}>List Your Property</Text>
+        </TouchableOpacity>
+
+        {/* Tutorial Link */}
         <TouchableOpacity
           style={styles.videoButton}
           onPress={() => setModalVisible(true)}
         >
-          <Ionicons name="play-circle" size={24} color="#6846bd" />
+          <Ionicons name="play-circle-outline" size={22} color="#6846bd" />
           <Text style={styles.videoText}>Watch Tutorial</Text>
         </TouchableOpacity>
+
+        {/* Workflow Icons */}
+        <View style={styles.workflowContainer}>
+          <View style={styles.workflowIcon}>
+            <Ionicons name="create-outline" size={32} color="#6846bd" />
+          </View>
+          <Ionicons name="arrow-forward" size={24} color="#9CA3AF" />
+          <View style={styles.workflowIcon}>
+            <Ionicons name="people-outline" size={32} color="#6846bd" />
+          </View>
+          <Ionicons name="arrow-forward" size={24} color="#9CA3AF" />
+          <View style={styles.workflowIcon}>
+            <Ionicons name="wallet-outline" size={32} color="#6846bd" />
+          </View>
+          <Ionicons name="arrow-forward" size={24} color="#9CA3AF" />
+          <View style={styles.workflowIcon}>
+            <Ionicons name="checkmark-circle" size={32} color="#10B981" />
+          </View>
+        </View>
       </View>
 
       {/* MODAL */}
       <Modal transparent visible={modalVisible} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Choose Language</Text>
+            <View style={styles.modalHeader}>
+              <Ionicons name="videocam" size={32} color="#6846bd" />
+              <Text style={styles.modalTitle}>Choose Tutorial Language</Text>
+            </View>
 
             {["Telugu", "Hindi", "English"].map((lang) => (
               <TouchableOpacity
@@ -97,7 +141,9 @@ const Host = () => {
                 style={styles.langOption}
                 onPress={() => openVideo(lang)}
               >
+                <Ionicons name="play" size={20} color="#6846bd" />
                 <Text style={styles.langText}>{lang}</Text>
+                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
               </TouchableOpacity>
             ))}
 
@@ -120,120 +166,185 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F9FAFB",
   },
-
-  header: {
-    backgroundColor: "#FFFFFF",
-    paddingTop: 12,
-    paddingBottom: 24,
-    alignItems: "center",
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    elevation: 4,
-  },
-
-  brandText: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: "#6846bd",
-    marginTop: 8,
-  },
-
-  tagline: {
-    fontSize: 15,
-    color: "#6B7280",
-  },
-
   content: {
     flex: 1,
-    padding: 24,
+    padding: 20,
   },
-
+  headerSection: {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 32,
+  },
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#F3F0FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "700",
+    color: "#1F2937",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 8,
   },
-
   subtitle: {
     fontSize: 15,
     color: "#6B7280",
     textAlign: "center",
-    marginBottom: 40,
   },
+  benefitsContainer: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginBottom: 32,
+},
 
+ benefitCard: {
+  width: "30%",
+  backgroundColor: "#FFFFFF",
+  paddingVertical: 20,
+  paddingHorizontal: 10,
+  borderRadius: 16,
+  alignItems: "center",
+
+  elevation: 2,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 8,
+},
+benefitIcon: {
+  width: 48,
+  height: 48,
+  borderRadius: 24,
+  backgroundColor: "#F3F0FF",
+  alignItems: "center",
+  justifyContent: "center",
+  marginBottom: 8,
+},
+
+ benefitTitle: {
+  fontSize: 14,
+  fontWeight: "700",
+  color: "#1F2937",
+  textAlign: "center",
+},
+
+  benefitText: {
+    fontSize: 14,
+    color: "#6B7280",
+    lineHeight: 20,
+  },
   button: {
     flexDirection: "row",
     backgroundColor: "#6846bd",
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
+    elevation: 4,
+    shadowColor: "#6846bd",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
-
   buttonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "700",
   },
-
   videoButton: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
-    gap: 6,
+    marginTop: 16,
+    marginBottom: 32,
+    paddingVertical: 12,
+    gap: 8,
   },
-
   videoText: {
     color: "#6846bd",
     fontSize: 16,
     fontWeight: "600",
   },
-
+  workflowContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    borderRadius: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    gap: 12,
+  },
+  workflowIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#F3F0FF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
   },
-
   modalContainer: {
-    backgroundColor: "#fff",
-    width: "80%",
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: "#FFFFFF",
+    width: "85%",
+    borderRadius: 20,
+    padding: 24,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
   },
-
+  modalHeader: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700",
-    marginBottom: 16,
-    textAlign: "center",
+    marginTop: 12,
+    color: "#1F2937",
   },
-
   langOption: {
-    padding: 14,
-    backgroundColor: "#F3F4F6",
-    borderRadius: 10,
-    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    marginBottom: 12,
+    gap: 12,
   },
-
   langText: {
-    textAlign: "center",
+    flex: 1,
     fontSize: 16,
+    color: "#1F2937",
     fontWeight: "600",
   },
-
   closeBtn: {
-    marginTop: 10,
-    padding: 12,
+    backgroundColor: "#F3F4F6",
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: "center",
   },
-
   closeBtnText: {
     color: "#6846bd",
     fontWeight: "700",
+    fontSize: 16,
   },
 });
