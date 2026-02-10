@@ -50,50 +50,53 @@ const HostProfile = ({ navigation, setIsHost }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
+      <StatusBar backgroundColor="#6846bd" barStyle="light-content" />
       
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Host Profile</Text>
-      </View>
+      {/* Unique Header with Profile */}
+      <View style={styles.headerContainer}>
+        <View style={styles.headerBackground}>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.greeting}>Welcome Back</Text>
+              <Text style={styles.headerTitle}>{hostInfo?.username || "Guest"}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.logoutBtn}
+              onPress={
+                hostInfo ? signOutHost : () => navigation.navigate("HostSignIn")
+              }
+              activeOpacity={0.8}
+            >
+              <Ionicons name={hostInfo ? "log-out-outline" : "log-in-outline"} size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Profile Card */}
-        <View style={styles.profileCard}>
-          <TouchableOpacity
-            style={styles.logoutBtn}
-            onPress={
-              hostInfo ? signOutHost : () => navigation.navigate("HostSignIn")
-            }
-            activeOpacity={0.8}
-          >
-            <Ionicons name={hostInfo ? "log-out" : "log-in"} size={20} color="#FF4757" />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+        {/* Profile Card Overlapping Header */}
+        <View style={styles.profileCardOverlay}>
+          <TouchableOpacity onPress={pickImage} activeOpacity={0.8} style={styles.profileImageWrapper}>
             {hostImage === "please select image" ? (
               <View style={styles.initialCircle}>
                 <Text style={styles.initialText}>
                   {hostInfo?.username?.charAt(0)?.toUpperCase() || "H"}
                 </Text>
                 <View style={styles.editBadge}>
-                  <Ionicons name="camera" size={16} color="#FFFFFF" />
+                  <Ionicons name="camera" size={14} color="#FFFFFF" />
                 </View>
               </View>
             ) : (
               <View style={styles.imageContainer}>
                 <Image source={{ uri: hostImage }} style={styles.profileImage} />
                 <View style={styles.editBadge}>
-                  <Ionicons name="camera" size={16} color="#FFFFFF" />
+                  <Ionicons name="camera" size={14} color="#FFFFFF" />
                 </View>
               </View>
             )}
           </TouchableOpacity>
 
-          <View style={styles.profileDetails}>
-            <Text style={styles.name}>{hostInfo?.username || "Guest"}</Text>
+          <View style={styles.profileInfo}>
             <View style={styles.roleBadge}>
-              <Ionicons name="shield-checkmark" size={14} color="#6846bd" />
+              <Ionicons name="shield-checkmark" size={12} color="#6846bd" />
               <Text style={styles.roleText}>
                 {hostInfo?.email ? "Host" : isVisitor ? "Visitor" : "Host"}
               </Text>
@@ -103,33 +106,100 @@ const HostProfile = ({ navigation, setIsHost }) => {
             )}
           </View>
         </View>
+      </View>
 
-        {/* Options Section */}
-        {hostInfo && (
-          <View style={styles.optionsCard}>
-            <TouchableOpacity
-              style={styles.optionRow}
-              onPress={() => navigation.navigate("EditPlace")}
-              activeOpacity={0.7}
-            >
-              <View style={styles.optionIconCircle}>
-                <Ionicons name="create" size={22} color="#6846bd" />
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+        {/* Stats Cards */}
+        <View style={styles.statsRow}>
+          <View style={styles.statCard}>
+            <View style={styles.statIconBox}>
+              <Ionicons name="home" size={20} color="#6846bd" />
+            </View>
+            <Text style={styles.statValue}>3</Text>
+            <Text style={styles.statLabel}>Properties</Text>
+          </View>
+          <View style={styles.statCard}>
+            <View style={styles.statIconBox}>
+              <Ionicons name="people" size={20} color="#10B981" />
+            </View>
+            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statLabel}>Tenants</Text>
+          </View>
+          <View style={styles.statCard}>
+            <View style={styles.statIconBox}>
+              <Ionicons name="cash" size={20} color="#F59E0B" />
+            </View>
+            <Text style={styles.statValue}>₹24K</Text>
+            <Text style={styles.statLabel}>Revenue</Text>
+          </View>
+        </View>
+
+        {/* Menu Options */}
+        <View style={styles.menuSection}>
+          <Text style={styles.sectionTitle}>ACCOUNT</Text>
+          
+          <View style={styles.menuCard}>
+            <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+              <View style={styles.menuIconBox}>
+                <Ionicons name="person-outline" size={20} color="#6846bd" />
               </View>
-              <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Manage Properties</Text>
-                <Text style={styles.optionSubtitle}>Edit or update your listings</Text>
+              <Text style={styles.menuText}>Edit Profile</Text>
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+
+            <View style={styles.menuDivider} />
+
+            <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+              <View style={styles.menuIconBox}>
+                <Ionicons name="notifications-outline" size={20} color="#6846bd" />
               </View>
-              <Ionicons name="chevron-forward" size={22} color="#9CA3AF" />
+              <Text style={styles.menuText}>Notifications</Text>
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+
+            <View style={styles.menuDivider} />
+
+            <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+              <View style={styles.menuIconBox}>
+                <Ionicons name="lock-closed-outline" size={20} color="#6846bd" />
+              </View>
+              <Text style={styles.menuText}>Privacy & Security</Text>
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
             </TouchableOpacity>
           </View>
-        )}
+        </View>
+
+        <View style={styles.menuSection}>
+          <Text style={styles.sectionTitle}>SUPPORT</Text>
+          
+          <View style={styles.menuCard}>
+            <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+              <View style={styles.menuIconBox}>
+                <Ionicons name="help-circle-outline" size={20} color="#6846bd" />
+              </View>
+              <Text style={styles.menuText}>Help Center</Text>
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+
+            <View style={styles.menuDivider} />
+
+            <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+              <View style={styles.menuIconBox}>
+                <Ionicons name="information-circle-outline" size={20} color="#6846bd" />
+              </View>
+              <Text style={styles.menuText}>About</Text>
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          </View>
+        </View>
       </ScrollView>
 
       {/* Fixed Switch Button */}
       <View style={styles.fixedSwitch}>
         <TouchableOpacity onPress={handleToggleSwitch} activeOpacity={0.9}>
           <View style={styles.switchButton}>
-            <Ionicons name="swap-horizontal" size={24} color="white" />
+            <Ionicons name="swap-horizontal" size={20} color="white" />
             <Text style={styles.switchText}>
               {isVisitor ? "Switch to Host Mode" : "Switch to User Mode"}
             </Text>
@@ -145,63 +215,88 @@ export default HostProfile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#F8F9FA",
   },
-  header: {
-   paddingTop: 36,
-    paddingBottom: 20,
-    paddingHorizontal: 24,
+  headerContainer: {
+    marginBottom: 40,
+  },
+  headerBackground: {
+    backgroundColor: "#6846bd",
+    paddingTop: 50,
+    paddingBottom: 80,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  greeting: {
+    fontSize: 14,
+    color: "rgba(255,255,255,0.8)",
+    fontWeight: "500",
+    marginBottom: 4,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "500",
-    color: "#1F2937",
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 100,
-  },
-  profileCard: {
-    position: "relative",
-    backgroundColor: "#FFFFFF",
-    padding: 30,
-    borderRadius: 20,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    marginBottom: 20,
-    alignItems: "center",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#fff",
   },
   logoutBtn: {
-    position: "absolute",
-    top: 16,
-    right: 16,
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profileCardOverlay: {
+    backgroundColor: "#fff",
+    marginHorizontal: 20,
+    marginTop: -50,
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+  },
+  profileImageWrapper: {
+    marginRight: 16,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 100,
   },
   imageContainer: {
     position: "relative",
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 3,
     borderColor: "#6846bd",
   },
   initialCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: "#6846bd",
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
   },
   initialText: {
-    fontSize: 48,
+    fontSize: 32,
     color: "white",
     fontWeight: "700",
   },
@@ -210,9 +305,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     backgroundColor: "#6846bd",
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
@@ -220,75 +315,120 @@ const styles = StyleSheet.create({
   },
   profileDetails: {
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 16,
   },
   name: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: 8,
+    color: "#2D3436",
+    marginBottom: 6,
   },
   roleBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F0FF",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    backgroundColor: "#E8E3F3",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
     gap: 4,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   roleText: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#6846bd",
     fontWeight: "600",
   },
   email: {
-    fontSize: 14,
-    color: "#6B7280",
+    fontSize: 13,
+    color: "#636E72",
   },
-  optionsCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 4,
+  statsRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 20,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 14,
+    alignItems: "center",
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
   },
-  optionRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-  },
-  optionIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#F3F0FF",
+  statIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F8F9FA",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 16,
+    marginBottom: 8,
   },
-  optionContent: {
-    flex: 1,
-  },
-  optionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1F2937",
+  statValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#2D3436",
     marginBottom: 2,
   },
-  optionSubtitle: {
-    fontSize: 13,
-    color: "#6B7280",
+  statLabel: {
+    fontSize: 11,
+    color: "#636E72",
+    fontWeight: "500",
+  },
+  menuSection: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#636E72",
+    letterSpacing: 1,
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  menuCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 14,
+  },
+  menuIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#F8F9FA",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  menuText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#2D3436",
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: "#F8F9FA",
+    marginHorizontal: 14,
   },
   fixedSwitch: {
     position: "absolute",
     bottom: 20,
-    left: 20,
-    right: 20,
+    left: 16,
+    right: 16,
   },
   switchButton: {
     flexDirection: "row",
@@ -303,11 +443,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    gap: 10,
+    gap: 8,
   },
   switchText: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
   },
 });
