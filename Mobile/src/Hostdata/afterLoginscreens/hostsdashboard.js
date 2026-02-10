@@ -96,7 +96,7 @@ const HostDashBoard = () => {
 
           <TouchableOpacity 
             style={styles.actionCard}
-            onPress={() => navigation.navigate("EditYourPlace")}
+            onPress={() => navigation.navigate("EditPlace")}
             activeOpacity={0.8}
           >
             <View style={[styles.actionIcon, { backgroundColor: '#FEF3C7' }]}>
@@ -107,6 +107,7 @@ const HostDashBoard = () => {
 
           <TouchableOpacity 
             style={styles.actionCard}
+             onPress={() => navigation.navigate("ViewTenants")}
             activeOpacity={0.8}
           >
             <View style={[styles.actionIcon, { backgroundColor: '#D1FAE5' }]}>
@@ -117,6 +118,7 @@ const HostDashBoard = () => {
 
           <TouchableOpacity 
             style={styles.actionCard}
+             onPress={() => navigation.navigate("Analytics")}
             activeOpacity={0.8}
           >
             <View style={[styles.actionIcon, { backgroundColor: '#DBEAFE' }]}>
