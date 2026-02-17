@@ -1,6 +1,6 @@
 const crypto = require("crypto");
-const cloudinary = require("../cloudinaryConfig");
-const ImageCache = require("../image/imageCacheModel");
+const cloudinary = require("../config/cloudinary");
+const ImageCache = require("../models/imageCache.model");
 
 const uploadImageWithCache = async (file, folder) => {
   const fileHash = crypto.createHash("md5").update(file.buffer).digest("hex");
@@ -9,6 +9,7 @@ const uploadImageWithCache = async (file, folder) => {
   let cachedImage = await ImageCache.findOne({ hash: fileHash });
 
   if (cachedImage) {
+    console.log(`✅ Using cached image: ${fileHash}`);
     return cachedImage.cloudinaryUrl;
   }
 
@@ -25,6 +26,7 @@ const uploadImageWithCache = async (file, folder) => {
     folder,
   }).save();
 
+  console.log(`✅ Uploaded new image to Cloudinary: ${result.secure_url}`);
   return result.secure_url;
 };
 

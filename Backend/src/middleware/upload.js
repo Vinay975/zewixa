@@ -1,6 +1,6 @@
 const multer = require("multer");
 
-// Use memory storage instead of disk storage
+// Use memory storage for file uploads
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
@@ -11,6 +11,10 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage: storage, fileFilter: fileFilter });
+const upload = multer({ 
+  storage: storage, 
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
 
 module.exports = upload;

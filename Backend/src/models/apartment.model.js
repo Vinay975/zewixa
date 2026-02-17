@@ -8,7 +8,6 @@ const apartmentSchema = new mongoose.Schema({
     mobile2: String,
     profileImage: String,
   },
-
   photos: {
     building: String,
     livingRoom: String,
@@ -17,21 +16,17 @@ const apartmentSchema = new mongoose.Schema({
     bathroom: String,
     balcony: String,
   },
-
-  location: String, // Simple location string from the form
-
+  location: String,
   wifiAvailable: {
     type: String,
     enum: ["yes", "no"],
     default: "no",
   },
-
   isElectricityIncluded: {
     type: String,
     enum: ["yes", "no"],
     default: "no",
   },
-
   bhkUnits: [
     {
       apartmentType: {
@@ -44,14 +39,12 @@ const apartmentSchema = new mongoose.Schema({
       maintenanceCharges: String,
     }
   ],
-
   security: {
     cctv: Boolean,
     securityGuards: Boolean,
     gatedCommunity: Boolean,
     fireSafety: Boolean,
   },
-
 }, { timestamps: true });
 
 module.exports = mongoose.model("Apartment", apartmentSchema);
